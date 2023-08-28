@@ -35,10 +35,8 @@ const UserSchema = new Schema(
       default: [],
     },
     occupation: String,
-    viewedProfile: Number,
-    impressions: Number,
   },
   { timestamps: true }
 );
-const Uesr = model("Uesr", UserSchema);
+const User = model("Users", UserSchema);
 export default User;

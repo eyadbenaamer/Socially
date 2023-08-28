@@ -1,0 +1,86 @@
+#abbaa 64ebf7905a8b56b95781f4fc
+#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWJmNzkwNWE4YjU2Yjk1NzgxZjRmYyIsImlhdCI6MTY5MzE4NTk2NX0.ykEZ-U7jETbftMR_8wQC18MqIXonOZuGgRWViDBrKvw
+#aaa 64ebf7a45a8b56b95781f4ff
+#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWJmN2E0NWE4YjU2Yjk1NzgxZjRmZiIsImlhdCI6MTY5MzE4NjAwMn0.jhj1mkj0QLw8dyGnjGEeAcKirFuHZ2b-bGXTiAdG7rQ
+#bbb  64ebf7a95a8b56b95781f502
+#eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWJmN2E5NWE4YjU2Yjk1NzgxZjUwMiIsImlhdCI6MTY5MzE4NjA0NX0.OcFkFEvzMBjnhrfo1DFtkk4L2s8Sfb5010YgFg_d-yU
+POST http://localhost:3001/register/
+Content-Type: application/json
+
+
+{
+  "firstName":"eyad",
+  "lastName":"binamir",
+    "email":"bbb@email.com",
+    "password":"1234",
+    "picturePath":"kdmsfkedcfe",
+    "friends":[],
+    "location":"kdpf",
+    "occupation":"dfpf"
+}
+
+###
+POST http://localhost:3001/login/
+Content-Type: application/json
+
+{
+  "email":"bbb@email.com",
+  "password":"1234"
+}
+
+###
+###ddd
+GET http://localhost:3001/posts
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTY0NTE0MTlkYTE1NGJhOTYwOTNjYyIsImlhdCI6MTY5Mjg4NzcwOX0.OgqRRnqQ23bkJzTzi3zVJ9-xSSWkN3lblVTLnsJ74pA
+###
+GET http://localhost:3001/posts/64e7a69dfd061d6044ef435e
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTY0NTE0MTlkYTE1NGJhOTYwOTNjYyIsImlhdCI6MTY5Mjg4NzcwOX0.OgqRRnqQ23bkJzTzi3zVJ9-xSSWkN3lblVTLnsJ74pA
+###
+POST http://localhost:3001/posts/create_post
+Content-Type: application/json
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWJmN2E5NWE4YjU2Yjk1NzgxZjUwMiIsImlhdCI6MTY5MzE4NjA0NX0.OcFkFEvzMBjnhrfo1DFtkk4L2s8Sfb5010YgFg_d-yU
+
+{ "description":"random description", "picturePath":"gsders","location":"benghazi" }
+###
+PATCH  http://localhost:3001/posts/edit_post/64ebf8205a8b56b95781f507
+Content-Type: application/json
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWFiMmRjYzRiYWIyNmRmYWFiMjQ0MSIsImlhdCI6MTY5MzEwMjgxOH0.QXyPccrMFYXsfdDThBea9L5KF4psQ70aZgnmNbEAAoQ
+
+{ "description":"hi", "picturePath":"gsders","location":"benghazi" }
+###
+PATCH  http://localhost:3001/posts/add_comment/64ebf8205a8b56b95781f507
+Content-Type: application/json
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWJmN2E0NWE4YjU2Yjk1NzgxZjRmZiIsImlhdCI6MTY5MzE4NjAwMn0.jhj1mkj0QLw8dyGnjGEeAcKirFuHZ2b-bGXTiAdG7rQ
+
+{ "comment":"hhh"}
+###
+PATCH  http://localhost:3001/posts/like_comment/64eab67712acb3c6c23cb870/64eb4197184b8eac3e15fbe6
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWFiMmRjYzRiYWIyNmRmYWFiMjQ0MSIsImlhdCI6MTY5MzEwMjgxOH0.QXyPccrMFYXsfdDThBea9L5KF4psQ70aZgnmNbEAAoQ
+
+
+###
+###eyad
+
+PATCH  http://localhost:3001/users/64e7a69dfd061d6044ef435e/64e6451419da154ba96093cc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTdhNjlkZmQwNjFkNjA0NGVmNDM1ZSIsImlhdCI6MTY5MjkwMzM3OH0.-2V30S1ySCpcISU5KnS8EFd0H59GBaEqYXR4ucwVrkc
+
+###eyad
+
+GET  http://localhost:3001/users/64e6451419da154ba96093cc/friends
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTdhNjlkZmQwNjFkNjA0NGVmNDM1ZSIsImlhdCI6MTY5MjkwNTA5MX0._glDkuVfZtA3ar4Vy_UsMfRYUZWpA1fvtGrARSBuOA0
+
+###
+GET http://localhost:3001/posts/64eab67712acb3c6c23cb870/64eb4197184b8eac3e15fbe6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTdhNjlkZmQwNjFkNjA0NGVmNDM1ZSIsImlhdCI6MTY5MjkwNTA5MX0._glDkuVfZtA3ar4Vy_UsMfRYUZWpA1fvtGrARSBuOA0
+###
+GET http://localhost:3001/posts/reaction_details/64eab67712acb3c6c23cb870
+
+###
+PATCH http://localhost:3001/posts/like_post/64e8ee97b63b9c437b2cf067
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTdhNjlkZmQwNjFkNjA0NGVmNDM1ZSIsImlhdCI6MTY5MjkwNTA5MX0._glDkuVfZtA3ar4Vy_UsMfRYUZWpA1fvtGrARSBuOA0
+###
+DELETE  http://localhost:3001/posts/delete/64e8ec0bd8dde757f40c8ed5
+
+###
+PATCH http://localhost:3001/posts/delete_comment/64ebf8205a8b56b95781f507/64ec0c0f91342f896f968d89
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZWJmNzkwNWE4YjU2Yjk1NzgxZjRmYyIsImlhdCI6MTY5MzE4NTk2NX0.ykEZ-U7jETbftMR_8wQC18MqIXonOZuGgRWViDBrKvw
