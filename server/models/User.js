@@ -30,10 +30,15 @@ const UserSchema = new Schema(
       type: String,
       default: "",
     },
-    friends: {
+    followers: {
       type: Array,
       default: [],
     },
+    following: {
+      type: Array,
+      default: [],
+    },
+    location: String,
     occupation: String,
   },
   { timestamps: true }

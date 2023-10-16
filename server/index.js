@@ -13,11 +13,11 @@ import authRoute from "./routes/auth.js";
 import usersRoute from "./routes/users.js";
 import postsRoute from "./routes/posts.js";
 
-import { register } from "./controllers/auth.js";
+import { signup } from "./controllers/auth.js";
 
 import { createPost, getFeedPosts } from "./controllers/posts.js";
-// import MongoStore from "connect-mongo";
-// import session from "express-session";
+import cookieParser from "cookie-parser";
+import { verifyToken } from "./middleware/auth.js";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -29,39 +29,33 @@ app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("short"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
-// app.use(
-//   session({
-//     cookie: { secure: true, httpOnly: false },
-//     name: "sid",
-//     store: MongoStore.create({
-//       mongoUrl: process.env.DATABASE_URL,
-//     }),
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-//   })
-// );
+// app.use(cookieParser(process.env.JWT_SECRET));
 /*FILE STORAGE*/
 const storage = multer.diskStorage({
-  destination: function (req, res, cb) {
+  destination: function (req, file, cb) {
     cb(null, "public/assets");
   },
-  filename: function (req, res, cb) {
-    cb(null, file.originalName);
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
   },
 });
 const upload = multer({ storage });
-
 /*ROUTES WITH FILES*/
-app.post("/auth/register", upload.single("picture"), register);
-app.post("/posts/create_post", upload.single("picture"), createPost);
+app.post("/signup", upload.single("picture"), signup);
+app.post(
+  "/posts/create_post",
+  verifyToken,
+  upload.single("picture"),
+  createPost
+);
 
 /*ROUTES*/
 app.use("/", authRoute);
 app.use("/home", getFeedPosts);
-app.use("/users", usersRoute);
+app.use("/user", usersRoute);
 app.use("/posts", postsRoute);
 /*MONGOOSE SETUP*/
 const PORT = process.env.PORT || 3001;

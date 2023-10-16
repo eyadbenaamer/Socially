@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,700;1,300&display=swap");
+html,
+boby,
+#root,
+.app {
+  height: 100%;
+  width: 100%;
+  font-family: "Open Sans", sans-serif;
+}
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #899dfc;
+  --background-dark-100: #171923;
+  --background-dark-200: #212330;
+  --background-dark-300: #2a2d3d;
+  --background-dark-alt: #303343;
+  --background-light-100: #f4f5f9;
+  --background-light-200: #ffffff;
+  --background-light-300: #fafbff;
+  --background-light-alt: #eaedfb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.box {
+  border-radius: 4px;
+  padding: 4px;
+  margin: 4px;
+}
+.image-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border-style: solid;
+  border-width: 2px;
+  overflow: hidden;
+}
+.image-circle img {
+  max-width: 100%;
+}
+
+.circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+}

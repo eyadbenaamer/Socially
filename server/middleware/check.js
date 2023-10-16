@@ -1,8 +1,13 @@
-export const isPropperId = async (req, res, next) => {
+export const verifyId = async (req, res, next) => {
   try {
-    const { userId, postId, commentId } = req.params;
+    const { userId, postId, commentId, accountId, replyId } = req.params;
     if (userId) {
       if (userId.length != 24) {
+        return res.status(400).send("invalid ID");
+      }
+    }
+    if (accountId) {
+      if (accountId.length != 24) {
         return res.status(400).send("invalid ID");
       }
     }
@@ -11,11 +16,17 @@ export const isPropperId = async (req, res, next) => {
         return res.status(400).send("invalid ID");
       }
     }
+    if (replyId) {
+      if (replyId.length != 24) {
+        return res.status(400).send("invalid ID");
+      }
+    }
     if (commentId) {
       if (commentId.length != 24) {
         return res.status(400).send("invalid ID");
       }
     }
+
     next();
   } catch (error) {
     return res.status(500).json({ error: error.message });

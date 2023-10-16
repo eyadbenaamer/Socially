@@ -9,9 +9,14 @@ export const verifyToken = async (req, res, next) => {
     if (token.startsWith("Bearer ")) {
       token = token.slice(7).trimStart();
     }
-    const userInfo = jwt.verify(token, process.env.TOKEN);
-    req.user = userInfo;
-    next();
+    const userInfo = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(userInfo.id);
+    if (user) {
+      req.user = user;
+      next();
+    } else {
+      return res.status(403).json("invalid token or user doesn't exist");
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
