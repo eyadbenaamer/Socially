@@ -14,7 +14,7 @@ export const useTheme = () => {
           alt: "#303343",
         },
       };
-    } else if (mode === "light" || !mode) {
+    } else if (mode === "light") {
       return {
         primaryColor: "#4361ee",
         secondaryColor: "#899dfc",

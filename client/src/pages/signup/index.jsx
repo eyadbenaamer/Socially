@@ -12,7 +12,7 @@ const Signup = () => {
   return (
     <>
       <div>
-        <h2 className="">hello</h2>
+        <h2>hello</h2>
         <Form />
         <button
           onClick={async () => {
