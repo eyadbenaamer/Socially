@@ -1,5 +1,7 @@
 import { Schema, model, Types } from "mongoose";
-const ObjectId = Types.ObjectId;
+import { CommentSchema } from "./comment.js";
+
+// const ObjectId = Types.ObjectId;
 const PostSchema = new Schema(
   {
     userId: {
@@ -14,21 +16,40 @@ const PostSchema = new Schema(
       default: [],
     },
     comments: [
-      {
-        _id: {
-          type: ObjectId,
-          default: new ObjectId(),
-        },
-        userId: String,
-        body: {
-          type: String,
-          required: true,
-        },
-        likes: {
-          type: Array,
-          default: [],
-        },
-      },
+      CommentSchema,
+      // {
+      //   _id: {
+      //     type: ObjectId,
+      //     default: new ObjectId(),
+      //   },
+      //   userId: String,
+      //   content: {
+      //     type: String,
+      //     required: true,
+      //   },
+      //   likes: {
+      //     type: Array,
+      //     default: [],
+      //   },
+      //   replies: [
+      //     {
+      //       _id: {
+      //         type: ObjectId,
+      //         default: new ObjectId(),
+      //       },
+      //       userId: String,
+      //       rootCommentId: String,
+      //       content: {
+      //         type: String,
+      //         required: true,
+      //       },
+      //       likes: {
+      //         type: Array,
+      //         default: [],
+      //       },
+      //     },
+      //   ],
+      // },
     ],
   },
   { timestamps: true }

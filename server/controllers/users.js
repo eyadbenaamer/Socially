@@ -15,29 +15,29 @@ export const getUser = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-export const getUserFriends = async (req, res) => {
+export const getFollowers = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
-    const friends = await Promise.all(
-      user.friends.map((id) => User.findById(id))
-    );
-    if (friends) {
-      const formattedFriends = friends.map(
-        ({ _id, firstName, lastName, occupation, location, picturePath }) => {
-          return {
-            _id,
-            firstName,
-            lastName,
-            occupation,
-            location,
-            picturePath,
-          };
-        }
-      );
-      return res.status(200).json(formattedFriends);
+    const followers = user.followers;
+    if (followers) {
+      return res.status(200).json(followers);
     } else {
-      return res.status(404).json({ error: "No friends found" });
+      return res.status(404).json({ error: "No followers found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+export const getFollowing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    const following = user.following;
+    if (following) {
+      return res.status(200).json(following);
+    } else {
+      return res.status(404).json({ error: "No following found" });
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -45,40 +45,77 @@ export const getUserFriends = async (req, res) => {
 };
 /*UPDATE*/
 
-export const addRemoveFriend = async (req, res) => {
+export const follow = async (req, res) => {
   try {
-    const { id, friendId } = req.params;
+    const { id } = req.user;
+    const { accountId } = req.params;
+    if (id == accountId) {
+      return res.status(409).json({ error: "cannot follow yourself" });
+    }
     const user = await User.findById(id);
-    const friend = await User.findById(friendId);
-    if (user && friend) {
-      if (user.friends.includes(friendId)) {
-        //this removes a friend with specified id(friendId) from the user's friends array
-        user.friends = user.friends.filter((id) => id !== friendId);
-        //this removes a user with specified id(id) from the friend's friends array
-        friend.friends = friend.friends.filter((id) => id !== id);
+    const account = await User.findById(accountId);
+    if (user && account) {
+      if (user.following.includes(accountId)) {
+        return res.status(409).json({ error: "already followed" });
       } else {
-        //otherwise the friend will be added to the user's friend's array and the opposite
-        user.friends.push(friendId);
-        friend.friends.push(id);
+        user.following.push(accountId);
+        account.followers.push(id);
       }
       await user.save();
-      await friend.save();
-      const friends = await Promise.all(
-        user.friends.map((id) => User.findById(id))
-      );
-      const formattedFriends = friends.map(
-        ({ _id, firstName, lastName, occupation, location, picturePath }) => {
-          return {
-            _id,
-            firstName,
-            lastName,
-            occupation,
-            location,
-            picturePath,
-          };
-        }
-      );
-      return res.status(200).json(formattedFriends);
+      await account.save();
+      return res.status(200).json(user.following);
+    } else {
+      return res.status(400).send("bad request");
+    }
+  } catch (error) {
+    return res.status(404).json({ error: error.message });
+  }
+};
+export const unFollow = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { accountId } = req.params;
+    if (id == accountId) {
+      return res.status(409).json({ error: "cannot unfollow yourself" });
+    }
+    const user = await User.findById(id);
+    const account = await User.findById(accountId);
+    if (user && account) {
+      if (user.following.includes(accountId)) {
+        user.following = user.following.filter((item) => item != accountId);
+        account.followers = account.followers.filter((item) => item != id);
+      } else {
+        return res.status(409).json({ error: "not followed" });
+      }
+      await user.save();
+      await account.save();
+      return res.status(200).json(user.following);
+    } else {
+      return res.status(400).send("bad request");
+    }
+  } catch (error) {
+    return res.status(404).json({ error: error.message });
+  }
+};
+export const removeFollower = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { accountId } = req.params;
+    if (id == accountId) {
+      return res.status(409).json({ error: "not applicable" });
+    }
+    const user = await User.findById(id);
+    const account = await User.findById(accountId);
+    if (user && account) {
+      if (user.followers.includes(accountId)) {
+        user.followers = user.followers.filter((item) => item != accountId);
+        account.following = account.following.filter((item) => item != id);
+      } else {
+        return res.status(409).json({ error: "not following" });
+      }
+      await user.save();
+      await account.save();
+      return res.status(200).json(user.followers);
     } else {
       return res.status(400).send("bad request");
     }

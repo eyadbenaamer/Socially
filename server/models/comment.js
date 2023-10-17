@@ -1,14 +1,17 @@
 import { Schema, model } from "mongoose";
-const CommentSchema = new Schema({
-  userId: String,
-  body: {
-    type: String,
-    required: true,
+import { ReplySchema } from "./reply.js";
+export const CommentSchema = new Schema(
+  {
+    userId: String,
+    content: {
+      type: String,
+      required: true,
+    },
+    likes: [],
+
+    replies: [ReplySchema],
   },
-  likes: {
-    type: Array,
-    default: [],
-  },
-});
+  { timestamps: true }
+);
 const Comment = model("comment", CommentSchema);
 export default Comment;
