@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
+
 const initialState = {
-  settings: { mode:"light"},
+  settings: { mode: "light" },
   posts: [],
   user: null,
   token: null,
@@ -12,7 +13,7 @@ export const slice = createSlice({
     setSettings: (state, action) => {
       state.settings = {
         ...state.settings,
-        [action.payload.property]:action.payload.value
+        [action.payload.property]: action.payload.value,
       };
     },
     setPosts: (state, action) => {
@@ -25,7 +26,15 @@ export const slice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload.user;
     },
+    logout: (state) => {
+      delete state.posts;
+      delete state.user;
+      delete state.token;
+      delete state.user;
+      state.settings.mode = "light";
+    },
   },
 });
-export const { setLogin, setPost, setSettings, setUser } = slice.actions;
+export const { setLogin, setPost, setSettings, setUser, logout } =
+  slice.actions;
 export default slice.reducer;

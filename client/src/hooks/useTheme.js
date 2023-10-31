@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-export const useTheme = () => {
+export const useThemes = () => {
   const mode = useSelector((state) => state.settings.mode);
   const theme = useMemo(() => {
     if (mode === "dark") {
@@ -21,7 +21,7 @@ export const useTheme = () => {
         background: {
           100: " #f4f5f9",
           200: "#ffffff",
-          300: "#fafbff",
+          300: "#fafbff" || "#edededb8",
           alt: "#eaedfb",
         },
       };

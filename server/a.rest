@@ -27,7 +27,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MTg4ZDNhO
 ###
 POST http://localhost:3001/posts/create_post
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MTg4ZDNhOTIwNGY4ZjJiMzlkYTdmZCIsImlhdCI6MTY5NjEwNzg0MywiZXhwIjoxNjk3MzE3NDQzfQ.vT7P3otks2zGnVxdw1lgS580a0m8wzWH_vzJovadwaw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NDAzMDQ0ZDE4YzYxNmQ4MjdjNWZlNCIsImlhdCI6MTY5ODc1NzUwOCwiZXhwIjoxNjk5OTY3MTA4fQ.qxgSmwYh-D24_dDcW93OXktkcj-Zbvrb3zlcNp18iz0
+
 
 { "description":"random description", "picturePath":"gsders","location":"benghazi" }
 ###

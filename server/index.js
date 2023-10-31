@@ -43,6 +43,7 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
+
 /*ROUTES WITH FILES*/
 app.post("/signup", upload.single("picture"), signup);
 app.post(
@@ -55,10 +56,10 @@ app.post(
 /*ROUTES*/
 app.use("/", authRoute);
 app.use("/home", getFeedPosts);
-app.use("/user", usersRoute);
+app.post("/user", usersRoute);
 app.use("/posts", postsRoute);
 /*MONGOOSE SETUP*/
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT;
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

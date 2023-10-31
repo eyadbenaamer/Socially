@@ -9,7 +9,7 @@ const PostSchema = new Schema(
       required: true,
     },
     location: String,
-    description: String,
+    text: String,
     picturePath: String,
     likes: {
       type: Array,

@@ -1,8 +1,5 @@
-import { Link, Navigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { setUser } from "state";
-import Form from "./Form";
-import submit from "./submit";
+import Header from "components/header";
+import Form from "./form";
 import { useState } from "react";
 const Signup = () => {
   const [signupDetails, setSignupDetails] = useState({
@@ -11,24 +8,10 @@ const Signup = () => {
   });
   return (
     <>
-      <div>
-        <h2>hello</h2>
-        <Form />
-        <button
-          onClick={async () => {
-            let { isSignedUp, message } = await submit();
-            setSignupDetails({ isSignedUp, message });
-          }}
-        >
-          Signup
-        </button>
-      </div>
+      <Header />
+      <h2>hello</h2>
+      <Form setSignupDetails={setSignupDetails} />
       {signupDetails.isSignedUp === false && <>{signupDetails.message}</>}
-      {signupDetails.isSignedUp === true && (
-        <>
-          {signupDetails.message} log in <Link to="/login">here</Link>
-        </>
-      )}
     </>
   );
 };

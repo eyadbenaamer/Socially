@@ -10,7 +10,7 @@ export const signup = async (req, res) => {
       lastName,
       email,
       password,
-      picturePath,
+      pictureName,
       birthDate,
       gender,
     } = req.body;
@@ -30,13 +30,12 @@ export const signup = async (req, res) => {
         lastName,
         email,
         password: hashedPassword,
-        picturePath,
+        picturePath: `${process.env.API_URL}/assets/${pictureName}`,
       });
       const savedUser = await newUser.save();
       return res.status(201).json(savedUser);
     }
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -45,7 +44,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!(email && password)) {
-      return res.status(400);
+      return res.status(400).json("bad request");
     }
     const user = await User.findOne({ email });
     if (!user) {

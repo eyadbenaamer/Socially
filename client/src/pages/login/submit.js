@@ -2,7 +2,8 @@ import { data } from "./Form";
 import axios from "axios";
 
 const submit = async () => {
-  const response = await axios.post("http://localhost:3001/login", data).then(
+  const API_URL = process.env.REACT_APP_API_URL;
+  const response = await axios.post(`${API_URL}/login`, data).then(
     (resolved) => {
       const isLoggedIn = true;
       return {

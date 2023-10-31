@@ -1,33 +1,19 @@
-import Navbar from "./Navbar.jsx";
-import Form from "../login/Form";
-import submit from "../login/submit";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { setLogin } from "state";
-const Login = () => {
-  const dispatch = useDispatch();
-  const [loginDetails, setLoginDetails] = useState({
-    isLoggedIn: false,
-    message: "",
-  });
+import { Link } from "react-router-dom";
+import Header from "../../components/header";
+import LoginForm from "../login/Form";
+import { useWindowWidth } from "hooks/useWindowWidth.js";
+
+const Landing = () => {
+  const isMobileScreen = useWindowWidth({ maxWidth: 768 });
   return (
     <>
-      <Navbar/>
-      <div className="container m-auto my-8">
-        <h1 style={{fontSize:32}}>Welcome to Socially!  </h1>
-        <Form />
-        <button
-          onClick={async () => {
-            let { isLoggedIn, message, user, token } = await submit();
-            dispatch(setLogin({ user, token }));
-            setLoginDetails({ isLoggedIn, message });
-          }}
-        >
-          Login
-        </button>
+      <div className="container m-auto ">
+        <h1 style={{ fontSize: isMobileScreen ? "1.5rem" : "2rem" }}>
+          Welcome to Socially!
+        </h1>
+        <LoginForm />
       </div>
-      {loginDetails.isLoggedIn === false && <>{loginDetails.message}</>}
     </>
   );
 };
-export default Login;
+export default Landing;

@@ -21,6 +21,7 @@ boby,
   --background-light-200: #ffffff;
   --background-light-300: #fafbff;
   --background-light-alt: #eaedfb;
+  --main-transition:0.1s !important;
 }
 
 * {
@@ -53,4 +54,111 @@ boby,
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
+}
+  .container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .container{
+      width: 85%;
+    }
+    
+  }
+  .light{
+    color: black;
+
+  }
+  .dark{
+    color: white;
+
+  }
+  .radius{
+    border-radius: 6px;
+  }
+.menu{
+  box-shadow: 0 0 3px 7px #00000012;
+}
+
+aside,
+.sidebar{
+  height: calc(100vh - 62px);
+}
+aside img{
+  aspect-ratio: 1;
+}
+textarea{
+  background: inherit;
+  border: none;
+  outline: none;
+  width: 100%;
+  overflow: hidden;
+  height: unset;
+  resize: none;
+}
+
+.text-hovered,
+.icon,
+  .icon *{
+  transition:var(--main-transition);
+}
+.text-hovered:hover,
+.primary-text,
+  .text-hovered:hover svg{
+  color: var(--primary-color);
+  stroke: var(--primary-color) !important;
+}
+.bg-primary{
+  background-color: var(--primary-color);
+}
+.bg-secondary{
+  background-color: var(--secondary-color);
+}
+.light .bg-100{
+  background-color:var(--background-light-100) ;
+}
+.light .bg-200{
+  background-color:var(--background-light-200) ;
+}
+.light .bg-300{
+  background-color:var(--background-light-300) ;
+}
+.dark.bg-100,
+  .dark .bg-100{
+  background-color:var(--background-dark-100) ;
+}
+.dark .bg-200{
+  background-color:var(--background-dark-200) ;
+}
+.dark .bg-300{
+  background-color:var(--background-dark-300) ;
+}
+.light .bg-hovered:hover{
+  background-color:var(--background-light-alt) ;
+}
+.dark .bg-hovered:hover{
+  background-color:var(--background-dark-alt) ;
+}
+.light svg:not(.selected){
+  stroke:#5B5D67 ;
+}
+svg,
+.dark .icon:not(.selected) svg,
+  .dark .icon:not(.text-hovered) svg{
+  stroke:#C3C5CD ;
+}
+svg.selected ,
+svg.hovered:hover ,
+   .icon.selected svg, 
+   .icon.selected  ,
+    .icon.hovered  
+      .icon.hovered svg  {
+  stroke: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+@media (min-width:640px) {
+  .prompt{
+    border-radius: 12px;
+  }
+  
 }

@@ -23,8 +23,7 @@ import { getPostData } from "../middleware/post.js";
 const router = express.Router();
 //root path: /posts
 
-/*CREATE*/
-// router.post("/create_post", verifyToken, createPost);
+router.post("/create_post", verifyToken, createPost);
 
 /*READ*/
 router.get(

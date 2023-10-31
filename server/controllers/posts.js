@@ -6,11 +6,11 @@ import Reply from "../models/reply.js";
 export const createPost = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { description, picturePath, location } = req.body;
+    const { text, picturePath, location } = req.body;
     if (userId) {
       const newPost = new Post({
         userId,
-        description,
+        text,
         picturePath,
         location,
       });
