@@ -57,7 +57,7 @@ app.post(
 /*ROUTES*/
 app.use("/", authRoute);
 app.use("/home", getFeedPosts);
-app.post("/user", usersRoute);
+app.use("/user", usersRoute);
 app.use("/posts", postsRoute);
 /*MONGOOSE SETUP*/
 const PORT = process.env.PORT;
