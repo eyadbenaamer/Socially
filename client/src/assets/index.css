@@ -87,6 +87,7 @@ aside,
 aside img{
   aspect-ratio: 1;
 }
+input,
 textarea{
   background: inherit;
   border: none;
@@ -96,7 +97,9 @@ textarea{
   height: unset;
   resize: none;
 }
-
+.circle img{
+  font-size: 8px;
+}
 .text-hovered,
 .icon,
   .icon *{

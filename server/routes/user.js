@@ -1,19 +1,19 @@
 import express from "express";
 import {
-  getUser,
+  getProfile,
   getFollowers,
   follow,
   unFollow,
   removeFollower,
   getFollowing,
-} from "../controllers/users.js";
+} from "../controllers/user.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
 
 const router = express.Router();
 
 /*READ*/
-router.get("/:id", verifyId, getUser);
+router.get("/:id", verifyId, getProfile);
 router.get("/following/:id", verifyId, getFollowing);
 router.get("/followers/:id", verifyId, getFollowers);
 

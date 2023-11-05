@@ -32,11 +32,7 @@ const Sidebar = () => {
               <span className="circle w-9">
                 <img src={user.picturePath} />
               </span>
-              <span
-                className={`${
-                  location.pathname === "/profile" && "primary-text"
-                }`}
-              >{`${user.firstName} ${user.lastName}`}</span>
+              <span>{`${user.firstName} ${user.lastName}`}</span>
             </div>
           </Link>
         </li>

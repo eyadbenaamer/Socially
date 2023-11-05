@@ -1,25 +1,14 @@
-import axios from "axios";
-
 const submit = async (data, setSignupDetails) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
-  let formData = new FormData();
-  for (const property in data) {
-    formData.append(property, data[property]);
-  }
-
-  data.picture && formData.append("pictureName", data.picture.name);
-  const response = await axios.post(`${API_URL}/signup`, formData).then(
-    (resolved) => {
-      const isSignedUp = true;
-      return { isSignedUp, status: 200 };
-    },
-    (rejected) => {
-      const isSignedUp = false,
-        status = rejected.response.status;
-      return { isSignedUp, status };
-    }
-  );
+  const response = await fetch(`${API_URL}/signup`, {
+    method: "POST",
+    headers: [["Content-Type", "application/json"]],
+    body: JSON.stringify(data),
+  }).then((response) => {
+    const status = response.status;
+    return { isSignedUp: status === 200 ? true : false, status };
+  });
   const { status } = response;
   const signupDetails =
     status === 200

@@ -1,20 +1,26 @@
 import { useState, useRef } from "react";
 
-const DropZone = ({ onChange }) => {
+const DropZone = ({ onChange, multiple }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState(null);
   const input = useRef(null);
   return (
     <>
       <input
         type="file"
-        name="picture"
+        name="media"
         ref={input}
+        accept="video/*, video/x-m4v, video/webm, video/x-ms-wmv, video/x-msvideo, video/3gpp, video/flv, video/x-flv, video/mp4, video/quicktime, video/mpeg, video/ogv, .ts, .mkv, image/*, image/heic, image/heif"
+        multiple
         style={{ display: "none" }}
         onChange={(e) => {
-          const file = e.target.files[0];
-          onChange(file);
-          setFile(file);
+          if (multiple) {
+            onChange([...e.target.files]);
+            setFiles([...e.target.files]);
+          } else {
+            onChange(e.target.files[0]);
+            setFiles(e.target.files[0]);
+          }
         }}
       />
       <p
@@ -31,13 +37,13 @@ const DropZone = ({ onChange }) => {
           setIsDragging(false);
         }}
       >
-        {!file &&
+        {!files &&
           (isDragging ? (
             <>Drop the files here ...</>
           ) : (
             <>Drag 'n' drop some files here, or click to select files</>
           ))}
-        {file && <>{file.name}</>}
+        {/* {files && <>{files.map((file) => file.name)}</>} */}
       </p>
     </>
   );

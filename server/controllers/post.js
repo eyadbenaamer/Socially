@@ -4,14 +4,31 @@ import Reply from "../models/reply.js";
 //TODO: find a way to send comments on patches
 /*CREATE*/
 export const createPost = async (req, res) => {
+  const uploadsFolder = `${process.env.API_URL}/assets/`;
   try {
     const userId = req.user.id;
-    const { text, picturePath, location } = req.body;
+    let { text, location } = req.body;
+    const { media } = req.files;
+    console.log(media);
+    let filesPaths = {
+      photos: [],
+      videos: [],
+    };
     if (userId) {
+      if (media) {
+        media.map((file) => {
+          if (file.mimetype.startsWith("image")) {
+            filesPaths.photos.push(`${uploadsFolder}${file.filename}`);
+          } else if (file.mimetype.startsWith("video")) {
+            filesPaths.videos.push(`${uploadsFolder}${file.filename}`);
+          }
+        });
+      }
+
       const newPost = new Post({
         userId,
         text,
-        picturePath,
+        files: media ? filesPaths : null,
         location,
       });
       await newPost.save();
@@ -47,12 +64,9 @@ export const getComment = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const postList = await Post.find({ userId });
-    if (postList.length > 0) {
-      return res.status(200).json(postList);
-    } else {
-      return res.status(404).json({ message: "no posts found" });
-    }
+    const postList = (await Post.find({ userId })).reverse();
+
+    return res.status(200).json(postList);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -158,9 +172,9 @@ export const likeComment = async (req, res) => {
 export const editPost = async (req, res) => {
   try {
     const { user, post } = req;
-    const { description, location } = req.body;
+    const { text, location } = req.body;
     if (post.userId === user.id) {
-      post.description = description;
+      post.text = text;
       post.location = location;
       await post.save();
       return res.status(200).json(post);

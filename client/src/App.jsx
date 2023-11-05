@@ -6,7 +6,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useTheme } from "hooks/useTheme";
 
 import Home from "pages/home";
 import Landing from "pages/landing";
@@ -24,12 +23,11 @@ import "./assets/index.css";
 const App = () => {
   const isLoggedin = Boolean(useSelector((state) => state.token));
   const mode = useSelector((state) => state.settings.mode);
-
   return (
-    <div className={`App ${mode} bg-100`}>
-      <BrowserRouter>
+    <BrowserRouter>
+      <div className={`App ${mode} bg-100`}>
         <Header />
-        <main className=" relative top-[62px] mt-5 bg-100">
+        <main className=" relative top-[62px] pt-5 bg-100 min-h-screen">
           <Routes>
             <Route path="/" element={isLoggedin ? <Home /> : <Landing />} />
             <Route
@@ -75,8 +73,8 @@ const App = () => {
             <Route path="/profile/:id" element={<OtherUserProfile />} />
           </Routes>
         </main>
-      </BrowserRouter>
-    </div>
+      </div>
+    </BrowserRouter>
   );
 };
 export default App;

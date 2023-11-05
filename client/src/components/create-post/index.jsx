@@ -4,12 +4,15 @@ import { ReactComponent as VideoIcon } from "../../assets/icons/video.svg";
 
 import { useSelector } from "react-redux";
 import Prompt from "components/Prompt";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Form from "./form";
 
-const CreatePost = () => {
+const CreatePost = ({ setCreatedPost }) => {
   const user = useSelector((state) => state.user);
   const [isOpened, setIsOpened] = useState(false);
+  const [data, setData] = useState({ text: "", location: "" });
+  const [media, setMedia] = useState(null);
+
   return (
     <section
       className="create-post bg-200 w-full px-4 pt-5 pb-1 radius flex flex-col gap-3"
@@ -25,10 +28,10 @@ const CreatePost = () => {
         </Link>
         <div
           onClick={() => setIsOpened(!isOpened)}
-          className="cursor-pointer radius bg-300 p-2 w-full shadow-md"
+          className="cursor-pointer text-ellipsis overflow-clip radius bg-300 p-2 w-full shadow-md"
           style={{ borderRadius: "16px" }}
         >
-          Type Anything!
+          {data.text || "Type Anything!"}
         </div>
       </div>
       <div className="flex items-center">
@@ -46,7 +49,14 @@ const CreatePost = () => {
           <VideoIcon width={32} /> Video
         </div>
         <Prompt isOpened={isOpened} setIsOpened={setIsOpened}>
-          <Form />
+          <Form
+            setIsOpened={setIsOpened}
+            data={data}
+            setData={setData}
+            media={media}
+            setMedia={setMedia}
+            setCreatedPost={setCreatedPost}
+          />
         </Prompt>
       </div>
     </section>

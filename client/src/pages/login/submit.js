@@ -3,22 +3,24 @@ import axios from "axios";
 
 const submit = async () => {
   const API_URL = process.env.REACT_APP_API_URL;
-  const response = await axios.post(`${API_URL}/login`, data).then(
-    (resolved) => {
-      const isLoggedIn = true;
-      return {
-        status: 200,
-        isLoggedIn,
-        user: resolved.data,
-        token: resolved.data.token,
-      };
-    },
-    (rejected) => {
-      const isLoggedIn = false,
-        status = rejected.response.status;
-      return { isLoggedIn, status };
-    }
-  );
+  const response = await axios
+    .post(`${API_URL}/login`, data)
+    .then((response) => {
+      const { status } = response;
+      if (status === 200) {
+        return {
+          status,
+          isLoggedIn: true,
+          user: response.data,
+          token: response.data.token,
+        };
+      } else {
+        return {
+          status,
+          isLoggedIn: false,
+        };
+      }
+    });
   const { status, user, token } = response;
   const loginDetails =
     status === 200

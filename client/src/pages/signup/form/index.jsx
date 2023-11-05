@@ -3,23 +3,22 @@ import { Link } from "react-router-dom";
 import DateInput from "./DateInput";
 import submit from "./submit";
 import { useRef, useState } from "react";
-import DropZone from "components/dropzone";
-
 const Form = (props) => {
   const { setSignupDetails } = props;
   const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    birthDate: "",
-    gender: "male",
+    firstName: sessionStorage.getItem("firstName") ?? "",
+    lastName: sessionStorage.getItem("lastName") ?? "",
+    email: sessionStorage.getItem("email") ?? "",
+    password: sessionStorage.getItem("password") ?? "",
+    birthDate: sessionStorage.getItem("birthDate") ?? "",
+    gender: sessionStorage.getItem("gender") ?? "male",
   });
   const handleChange = async (e) => {
-    setData({
-      ...data,
+    window.sessionStorage.setItem([e.target.name], e.target.value);
+    setData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const submitButton = useRef(null);
@@ -35,24 +34,28 @@ const Form = (props) => {
           <input
             type="text"
             name="firstName"
+            value={data.firstName}
             onChange={handleChange}
             onKeyDown={handleEnterSubmit}
           />
           <input
             type="text"
             name="lastName"
+            value={data.lastName}
             onChange={handleChange}
             onKeyDown={handleEnterSubmit}
           />
           <input
             type="email"
             name="email"
+            value={data.email}
             onChange={handleChange}
             onKeyDown={handleEnterSubmit}
           />
           <input
             type="password"
             name="password"
+            value={data.password}
             onChange={handleChange}
             onKeyDown={handleEnterSubmit}
           />
@@ -62,11 +65,6 @@ const Form = (props) => {
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
-          <DropZone
-            onChange={(file) => {
-              data.picture = file;
-            }}
-          />
         </form>
         <button
           ref={submitButton}

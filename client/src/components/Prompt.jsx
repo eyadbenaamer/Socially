@@ -1,7 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ReactComponent as CloseIcon } from "../assets/icons/cross.svg";
+import useCloseWidget from "hooks/useCloseWidget";
 const Prompt = (props) => {
   const { isOpened, setIsOpened, children } = props;
+
+  const prompt = useRef(null);
+  useCloseWidget(prompt, setIsOpened);
+
   useEffect(() => {
     if (isOpened) {
       window.scrollTo({ top: 0 });
@@ -13,9 +18,16 @@ const Prompt = (props) => {
   }, [isOpened]);
   return (
     isOpened && (
-      <div className=" absolute left-0 w-full h-[200%] flex items-center justify-center z-10">
+      <div
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            setIsOpened(false);
+          }
+        }}
+        className=" absolute left-0 w-full h-[200%] flex items-center justify-center z-10"
+      >
         <div className="overlay absolute w-full h-[100%] bg-black opacity-40 "></div>
-        <div className="w-full sm:w-[600px] ">
+        <div ref={prompt} className="w-full sm:w-[600px] ">
           <section className="relative prompt bg-200 w-full sm:w-[600px] z-20 px-4 py-3 ">
             <div
               className="cursor-pointer w-5"

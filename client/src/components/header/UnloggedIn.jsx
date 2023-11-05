@@ -1,4 +1,3 @@
-import { useTheme } from "hooks/useTheme";
 import { useSelector } from "react-redux";
 
 import ToggleTheme from "../ToggleTheme";

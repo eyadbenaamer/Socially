@@ -1,25 +1,31 @@
 import { useDispatch, useSelector } from "react-redux";
 import { ReactComponent as DropDownIcon } from "../../../assets/icons/drop-down.svg";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ToggleTheme from "components/ToggleTheme";
 import { logout, setLogin, setSettings } from "state";
 import useHover from "hooks/useHover";
 import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
 import { ReactComponent as SettingsIcon } from "../../../assets/icons/settings.svg";
+import useCloseWidget from "hooks/useCloseWidget";
 const Menu = () => {
   const mode = useSelector((state) => state.settings.mode);
   const [showMenu, setShowMenu] = useState(false);
   const dispatch = useDispatch();
+  const menu = useRef(null);
+  useCloseWidget(menu, setShowMenu);
   return (
     <div
-      className="cursor-pointer relative w-6"
+      className="cursor-pointer relative flex justify-center w-10"
       onClick={() => {
         setShowMenu(!showMenu);
       }}
     >
       <DropDownIcon className="icon hovered" />
       {showMenu && (
-        <div className="menu bg-300 cursor-pointer absolute right-0 radius w-max">
+        <div
+          ref={menu}
+          className="menu bg-300 cursor-pointer absolute right-0 radius w-max"
+        >
           <ul className="flex flex-col radius">
             <li className="icon py-2 px-3 radius gap-3 bg-hovered text-hovered ">
               <SettingsIcon

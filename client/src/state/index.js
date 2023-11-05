@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   settings: { mode: "light" },
-  posts: [],
   user: null,
   token: null,
 };
@@ -16,9 +15,7 @@ export const slice = createSlice({
         [action.payload.property]: action.payload.value,
       };
     },
-    setPosts: (state, action) => {
-      state.posts = action.payload.posts;
-    },
+
     setLogin: (state, action) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
@@ -35,6 +32,5 @@ export const slice = createSlice({
     },
   },
 });
-export const { setLogin, setPost, setSettings, setUser, logout } =
-  slice.actions;
+export const { setLogin, setSettings, setUser, logout } = slice.actions;
 export default slice.reducer;

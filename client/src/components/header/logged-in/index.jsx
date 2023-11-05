@@ -9,15 +9,16 @@ const LoggedIn = () => {
   const mode = useSelector((state) => state.settings).mode;
 
   return (
-    <div className="shadow-lg bg-300 py-2 transition-all">
-      <div className="container m-auto py-2 flex gap-3 items-center justify-between">
-        <Link to="/">
+    <div className="shadow-lg bg-300  transition-all">
+      <div className="container m-auto  flex gap-3 items-center justify-between">
+        <Link className="py-4" to="/">
           {mode === "light" ? (
             <img src={lightLogo} alt="Socially" />
           ) : (
             <img src={darkLogo} alt="Socially" />
           )}
         </Link>
+
         <Menu />
       </div>
     </div>

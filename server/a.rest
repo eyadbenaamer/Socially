@@ -1,11 +1,13 @@
-POST http://localhost:3001/register/
+POST http://localhost:3001/signup/
 Content-Type: application/json
-
 
 {
   "firstName":"eyad",
   "lastName":"binamir",
-    "email":"ccsasc@email.com",
+    "email":"s2@email.com",
+    "password":"1234",
+       "birthDate":"2015-5-7",
+        "gender":"male"
 }
 
 ###
@@ -30,7 +32,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NDAzMDQ0ZDE4YzYxNmQ4MjdjNWZlNCIsImlhdCI6MTY5ODc1NzUwOCwiZXhwIjoxNjk5OTY3MTA4fQ.qxgSmwYh-D24_dDcW93OXktkcj-Zbvrb3zlcNp18iz0
 
 
-{ "description":"random description", "picturePath":"gsders","location":"benghazi" }
+{ "text":"random description", "picturePath":"gsders","location":"benghazi" }
 ###
 PATCH  http://localhost:3001/posts/edit_post/651893253a3d401d8d97a459
 Content-Type: application/json
@@ -38,9 +40,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MTg4ZDNhO
 
 { "description":"hi", "picturePath":"gsders","location":"benghazi" }
 ###
-PATCH  http://localhost:3001/posts/add_comment/651b3441285615be7527723d
+PATCH  http://localhost:3001/posts/add_comment/654150fe92c9292aaebaa5aa
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MTg4ZDNhOTIwNGY4ZjJiMzlkYTdmZCIsImlhdCI6MTY5NjEwNzg0MywiZXhwIjoxNjk3MzE3NDQzfQ.vT7P3otks2zGnVxdw1lgS580a0m8wzWH_vzJovadwaw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NDAzMDQ0ZDE4YzYxNmQ4MjdjNWZlNCIsImlhdCI6MTY5ODc1NzUwOCwiZXhwIjoxNjk5OTY3MTA4fQ.qxgSmwYh-D24_dDcW93OXktkcj-Zbvrb3zlcNp18iz0
 
 { "comment":"this is a comment"}
 ###

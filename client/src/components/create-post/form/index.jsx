@@ -1,22 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { submit } from "./submit";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import DropZone from "components/dropzone";
 
-const Form = () => {
+const Form = (props) => {
+  const { data, setData, media, setMedia, setIsOpened, setCreatedPost } = props;
   const [isValidPost, setIsValidPost] = useState(false);
-  const [data, setData] = useState({ text: null, photo: null, vedio: null });
   const { token } = useSelector((state) => state.user);
-
+  const posts = useSelector((state) => state.posts);
+  const dispatch = useDispatch();
   useEffect(() => {
-    if (data.text || data.photo || data.vedio) {
+    if (data.text != "" || media) {
       setIsValidPost(true);
     } else {
       setIsValidPost(false);
     }
-  }, [data]);
+  }, [data, media]);
   return (
     <div className="flex flex-col">
       <textarea
+        autoFocus={true}
+        // value={data.text}
         className="mt-2"
         type="text"
         name="text"
@@ -25,12 +29,18 @@ const Form = () => {
           setData((prev) => ({ ...prev, text: e.target.value }));
         }}
       />
+      <DropZone multiple={true} onChange={(files) => setMedia(files)} />
       <button
         disabled={!isValidPost}
         className={`${
           isValidPost ? "bg-primary" : "bg-secondary"
-        } self-end py-2 px-4 radius`}
-        onClick={async () => await submit(data, token)}
+        } self-end py-2 px-4 radius text-white`}
+        onClick={async () => {
+          setIsOpened(false);
+          setData({ text: "", location: "" });
+          setMedia(null);
+          setCreatedPost(await submit(data, media, token));
+        }}
       >
         Post
       </button>

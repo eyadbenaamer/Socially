@@ -16,7 +16,7 @@ import {
   likeComment,
   likeReply,
   getReactionDetails,
-} from "../controllers/posts.js";
+} from "../controllers/post.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
 import { getPostData } from "../middleware/post.js";

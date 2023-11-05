@@ -2,23 +2,10 @@ import { Schema, model } from "mongoose";
 
 const UserSchema = new Schema(
   {
-    firstName: {
-      type: String,
-      required: true,
-      min: 2,
-      max: 20,
-    },
-    lastName: {
-      type: String,
-      required: true,
-      min: 2,
-      max: 20,
-    },
-    email: {
-      type: String,
-      required: true,
-      uniqe: true,
-      max: 20,
+    creadentials: {
+      username: { type: String, uniqe: true, max: 50, default: "" },
+      email: [{ type: String, uniqe: true, max: 50 }],
+      phoneNubmer: [{ type: Number, uniqe: true, max: 15 }],
     },
     password: {
       type: String,
@@ -26,20 +13,6 @@ const UserSchema = new Schema(
       min: 8,
       max: 50,
     },
-    picturePath: {
-      type: String,
-      default: "",
-    },
-    followers: {
-      type: Array,
-      default: [],
-    },
-    following: {
-      type: Array,
-      default: [],
-    },
-    location: String,
-    occupation: String,
   },
   { timestamps: true }
 );

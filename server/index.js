@@ -10,15 +10,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import authRoute from "./routes/auth.js";
-import usersRoute from "./routes/users.js";
-import postsRoute from "./routes/posts.js";
+import usersRoute from "./routes/user.js";
+import postsRoute from "./routes/post.js";
 
 import { signup } from "./controllers/auth.js";
 
-import { createPost, getFeedPosts } from "./controllers/posts.js";
-import cookieParser from "cookie-parser";
+import { createPost, getFeedPosts } from "./controllers/post.js";
 import { verifyToken } from "./middleware/auth.js";
-
+import { renameFile } from "./utils/renameFile.js";
+import { setProfile } from "./controllers/user.js";
+import cookieParser from "cookie-parser";
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,17 +40,17 @@ const storage = multer.diskStorage({
     cb(null, "public/assets");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    cb(null, renameFile(file.originalname));
   },
 });
 const upload = multer({ storage });
 
 /*ROUTES WITH FILES*/
-app.post("/signup", upload.single("picture"), signup);
+app.patch("/set_profile_picture", upload.single("picture"), setProfile);
 app.post(
   "/posts/create_post",
   verifyToken,
-  upload.single("picture"),
+  upload.fields([{ name: "media", maxCount: 5 }]),
   createPost
 );
 

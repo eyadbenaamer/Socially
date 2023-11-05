@@ -1,13 +1,13 @@
-import User from "../models/user.js";
+import Profile from "../models/profile.js";
 
 /*READ*/
 
-export const getUser = async (req, res) => {
+export const getProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
-    if (user) {
-      return res.status(200).json(user);
+    const profile = await Profile.findById(id);
+    if (profile) {
+      return res.status(200).json(profile);
     } else {
       return res.status(404).json({ error: error.message });
     }
@@ -45,6 +45,19 @@ export const getFollowing = async (req, res) => {
 };
 /*UPDATE*/
 
+export const setProfile = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { file } = req;
+    const user = await User.findById(id);
+    user.picturPath = `${process.env.API_URL}/assets/${file.filename}`;
+    await user.save();
+    await account.save();
+    return res.status(200).json(user.picturPath);
+  } catch (error) {
+    return res.status(404).json({ error: error.message });
+  }
+};
 export const follow = async (req, res) => {
   try {
     const { id } = req.user;
