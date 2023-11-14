@@ -41,7 +41,7 @@ const CreatePost = ({ setCreatedPost }) => {
         >
           <PhotoIcon width={32} /> Photo
         </div>
-        <span width={1} className="bg-white h-7 w-[2px] opacity-20"></span>
+        <span width={1} className={`bg-inverse h-7 w-[2px] opacity-20`}></span>
         <div
           onClick={() => setIsOpened(!isOpened)}
           className="icon text-hovered p-3 flex items-center gap-3 cursor-pointer w-full justify-center"

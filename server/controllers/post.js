@@ -9,7 +9,6 @@ export const createPost = async (req, res) => {
     const userId = req.user.id;
     let { text, location } = req.body;
     const { media } = req.files;
-    console.log(media);
     let filesPaths = {
       photos: [],
       videos: [],

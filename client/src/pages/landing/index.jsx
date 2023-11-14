@@ -1,19 +1,17 @@
-import { Link } from "react-router-dom";
-import Header from "../../components/header";
-import LoginForm from "../login/Form";
-import { useWindowWidth } from "hooks/useWindowWidth.js";
+import { useLocation } from "react-router-dom";
+import Login from "./login";
+import VerifyAccount from "./verify-account";
+import ResetPassword from "./reset-password";
 
 const Landing = () => {
-  const isMobileScreen = useWindowWidth({ maxWidth: 768 });
+  const location = useLocation();
   return (
     <>
-      <div className="container m-auto ">
-        <h1 style={{ fontSize: isMobileScreen ? "1.5rem" : "2rem" }}>
-          Welcome to Socially!
-        </h1>
-        <LoginForm />
-      </div>
+      {location.pathname === "/login" && <Login />}
+      {location.pathname === "/verify-account" && <VerifyAccount />}
+      {location.pathname === "/reset-password" && <ResetPassword />}
     </>
   );
 };
+
 export default Landing;

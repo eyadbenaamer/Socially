@@ -21,7 +21,7 @@ boby,
   --background-light-200: #ffffff;
   --background-light-300: #fafbff;
   --background-light-alt: #eaedfb;
-  --main-transition:0.1s !important;
+  --main-transition: 0.1s !important;
 }
 
 * {
@@ -55,40 +55,40 @@ boby,
   border-radius: 50%;
   overflow: hidden;
 }
+.center {
+  margin: 0 auto;
+}
+.container {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+@media (min-width: 768px) {
   .container {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    width: 85%;
   }
-  @media (min-width: 768px) {
-    .container{
-      width: 85%;
-    }
-    
-  }
-  .light{
-    color: black;
-
-  }
-  .dark{
-    color: white;
-
-  }
-  .radius{
-    border-radius: 6px;
-  }
-.menu{
+}
+.light {
+  color: black;
+}
+.dark {
+  color: white;
+}
+.radius {
+  border-radius: 12px;
+}
+.menu {
   box-shadow: 0 0 3px 7px #00000012;
 }
 
 aside,
-.sidebar{
+.sidebar {
   height: calc(100vh - 62px);
 }
-aside img{
+aside img {
   aspect-ratio: 1;
 }
 input,
-textarea{
+textarea {
   background: inherit;
   border: none;
   outline: none;
@@ -97,71 +97,98 @@ textarea{
   height: unset;
   resize: none;
 }
-.circle img{
+.circle img {
   font-size: 8px;
 }
 .text-hovered,
 .icon,
-  .icon *{
-  transition:var(--main-transition);
+.icon * {
+  transition: var(--main-transition);
 }
 .text-hovered:hover,
 .primary-text,
-  .text-hovered:hover svg{
+.text-hovered:hover svg {
   color: var(--primary-color);
   stroke: var(--primary-color) !important;
 }
-.bg-primary{
+.light .text-inverse {
+  color: white;
+}
+.dark .text-inverse {
+  color: black;
+}
+.light .bg-inverse {
+  background-color: black;
+}
+.dark .bg-inverse {
+  background-color: white;
+}
+.bg-primary {
   background-color: var(--primary-color);
 }
-.bg-secondary{
+.bg-secondary {
   background-color: var(--secondary-color);
 }
-.light .bg-100{
-  background-color:var(--background-light-100) ;
+.light .bg-100 {
+  background-color: var(--background-light-100);
 }
-.light .bg-200{
-  background-color:var(--background-light-200) ;
+.light .bg-200 {
+  background-color: var(--background-light-200);
 }
-.light .bg-300{
-  background-color:var(--background-light-300) ;
+.light .bg-300 {
+  background-color: var(--background-light-300);
 }
 .dark.bg-100,
-  .dark .bg-100{
-  background-color:var(--background-dark-100) ;
+.dark .bg-100 {
+  background-color: var(--background-dark-100);
 }
-.dark .bg-200{
-  background-color:var(--background-dark-200) ;
+.dark .bg-200 {
+  background-color: var(--background-dark-200);
 }
-.dark .bg-300{
-  background-color:var(--background-dark-300) ;
+.dark .bg-300 {
+  background-color: var(--background-dark-300);
 }
-.light .bg-hovered:hover{
-  background-color:var(--background-light-alt) ;
+.light .bg-hovered:hover {
+  background-color: var(--background-light-alt);
 }
-.dark .bg-hovered:hover{
-  background-color:var(--background-dark-alt) ;
+.dark .bg-hovered:hover {
+  background-color: var(--background-dark-alt);
 }
-.light svg:not(.selected){
-  stroke:#5B5D67 ;
+.light svg:not(.selected) {
+  stroke: #5b5d67;
 }
 svg,
 .dark .icon:not(.selected) svg,
-  .dark .icon:not(.text-hovered) svg{
-  stroke:#C3C5CD ;
+.dark .icon:not(.text-hovered) svg {
+  stroke: #c3c5cd;
 }
-svg.selected ,
-svg.hovered:hover ,
-   .icon.selected svg, 
-   .icon.selected  ,
-    .icon.hovered  
-      .icon.hovered svg  {
+svg.selected,
+svg.hovered:hover,
+.icon.selected svg,
+.icon.selected,
+.icon.hovered .icon.hovered svg {
   stroke: var(--primary-color) !important;
   color: var(--primary-color) !important;
 }
-@media (min-width:640px) {
-  .prompt{
+@media (min-width: 640px) {
+  .prompt {
     border-radius: 12px;
   }
-  
+}
+.alert.error {
+  border: solid 2px #b0050587;
+  background: #e05454b5;
+}
+.alert.info {
+  border: solid 2px #050db087;
+  background: #548ee0b5;
+}
+.code input {
+  font-size: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  border: solid 2px;
+  height: 60px;
+  width: 120px;
+  font-size: 2rem;
 }

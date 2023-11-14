@@ -1,28 +1,20 @@
 import { useRef, useState } from "react";
 import submit from "./submit";
-import { useDispatch } from "react-redux";
-import { setLogin } from "state";
-import { Link } from "react-router-dom";
-
-export let data = {
-  email: "",
-  password: "",
-};
+import { useDispatch, useSelector } from "react-redux";
+import { setLoginStatus, setUser } from "state";
+import { Link, Navigate } from "react-router-dom";
 
 const Form = () => {
-  const [stateData, setStateData] = useState(data);
+  const [data, seteData] = useState({ email: "", password: "" });
   const handleChange = (e) => {
-    data = {
+    seteData({
       ...data,
       [e.target.name]: e.target.value,
-    };
-    setStateData(data);
+    });
   };
   const dispatch = useDispatch();
-  const [loginDetails, setLoginDetails] = useState({
-    isLoggedIn: null,
-    message: "",
-  });
+  const [isVerified, setIsVerified] = useState(null);
+  const [message, setMessage] = useState(null);
   const submitButton = useRef(null);
   const handleEnterSubmit = (e) => {
     if (e.key === "Enter") {
@@ -32,6 +24,7 @@ const Form = () => {
 
   return (
     <>
+      {isVerified === false && <Navigate to={"/verify-account"} />}
       <section>
         <input
           type="email"
@@ -45,12 +38,17 @@ const Form = () => {
           onChange={handleChange}
           onKeyDown={handleEnterSubmit}
         />
+        <Link to={"/reset-password"}>Forgot password?</Link>
         <button
           ref={submitButton}
-          onClick={async () => {
-            let { isLoggedIn, message, user, token } = await submit();
-            dispatch(setLogin({ user, token }));
-            setLoginDetails({ isLoggedIn, message });
+          onClick={() => {
+            submit(data).then((response) => {
+              let { message, user, isVerified } = response;
+              dispatch(setUser({ user, isVerified }));
+              dispatch(setLoginStatus({ email: data.email }));
+              setIsVerified(isVerified);
+              setMessage(message);
+            });
           }}
         >
           Login
@@ -62,7 +60,7 @@ const Form = () => {
           Sign up here
         </Link>
       </div>
-      {loginDetails.isLoggedIn === false && <div>{loginDetails.message}</div>}
+      {message && <div>{message}</div>}
     </>
   );
 };

@@ -3,7 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   settings: { mode: "light" },
   user: null,
-  token: null,
+  loginStatus: {
+    email: null,
+  },
+  isVerified: null,
 };
 export const slice = createSlice({
   name: "state",
@@ -15,22 +18,22 @@ export const slice = createSlice({
         [action.payload.property]: action.payload.value,
       };
     },
-
-    setLogin: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
+    setIsVerified: (state, action) => {
+      state.isVerified = action.payload;
     },
     setUser: (state, action) => {
       state.user = action.payload.user;
+      state.isVerified = action.payload.isVerified;
+    },
+    setLoginStatus: (state, action) => {
+      state.loginStatus = { ...state.loginStatus, ...action.payload };
     },
     logout: (state) => {
-      delete state.posts;
-      delete state.user;
-      delete state.token;
       delete state.user;
       state.settings.mode = "light";
     },
   },
 });
-export const { setLogin, setSettings, setUser, logout } = slice.actions;
+export const { setUser, setSettings, setIsVerified, setLoginStatus, logout } =
+  slice.actions;
 export default slice.reducer;

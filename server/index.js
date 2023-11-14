@@ -13,7 +13,7 @@ import authRoute from "./routes/auth.js";
 import usersRoute from "./routes/user.js";
 import postsRoute from "./routes/post.js";
 
-import { signup } from "./controllers/auth.js";
+import { signup, verifyAccount } from "./controllers/auth.js";
 
 import { createPost, getFeedPosts } from "./controllers/post.js";
 import { verifyToken } from "./middleware/auth.js";

@@ -12,8 +12,12 @@ export const verifyToken = async (req, res, next) => {
     const userInfo = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(userInfo.id);
     if (user) {
-      req.user = user;
-      next();
+      if (user.verificationStatus.isVerified) {
+        req.user = user;
+        next();
+      } else {
+        return res.status(401).json("verify your account first");
+      }
     } else {
       return res.status(403).json("invalid token or user doesn't exist");
     }

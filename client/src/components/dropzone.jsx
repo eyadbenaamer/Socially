@@ -27,7 +27,6 @@ const DropZone = ({ onChange, multiple }) => {
         onClick={(e) => input.current.click()}
         style={{ display: "", background: "#eee", padding: "100px" }}
         // onDragEndCapture={(e) => { //TODO:search for a way to implement the drop function
-        //   console.log(e.dataTransfer.files);
         //   setIsDragging(false);
         // }}
         onDragOver={() => {
