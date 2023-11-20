@@ -4,14 +4,16 @@ import Form from "./Form.jsx";
 import { useState } from "react";
 
 const VerifyAccount = () => {
-  const [message, setMessage] = useState("Verify your account first.");
+  const { email, message: stateMessage } = useSelector(
+    (state) => state.loginStatus
+  );
+  const [message, setMessage] = useState(stateMessage);
   const mode = useSelector((state) => state.settings.mode);
-  const { email } = useSelector((state) => state.loginStatus);
 
   return (
     <div className="container center ">
       <div className=" md:mx-auto my-3">
-        {message && <Alert message={message} />}
+        {message && <Alert type={"error"} message={message} />}
       </div>
       <div
         className={`${

@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import { ReplySchema } from "./reply.js";
 export const CommentSchema = new Schema({
-  userId: String,
+  creatorId: String,
   content: {
     type: String,
     required: true,

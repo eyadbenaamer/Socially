@@ -1,10 +1,12 @@
-// import Dropzone from "../../components/dropzone";
 import { Link } from "react-router-dom";
 import DateInput from "./DateInput";
 import submit from "./submit";
 import { useRef, useState } from "react";
+import Alert from "components/Alert";
+import { useDispatch } from "react-redux";
+import { setLoginStatus } from "state";
 const Form = (props) => {
-  const { setSignupDetails } = props;
+  const { setIsSignup } = props;
   const [data, setData] = useState({
     firstName: sessionStorage.getItem("firstName") ?? "",
     lastName: sessionStorage.getItem("lastName") ?? "",
@@ -13,6 +15,8 @@ const Form = (props) => {
     birthDate: sessionStorage.getItem("birthDate") ?? "",
     gender: sessionStorage.getItem("gender") ?? "male",
   });
+  const [message, setMessage] = useState("");
+
   const handleChange = async (e) => {
     window.sessionStorage.setItem([e.target.name], e.target.value);
     setData((prev) => ({
@@ -22,6 +26,9 @@ const Form = (props) => {
   };
 
   const submitButton = useRef(null);
+  const dispatch = useDispatch();
+  dispatch(setLoginStatus({ message: "" }));
+
   const handleEnterSubmit = (e) => {
     if (e.key === "Enter") {
       submitButton.current.click();
@@ -29,6 +36,11 @@ const Form = (props) => {
   };
   return (
     <>
+      {message && (
+        <div>
+          <Alert type={"error"} message={message} />
+        </div>
+      )}
       <section>
         <form>
           <input
@@ -68,7 +80,15 @@ const Form = (props) => {
         </form>
         <button
           ref={submitButton}
-          onClick={async () => await submit(data, setSignupDetails)}
+          onClick={() =>
+            submit(data).then((response) => {
+              dispatch(setLoginStatus({ email: data.email }));
+              const { message, isSignup } = response;
+              sessionStorage.setItem("isNotVerified", true);
+              setIsSignup(isSignup);
+              setMessage(message);
+            })
+          }
         >
           Signup
         </button>

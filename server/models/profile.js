@@ -21,7 +21,7 @@ const ProfileSchema = new Schema({
 
   picturePath: {
     type: String,
-    default: `${process.env.API_URL}/assets/blank_avatar.jpg`,
+    default: `${process.env.API_URL}/assets/default_avatar.jpg`,
   },
   birthDate: String,
   gender: String,

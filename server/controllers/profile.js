@@ -1,4 +1,5 @@
 import Profile from "../models/profile.js";
+import User from "../models/user.js";
 
 /*READ*/
 
@@ -49,11 +50,10 @@ export const setProfile = async (req, res) => {
   try {
     const { id } = req.user;
     const { file } = req;
-    const user = await User.findById(id);
-    user.picturPath = `${process.env.API_URL}/assets/${file.filename}`;
-    await user.save();
-    await account.save();
-    return res.status(200).json(user.picturPath);
+    const profile = await Profile.findById(id);
+    profile.picturePath = `${process.env.API_URL}/assets/${file.filename}`;
+    await profile.save();
+    return res.status(200).json(profile.picturePath);
   } catch (error) {
     return res.status(404).json({ error: error.message });
   }

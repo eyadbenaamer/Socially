@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 export const ReplySchema = new Schema({
-  userId: String,
+  creatorId: String,
   rootCommentId: String,
   content: {
     type: String,

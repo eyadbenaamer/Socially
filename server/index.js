@@ -10,16 +10,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import authRoute from "./routes/auth.js";
-import usersRoute from "./routes/user.js";
-import postsRoute from "./routes/post.js";
-
-import { signup, verifyAccount } from "./controllers/auth.js";
+import profileRoute from "./routes/profile.js";
+import postRoute from "./routes/post.js";
 
 import { createPost, getFeedPosts } from "./controllers/post.js";
 import { verifyToken } from "./middleware/auth.js";
 import { renameFile } from "./utils/renameFile.js";
-import { setProfile } from "./controllers/user.js";
-import cookieParser from "cookie-parser";
+import { setProfile } from "./controllers/profile.js";
+
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,7 +44,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /*ROUTES WITH FILES*/
-app.patch("/set_profile_picture", upload.single("picture"), setProfile);
+app.patch("/set_profile", verifyToken, upload.single("picture"), setProfile);
 app.post(
   "/posts/create_post",
   verifyToken,
@@ -57,8 +55,8 @@ app.post(
 /*ROUTES*/
 app.use("/", authRoute);
 app.use("/home", getFeedPosts);
-app.use("/user", usersRoute);
-app.use("/posts", postsRoute);
+app.use("/profile", profileRoute);
+app.use("/posts", postRoute);
 /*MONGOOSE SETUP*/
 const PORT = process.env.PORT;
 mongoose.connect(process.env.DATABASE_URL, {

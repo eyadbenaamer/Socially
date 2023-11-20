@@ -2,6 +2,7 @@ import express from "express";
 import {
   getFeedPosts,
   getUserPosts,
+  getPost,
   getComment,
   likePost,
   createPost,
@@ -15,7 +16,7 @@ import {
   deleteReply,
   likeComment,
   likeReply,
-  getReactionDetails,
+  getReactionInfo,
 } from "../controllers/post.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
@@ -26,24 +27,26 @@ const router = express.Router();
 router.post("/create_post", verifyToken, createPost);
 
 /*READ*/
+router.get("/", verifyId, getFeedPosts); // get feed posts
+router.get("/:userId", verifyId, getUserPosts); // get all user's posts
+router.get("/:userId/:postId", verifyId, getPost); // get a pirticular post
+router.get("/userId/:postId/:commentId", verifyId, getPostData, getComment);
 router.get(
-  "/reaction_details/:postId",
+  "/reaction_details/:userId/:postId",
   verifyId,
   getPostData,
-  getReactionDetails
+  getReactionInfo
 );
-router.get("/:userId", verifyId, getUserPosts); // get user's posts
-router.get("/:postId/:commentId", verifyId, getPostData, getComment);
 /*UPDATE*/
 router.patch(
-  "/like_post/:postId",
+  "/post_like_toggle/:userId/:postId",
   verifyId,
   verifyToken,
   getPostData,
   likePost
 );
 router.patch(
-  "/like_comment/:postId/:commentId",
+  "/like_comment/:userId/:postId/:commentId",
   verifyId,
   verifyToken,
   getPostData,
@@ -57,49 +60,49 @@ router.patch(
   editPost
 );
 router.patch(
-  "/add_comment/:postId",
+  "/add_comment/:userId/:postId",
   verifyId,
   verifyToken,
   getPostData,
   addComment
 );
 router.patch(
-  "/add_reply/:postId/:commentId",
+  "/add_reply/:userId/:postId/:commentId",
   verifyId,
   verifyToken,
   getPostData,
   addReply
 );
 router.patch(
-  "/edit_comment/:postId/:commentId",
+  "/edit_comment/:userId/:postId/:commentId",
   verifyId,
   verifyToken,
   getPostData,
   editComment
 );
 router.patch(
-  "/edit_reply/:postId/:commentId/:replyId",
+  "/edit_reply/:userId/:postId/:commentId/:replyId",
   verifyId,
   verifyToken,
   getPostData,
   editReply
 );
 router.patch(
-  "/delete_comment/:postId/:commentId",
+  "/delete_comment/:userId/:postId/:commentId",
   verifyId,
   verifyToken,
   getPostData,
   deleteComment
 );
 router.patch(
-  "/delete_reply/:postId/:commentId/:replyId",
+  "/delete_reply/:userId/:postId/:commentId/:replyId",
   verifyId,
   verifyToken,
   getPostData,
   deleteReply
 );
 router.patch(
-  "/like_reply/:postId/:commentId/:replyId",
+  "/like_reply/:userId/:postId/:commentId/:replyId",
   verifyId,
   verifyToken,
   getPostData,
@@ -108,7 +111,7 @@ router.patch(
 
 /*DELETE*/
 router.delete(
-  "/delete_post/:postId",
+  "/delete_post/:userId/:postId",
   verifyId,
   verifyToken,
   getPostData,

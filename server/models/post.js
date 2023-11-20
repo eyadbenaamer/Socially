@@ -1,17 +1,17 @@
 import { Schema, model } from "mongoose";
 import { CommentSchema } from "./comment.js";
 
-const PostSchema = new Schema({
-  userId: {
-    type: String,
-    required: true,
-  },
+export const PostSchema = new Schema({
+  creatorId: String,
   location: String,
   text: String,
-  files: {
-    photos: [String],
-    videos: [String],
-  },
+  files: [
+    {
+      name: String,
+      order: Number,
+      fileType: String,
+    },
+  ],
   likes: {
     type: Array,
     default: [],

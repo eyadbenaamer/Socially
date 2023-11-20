@@ -1,7 +1,6 @@
 import Post from "components/post";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 
 const Posts = ({ id, createdPost }) => {
   const API_URL = process.env.REACT_APP_API_URL;
@@ -10,7 +9,7 @@ const Posts = ({ id, createdPost }) => {
   const [isFetched, setIsFetched] = useState(false);
   const [posts, setPosts] = useState([]);
   const lastPost = useRef(null);
-  const fetchData = async () => {
+  const fetchPosts = async () => {
     await fetch(`${API_URL}/posts/${id ? id : ""}`).then(async (response) => {
       if (response.status === 200) {
         setPosts(await response.json());
@@ -22,7 +21,7 @@ const Posts = ({ id, createdPost }) => {
     });
   };
   useEffect(() => {
-    fetchData().catch(() => setMessage("Couldn't retrieve posts."));
+    fetchPosts().catch(() => setMessage("Couldn't retrieve posts."));
   }, [createdPost]);
   return (
     <div className="flex flex-col gap-y-4 items-center">

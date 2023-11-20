@@ -6,7 +6,7 @@ import {
   unFollow,
   removeFollower,
   getFollowing,
-} from "../controllers/user.js";
+} from "../controllers/profile.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
 

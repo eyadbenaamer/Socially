@@ -2,24 +2,26 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Home from "pages/home";
-import Login from "pages/landing/login";
-import VerifyAccount from "pages/landing/verify-account";
+import Login from "pages/login";
+import VerifyAccount from "pages/verify-account";
 import Signup from "pages/signup";
 import Profile from "pages/profile";
-import OtherUserProfile from "pages/other-user-profile";
 import Notifications from "pages/notifications";
 import SavedPosts from "pages/saved-posts";
 import Messages from "pages/messages";
 import Header from "components/header";
 
 import "./assets/index.css";
-import Landing from "pages/landing";
+import ResetPassword from "pages/reset-password";
+import SetProfile from "pages/set-profile";
+import { useEffect } from "react";
 
 const App = () => {
-  const isLoggedin = useSelector((state) => state.user && state.isVerified);
+  const isLoggedin = useSelector((state) => state.loginStatus.isLoggedIn);
   const isVerified = useSelector((state) => state.isVerified);
   const isNotVerified = sessionStorage.getItem("isNotVerified") && !isVerified;
   const mode = useSelector((state) => state.settings.mode);
+
   return (
     <BrowserRouter>
       <div className={`App ${mode} bg-100`}>
@@ -39,7 +41,7 @@ const App = () => {
             <Route
               path="/login"
               element={
-                isLoggedin ? <Navigate to="/" replace={true} /> : <Landing />
+                isLoggedin ? <Navigate to="/" replace={true} /> : <Login />
               }
             />
             <Route
@@ -51,13 +53,27 @@ const App = () => {
             <Route
               path="/reset-password"
               element={
-                isLoggedin ? <Navigate to={"/"} replace={true} /> : <Landing />
+                isLoggedin ? (
+                  <Navigate to={"/"} replace={true} />
+                ) : (
+                  <ResetPassword />
+                )
               }
             />
             <Route
               path="/verify-account"
               element={
-                isNotVerified ? <Landing /> : <Navigate to="/" replace={true} />
+                isNotVerified ? (
+                  <VerifyAccount />
+                ) : (
+                  <Navigate to="/set-profile" replace={true} />
+                )
+              }
+            />
+            <Route
+              path="/set-profile"
+              element={
+                isVerified ? <SetProfile /> : <Navigate to="/" replace={true} />
               }
             />
             <Route
@@ -83,12 +99,11 @@ const App = () => {
               }
             />
             <Route
-              path="/profile"
+              path="/profile/:id"
               element={
                 isLoggedin ? <Profile /> : <Navigate to="/" replace={true} />
               }
             />
-            <Route path="/profile/:id" element={<OtherUserProfile />} />
           </Routes>
         </main>
       </div>

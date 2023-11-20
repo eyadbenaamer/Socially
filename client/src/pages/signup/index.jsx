@@ -1,23 +1,17 @@
-import Header from "components/header";
 import Form from "./form";
 import { useState } from "react";
-import SetProfile from "./setProfile";
+import { useDispatch } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { setIsVerified } from "state";
 const Signup = () => {
-  const [signupDetails, setSignupDetails] = useState({
-    isSignedUp: false,
-    message: "",
-  });
+  const [isSignup, setIsSignup] = useState(false);
+  const dispatch = useDispatch();
+  dispatch(setIsVerified(false));
   return (
     <>
-      <Header />
       <h2>hello</h2>
-      {!signupDetails.isSignedUp && (
-        <>
-          <Form setSignupDetails={setSignupDetails} />
-          {signupDetails.isSignedUp === false && <>{signupDetails.message}</>}
-        </>
-      )}
-      {signupDetails.isSignedUp && <SetProfile />}
+      {!isSignup && <Form setIsSignup={setIsSignup} />}
+      {isSignup && <Navigate to={"/verify-account"} />}
     </>
   );
 };

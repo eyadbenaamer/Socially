@@ -17,10 +17,10 @@ const Form = (props) => {
     }
   }, [data, media]);
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-3">
       <textarea
         autoFocus={true}
-        // value={data.text}
+        value={data.text}
         className="mt-2"
         type="text"
         name="text"

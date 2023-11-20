@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoginStatus, setUser } from "state";
+import { setUser } from "state";
 
 const Form = (props) => {
   const { setMessage } = props;

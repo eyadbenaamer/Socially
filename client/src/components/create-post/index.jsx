@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import Prompt from "components/Prompt";
 import { useRef, useState } from "react";
 import Form from "./form";
+import UserPicture from "components/UserPicture";
 
 const CreatePost = ({ setCreatedPost }) => {
   const user = useSelector((state) => state.user);
@@ -14,22 +15,17 @@ const CreatePost = ({ setCreatedPost }) => {
   const [media, setMedia] = useState(null);
 
   return (
-    <section
-      className="create-post bg-200 w-full px-4 pt-5 pb-1 radius flex flex-col gap-3"
-      style={{ borderRadius: "16px" }}
-    >
+    <section className="create-post bg-200 w-full px-4 pt-5 pb-1 radius flex flex-col gap-3">
       <div className="flex gap-3 items-center">
-        <Link to={"/profile"} className="circle w-14 shadow-md">
-          <img
-            style={{ aspectRatio: 1 }}
-            src={user.picturePath}
-            alt={`${user.firstName} ${user.lastName}`}
-          />
-        </Link>
+        <UserPicture
+          to={`/profile/${user._id}`}
+          src={user.picturePath}
+          alt={`${user.firstName} ${user.lastName}`}
+        />
         <div
           onClick={() => setIsOpened(!isOpened)}
-          className="cursor-pointer text-ellipsis overflow-clip radius bg-300 p-2 w-full shadow-md"
-          style={{ borderRadius: "16px" }}
+          className="cursor-pointer h-[2.75rem] text-ellipsis overflow-clip radius bg-300 p-2 w-full shadow-md"
+          style={{ lineHeight: 2 }}
         >
           {data.text || "Type Anything!"}
         </div>

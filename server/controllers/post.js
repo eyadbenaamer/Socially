@@ -1,36 +1,44 @@
-import Post from "../models/post.js";
+import PostList from "../models/postList.js";
 import Comment from "../models/comment.js";
 import Reply from "../models/reply.js";
+import Post from "../models/post.js";
 //TODO: find a way to send comments on patches
 /*CREATE*/
 export const createPost = async (req, res) => {
   const uploadsFolder = `${process.env.API_URL}/assets/`;
   try {
-    const userId = req.user.id;
+    const { id } = req.user;
     let { text, location } = req.body;
     const { media } = req.files;
-    let filesPaths = {
-      photos: [],
-      videos: [],
-    };
-    if (userId) {
+    let filesPaths = [];
+    if (id) {
       if (media) {
-        media.map((file) => {
+        media.map((file, index) => {
           if (file.mimetype.startsWith("image")) {
-            filesPaths.photos.push(`${uploadsFolder}${file.filename}`);
+            filesPaths.push({
+              name: `${uploadsFolder}${file.filename}`,
+              order: index,
+              fileType: "photo",
+            });
           } else if (file.mimetype.startsWith("video")) {
-            filesPaths.videos.push(`${uploadsFolder}${file.filename}`);
+            filesPaths.push({
+              name: `${uploadsFolder}${file.filename}`,
+              order: index,
+              fileType: "vedio",
+            });
           }
         });
       }
-
       const newPost = new Post({
-        userId,
+        creatorId: id,
         text,
         files: media ? filesPaths : null,
+        createdAt: Date.now(),
         location,
       });
-      await newPost.save();
+      const postList = await PostList.findById(id);
+      postList.posts.push(newPost);
+      await postList.save();
       return res.status(201).json(newPost);
     } else {
       return res.status(409).json({ error: error.message });
@@ -43,11 +51,13 @@ export const createPost = async (req, res) => {
 /*READ*/
 export const getFeedPosts = async (req, res) => {
   try {
-    const posts = await Post.find();
-    if (!posts) {
+    const postList = await PostList.find();
+    if (!postList) {
       return res.status(404).json({ error: error.message });
     } else {
-      return res.status(200).json(posts);
+      let posts = [];
+      postList.map((list) => posts.push(...list.posts));
+      return res.status(200).json(posts.reverse());
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -63,14 +73,24 @@ export const getComment = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const postList = (await Post.find({ userId })).reverse();
+    let postList = await PostList.findById(userId);
+    postList = postList.posts.reverse();
+    return res.status(200).json(postList);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+export const getPost = async (req, res) => {
+  try {
+    const { userId, postId } = req.params;
+    const post = await PostList.find({ _id: userId });
 
     return res.status(200).json(postList);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
-export const getReactionDetails = async (req, res) => {
+export const getReactionInfo = async (req, res) => {
   try {
     const { post } = req;
     return res
@@ -87,7 +107,7 @@ export const addComment = async (req, res) => {
     const { user, post } = req;
     if (comment) {
       post.comments.addToSet({
-        userId: user.id,
+        creatorId: user.id,
         content: comment,
       });
       await post.save();
@@ -105,7 +125,7 @@ export const addReply = async (req, res) => {
     const { post, comment } = req;
     if (reply) {
       comment.replies.addToSet({
-        userId: req.user.id,
+        creatorId: req.user.id,
         rootCommentId: comment.id,
         content: reply,
       });
@@ -123,7 +143,7 @@ export const editComment = async (req, res) => {
     const { comment: newComment } = req.body;
     const { user, post, comment } = req;
     if (newComment) {
-      if (comment.userId === user.id) {
+      if (comment.creatorId === user.id) {
         comment.content = newComment;
         await post.save();
         return res.status(200).json(post);
@@ -140,15 +160,15 @@ export const editComment = async (req, res) => {
 
 export const likePost = async (req, res) => {
   try {
-    const { user, post } = req;
+    const { user, postList, post } = req;
     if (post.likes.includes(user.id)) {
       post.likes = post.likes.filter((id) => id !== user.id);
     } else {
       post.likes.push(user.id);
     }
-    await post.save();
-    const likesCount = post.likes.length;
-    return res.status(200).json({ likesCount });
+    await postList.save();
+    const likes = post.likes;
+    return res.status(200).json({ likes });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -172,7 +192,7 @@ export const editPost = async (req, res) => {
   try {
     const { user, post } = req;
     const { text, location } = req.body;
-    if (post.userId === user.id) {
+    if (post.creatorId === user.id) {
       post.text = text;
       post.location = location;
       await post.save();
@@ -189,9 +209,10 @@ export const editPost = async (req, res) => {
 
 export const deletePost = async (req, res) => {
   try {
-    const { user, post } = req;
-    if (post.userId === user.id) {
-      await Post.findByIdAndDelete(post.id);
+    const { user, postList, post } = req;
+    if (post.creatorId === user.id) {
+      postList.posts.id(post.id).deleteOne();
+      await postList.save();
       return res.status(200).json({ message: "post deleted successfully" });
     } else {
       return res.status(401).send("Unauthorized");
@@ -204,7 +225,7 @@ export const deletePost = async (req, res) => {
 export const deleteComment = async (req, res) => {
   try {
     const { user, post, comment } = req;
-    if (user.id === comment.userId || user.id === post.userId) {
+    if (user.id === comment.creatorId || user.id === post.creatorId) {
       post.comments.id(comment.id).deleteOne();
       await post.save();
       return res.status(200).json(post);
@@ -218,7 +239,7 @@ export const deleteComment = async (req, res) => {
 export const deleteReply = async (req, res) => {
   try {
     let { post, comment, reply } = req;
-    if (req.user.id === reply.userId) {
+    if (req.user.id === reply.creatorId) {
       comment.replies.id(reply.id).deleteOne();
       await post.save();
       res.status(200).json(post);
@@ -232,7 +253,7 @@ export const deleteReply = async (req, res) => {
 export const editReply = async (req, res) => {
   try {
     let { post, comment, reply } = req;
-    if (req.user.id === reply.userId) {
+    if (req.user.id === reply.creatorId) {
       let { reply: newReply } = req.body;
       if (newReply) {
         comment.replies.id(reply.id).content = newReply;

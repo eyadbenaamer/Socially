@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
 import { generateCode } from "../utils/generateCode.js";
+import PostList from "../models/postList.js";
 /*REGISTER USER*/
 export const signup = async (req, res) => {
   //TODO: set validatior for this route
@@ -10,17 +11,30 @@ export const signup = async (req, res) => {
     const { firstName, lastName, email, password, birthDate, gender } =
       req.body;
     if (!(firstName && lastName && email && password && birthDate && gender)) {
-      return res
-        .status(400)
-        .json({ message: "some of information are missing" });
+      return res.status(400).json({ message: "Required fields missing." });
     }
     const isEmailUsed = (await User.findOne({ email })) ? true : false;
     if (isEmailUsed) {
-      return res.status(409).json({ message: "this email is used" });
+      return res.status(409).json({ message: "This email is used." });
     }
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({ email, password: hashedPassword });
+
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+    });
+    const verificationCode = generateCode(6);
+    console.log(verificationCode);
+    const verificationToken = jwt.sign(
+      { id: newUser._id, verificationCode },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "10m",
+      }
+    );
+    newUser.verificationStatus.verificationToken = verificationToken;
+
     await newUser.save();
     const newProfile = new Profile({
       _id: newUser.id,
@@ -29,14 +43,15 @@ export const signup = async (req, res) => {
       birthDate,
       gender,
     });
+    const newPostList = new PostList({ id: newUser.id });
+    await newPostList.save();
     await newProfile.save();
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.TOKEN_EXPIRATION,
-    });
-    return res.status(201).json({ token });
+    return res.status(201).send("user created.");
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: error.message });
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "An error occured. please try again later." });
   }
 };
 /*LOGIN USER*/
@@ -181,18 +196,17 @@ export const resetPassword = async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, salt);
       user.password = hashedPassword;
       user.resetPasswordToken = null;
+      user.verificationStatus.isVerified = true;
       delete user.resetPasswordToken;
       await user.save();
       const profile = await Profile.findById(user.id);
       const loginToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
         expiresIn: process.env.TOKEN_EXPIRATION,
       });
-      return res
-        .status(200)
-        .json({
-          isVerified: true,
-          user: { token: loginToken, ...profile._doc },
-        });
+      return res.status(200).json({
+        isVerified: true,
+        user: { token: loginToken, ...profile._doc },
+      });
     } catch (error) {
       console.log(error);
       return res.status(401).json({ message: "Link expired." });

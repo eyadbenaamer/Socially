@@ -6,7 +6,7 @@ import Following from "./following";
 const Home = () => {
   const windowWidth = useWindowWidth();
   return (
-    <div className="grid grid-cols-5 h-[1000px] ">
+    <div className="grid grid-cols-5">
       {windowWidth >= 1100 && (
         <div className="sidebar flex justify-center col-span-1">
           <Sidebar />
