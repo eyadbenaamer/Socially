@@ -15,6 +15,7 @@ import "./assets/index.css";
 import ResetPassword from "pages/reset-password";
 import SetProfile from "pages/set-profile";
 import { useEffect } from "react";
+import PostViewer from "pages/post-viewer";
 
 const App = () => {
   const isLoggedin = useSelector((state) => state.loginStatus.isLoggedIn);
@@ -26,7 +27,7 @@ const App = () => {
     <BrowserRouter>
       <div className={`App ${mode} bg-100`}>
         <Header />
-        <main className=" relative top-[62px] pt-5 bg-100 min-h-screen">
+        <main className=" relative pt-5 bg-100 min-h-screen">
           <Routes>
             <Route
               path="/"
@@ -76,6 +77,8 @@ const App = () => {
                 isVerified ? <SetProfile /> : <Navigate to="/" replace={true} />
               }
             />
+            <Route path="/post/:userId/:postId" element={<PostViewer />} />
+
             <Route
               path="/notifications"
               element={

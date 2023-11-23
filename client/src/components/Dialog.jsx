@@ -1,12 +1,11 @@
 import { useEffect, useRef } from "react";
 import { ReactComponent as CloseIcon } from "../assets/icons/cross.svg";
 import useCloseWidget from "hooks/useCloseWidget";
-const Prompt = (props) => {
+const Dialog = (props) => {
   const { isOpened, setIsOpened, children } = props;
 
   const prompt = useRef(null);
   useCloseWidget(prompt, setIsOpened);
-
   useEffect(() => {
     if (isOpened) {
       document.body.style.height = "100vh";
@@ -15,32 +14,31 @@ const Prompt = (props) => {
       document.body.style = null;
     }
   }, [isOpened]);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      setIsOpened(false);
+    }
+  });
   return (
     isOpened && (
-      <div
-        onKeyDown={(e) => {
-          if (e.key === "Escape") {
-            setIsOpened(false);
-          }
-        }}
-        className=" absolute left-0 w-full h-[100vh] stop-[-62px] flex items-center justify-center z-10"
-        style={{ top: window.scrollY - 62 }}
+      <dialog
+        aria-busy={true}
+        className=" text-inherit w-full fixed top-0 bg-[#00000063] h-[100vh] flex items-center justify-center z-10"
       >
-        <div className="overlay absolute w-full h-[100%] bg-black opacity-40 "></div>
         <div ref={prompt}>
-          <section className="relative prompt bg-200  z-20 px-4 py-3 w-fit h-fit radius ">
-            <div
+          <section className="prompt bg-200 z-20 px-4 py-3 w-fit h-fit radius ">
+            <button
               className="cursor-pointer w-5"
               onClick={() => setIsOpened(false)}
             >
               <CloseIcon className="hover:text-white" />
-            </div>
+            </button>
             <>{children}</>
           </section>
         </div>
-      </div>
+      </dialog>
     )
   );
 };
 
-export default Prompt;
+export default Dialog;

@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
 
-const CreatedAt = ({ createdAt }) => {
+const useGetTime = (createdAt) => {
   const [time, setTime] = useState("");
-  let interval = 0;
-  let updateInterval = 1000;
+  let updateInterval =
+    Date.now() - createdAt > 60000
+      ? 60000
+      : Date.now() - createdAt > 3600000
+      ? 3600000
+      : 1000;
   const updateTime = () => {
-    interval = Date.now() - createdAt;
+    let interval = Date.now() - createdAt;
     if (interval > 3600000) {
       interval = Math.floor(interval / 3600000);
       if (interval < 24) {
-        updateInterval = 3600000;
-        setTime(`${interval}h`);
+        setTime(`${interval}h ago`);
       } else if (interval >= 24) {
         // clearInterval()
         interval = Math.floor(interval / 24);
         if (interval < 7) {
-          setTime(`${interval}d`);
+          setTime(`${interval}d ago`);
         } else {
           setTime(`${new Date().toDateString(createdAt)}`);
         }
@@ -25,14 +28,15 @@ const CreatedAt = ({ createdAt }) => {
       if (interval < 1) {
         setTime("just now");
       } else {
-        updateInterval = 60000;
-        setTime(`${interval}m`);
+        setTime(`${interval}m ago`);
       }
     }
   };
-  useEffect(updateTime, []);
-  setInterval(updateTime, updateInterval);
-  return <span>{time}</span>;
+  useEffect(() => {
+    updateTime();
+    setInterval(updateTime, updateInterval);
+  }, []);
+  return time;
 };
 
-export default CreatedAt;
+export default useGetTime;

@@ -5,6 +5,7 @@ export const PostSchema = new Schema({
   creatorId: String,
   location: String,
   text: String,
+  isCommentsDisabled: { type: Boolean, default: false },
   files: [
     {
       name: String,

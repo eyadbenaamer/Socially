@@ -8,10 +8,7 @@ export const CommentSchema = new Schema({
   },
   likes: [],
   replies: [ReplySchema],
-  createdAt: {
-    type: Number,
-    default: Date.now(),
-  },
+  createdAt: Number,
 });
 const Comment = model("comment", CommentSchema);
 export default Comment;

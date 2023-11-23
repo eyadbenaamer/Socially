@@ -7,10 +7,7 @@ export const ReplySchema = new Schema({
     required: true,
   },
   likes: [],
-  createdAt: {
-    type: Number,
-    default: Date.now(),
-  },
+  createdAt: Number,
 });
 const Reply = model("reply", ReplySchema);
 export default Reply;

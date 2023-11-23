@@ -4,7 +4,7 @@ import { ReactComponent as HomeIcon } from "../../assets/icons/home.svg";
 import { ReactComponent as NotificationsIcon } from "../../assets/icons/notifications.svg";
 import { ReactComponent as MessagesIcon } from "../../assets/icons/message-text.svg";
 import { ReactComponent as SavedPostsIcon } from "../../assets/icons/save.svg";
-import SidebarItem from "./Link";
+import SidebarItem from "./SidebarItem";
 const Sidebar = () => {
   const user = useSelector((state) => state.user);
   const location = useLocation();
@@ -13,7 +13,7 @@ const Sidebar = () => {
       <ul className="flex flex-col gap-3 items-start px-2 w-full">
         <SidebarItem to={"/"} name={"Home"}>
           <HomeIcon
-            className={`${location.pathname === "/" && "primary-text"}`}
+            className={`${location.pathname === "/" ? "primary-text" : ""}`}
           />
         </SidebarItem>
 
@@ -29,21 +29,23 @@ const Sidebar = () => {
         <SidebarItem to={"/notifications"} name={"Notifications"}>
           <NotificationsIcon
             className={`${
-              location.pathname === "/notifications" && "primary-text"
+              location.pathname === "/notifications" ? "primary-text" : ""
             }`}
           />
         </SidebarItem>
 
         <SidebarItem to={"/messages"} name={"Messages"}>
           <MessagesIcon
-            className={`${location.pathname === "/messages" && "primary-text"}`}
+            className={`${
+              location.pathname === "/messages" ? "primary-text" : ""
+            }`}
           />
         </SidebarItem>
 
         <SidebarItem to={"/saved-posts"} name={"Saved Posts"}>
           <SavedPostsIcon
             className={`${
-              location.pathname === "/saved-posts" && "primary-text"
+              location.pathname === "/saved-posts" ? "primary-text" : ""
             }`}
           />
         </SidebarItem>

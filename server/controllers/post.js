@@ -82,10 +82,9 @@ export const getUserPosts = async (req, res) => {
 };
 export const getPost = async (req, res) => {
   try {
-    const { userId, postId } = req.params;
-    const post = await PostList.find({ _id: userId });
-
-    return res.status(200).json(postList);
+    const { post } = req;
+    console.log(post);
+    return res.status(200).json(post);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -104,13 +103,14 @@ export const getReactionInfo = async (req, res) => {
 export const addComment = async (req, res) => {
   try {
     const { comment } = req.body;
-    const { user, post } = req;
+    const { user, postList, post } = req;
     if (comment) {
       post.comments.addToSet({
         creatorId: user.id,
         content: comment,
+        createdAt: Date.now(),
       });
-      await post.save();
+      await postList.save();
       return res.status(200).json(post);
     } else {
       return res.status(409).json({ error: "comment cannot be empty" });
@@ -122,14 +122,15 @@ export const addComment = async (req, res) => {
 export const addReply = async (req, res) => {
   try {
     const { reply } = req.body;
-    const { post, comment } = req;
+    const { user, postList, post, comment } = req;
+
     if (reply) {
       comment.replies.addToSet({
         creatorId: req.user.id,
         rootCommentId: comment.id,
         content: reply,
       });
-      await post.save();
+      await postList.save();
       return res.status(200).json(post);
     } else {
       return res.status(409).json({ message: "reply cannot be empty" });
@@ -190,12 +191,12 @@ export const likeComment = async (req, res) => {
 };
 export const editPost = async (req, res) => {
   try {
-    const { user, post } = req;
+    const { user, postList, post } = req;
     const { text, location } = req.body;
     if (post.creatorId === user.id) {
-      post.text = text;
-      post.location = location;
-      await post.save();
+      text ? (post.text = text) : null;
+      location ? (post.location = location) : null;
+      await postList.save();
       return res.status(200).json(post);
     } else {
       return res.status(401).send("Unauthorized");

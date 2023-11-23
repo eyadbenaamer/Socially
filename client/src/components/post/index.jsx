@@ -1,45 +1,45 @@
 import axios from "axios";
 import PostContent from "./post-content";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import UpperPart from "./upper-part";
-import { useSelector } from "react-redux";
 import ReactionBar from "./reaction-bar";
+import useFetchUser from "hooks/useFetchUser";
+import CreateComment from "./CreateComment";
 
 const Post = (props) => {
   const {
-    data: { _id, creatorId, files, text, createdAt, location, comments, likes },
+    post: {
+      _id,
+      creatorId,
+      files,
+      text,
+      isCommentsDisables,
+      createdAt,
+      location,
+      likes,
+    },
+    children,
   } = props;
-  const [user, setUser] = useState(useSelector((state) => state.user));
-  useEffect(() => {
-    const getUser = async () => {
-      let user = await axios
-        .get(`${process.env.REACT_APP_API_URL}/profile/${creatorId}`)
-        .then((response) => {
-          return response.data;
-        });
-      setUser(user);
-    };
-    if (creatorId !== user._id) {
-      setUser(getUser());
-    }
-  }, []);
+  const [user, setUser] = useFetchUser(creatorId);
+  const [comments, setComments] = useState(props.post.comments);
   return (
-    <div className="bg-200 radius w-full">
-      <div>
-        <UpperPart
-          id={_id}
-          user={user}
-          createdAt={createdAt}
-          location={location}
-        />
-      </div>
-      <PostContent text={text} media={files} />
+    <div className="flex flex-col gap-4 bg-200 radius w-full py-3  shadow-sm">
+      <PostContent
+        id={_id}
+        user={user}
+        createdAt={createdAt}
+        location={location}
+        text={text}
+        media={files}
+      />
       <ReactionBar
         id={_id}
         creatorId={creatorId}
-        commentsCount={comments.lenght}
+        commentsCount={comments.length}
         likes={likes}
       />
+      {children}
+      {!isCommentsDisables && <CreateComment setComments={setComments} />}
     </div>
   );
 };

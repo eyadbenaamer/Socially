@@ -3,8 +3,10 @@
 @tailwind utilities;
 /* @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,700;1,300&display=swap"); */
 html,
-boby,
-#root,
+body,
+#root {
+  scroll-behavior: smooth;
+}
 :root {
   --primary-color: #4361ee;
   --secondary-color: #899dfc;
@@ -14,7 +16,8 @@ boby,
   --background-dark-alt: #303343;
   --background-light-100: #f4f5f9;
   --background-light-200: #ffffff;
-  --background-light-300: #fafbff;
+  --background-light-300: #f6f6f6;
+  /* --background-light-300: #fafbff; */
   --background-light-alt: #eaedfb;
   --main-transition: 0.1s !important;
 }
@@ -22,7 +25,14 @@ boby,
 * {
   box-sizing: border-box;
 }
-
+@media (max-width: 280px) {
+  html {
+    font-size: 0.75rem;
+  }
+  svg {
+    width: 1.5rem;
+  }
+}
 .box {
   border-radius: 4px;
   padding: 4px;

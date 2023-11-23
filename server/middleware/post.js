@@ -7,7 +7,6 @@ export const getPostData = async (req, res, next) => {
     postList = await PostList.findById(userId);
     if (postId) {
       post = postList.posts.id(postId);
-      console.log(post);
       if (post) {
         req.post = post;
         req.postList = postList;

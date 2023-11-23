@@ -29,7 +29,7 @@ router.post("/create_post", verifyToken, createPost);
 /*READ*/
 router.get("/", verifyId, getFeedPosts); // get feed posts
 router.get("/:userId", verifyId, getUserPosts); // get all user's posts
-router.get("/:userId/:postId", verifyId, getPost); // get a pirticular post
+router.get("/:userId/:postId", verifyId, getPostData, getPost); // get a pirticular post
 router.get("/userId/:postId/:commentId", verifyId, getPostData, getComment);
 router.get(
   "/reaction_details/:userId/:postId",
@@ -53,7 +53,7 @@ router.patch(
   likeComment
 );
 router.patch(
-  "/edit_post/:postId",
+  "/edit_post/:userId/:postId",
   verifyId,
   verifyToken,
   getPostData,

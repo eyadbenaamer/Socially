@@ -8,6 +8,7 @@ const initialState = {
     isLoggedIn: false,
   },
   isVerified: null,
+  currentPost: null,
 };
 export const slice = createSlice({
   name: "state",
@@ -31,6 +32,7 @@ export const slice = createSlice({
       state.loginStatus.isLoggedIn = action.payload.isLoggedIn;
       state.loginStatus.message = action.payload.message;
     },
+
     logout: (state) => {
       delete state.user;
       state.loginStatus.email = null;

@@ -34,7 +34,7 @@ const Posts = ({ id, createdPost }) => {
               key={post._id}
               // ref={index === posts.length - 1 ? lastPost : null}
               ref={lastPost}
-              data={post}
+              post={post}
             />
           );
         })}

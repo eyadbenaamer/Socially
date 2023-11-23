@@ -2,6 +2,7 @@ import { useWindowWidth } from "hooks/useWindowWidth";
 import Sidebar from "../../components/sidebar";
 import { Content } from "./content";
 import Following from "./following";
+import { useState } from "react";
 
 const Home = () => {
   const windowWidth = useWindowWidth();
