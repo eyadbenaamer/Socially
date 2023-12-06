@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { ReactComponent as HomeIcon } from "../../assets/icons/home.svg";
 import { ReactComponent as NotificationsIcon } from "../../assets/icons/notifications.svg";
 import { ReactComponent as MessagesIcon } from "../../assets/icons/message-text.svg";
-import { ReactComponent as SavedPostsIcon } from "../../assets/icons/save.svg";
+import { ReactComponent as SavedPostsIcon } from "../../assets/icons/saved-posts.svg";
 import SidebarItem from "./SidebarItem";
 const Sidebar = () => {
   const user = useSelector((state) => state.user);

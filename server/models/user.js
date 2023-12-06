@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 const UserSchema = new Schema(
   {
     username: { type: String, uniqe: true, max: 50, default: "" },
@@ -14,6 +14,14 @@ const UserSchema = new Schema(
       verificationToken: String,
     },
     resetPasswordToken: String,
+    savedPosts: [
+      new Schema({
+        userId: String,
+        postId: String,
+      }),
+    ],
+
+    // ArraySubdocument: { type:  },
   },
   { timestamps: true }
 );

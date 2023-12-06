@@ -18,11 +18,12 @@ const ProfileSchema = new Schema({
     min: 2,
     max: 20,
   },
-
+  coverPath: String,
   picturePath: {
     type: String,
     default: `${process.env.API_URL}/assets/default_avatar.jpg`,
   },
+  bio: String,
   birthDate: String,
   gender: String,
   followers: {

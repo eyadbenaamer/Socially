@@ -23,10 +23,10 @@ const Dialog = (props) => {
     isOpened && (
       <dialog
         aria-busy={true}
-        className=" text-inherit w-full fixed top-0 bg-[#00000063] h-[100vh] flex items-center justify-center z-10"
+        className="text-inherit w-full fixed top-0 bg-[#00000063] h-[100vh] flex items-center justify-center z-20"
       >
         <div ref={prompt}>
-          <section className="prompt bg-200 z-20 px-4 py-3 w-fit h-fit radius ">
+          <section className="dialog bg-200 z-20 px-4 py-3 w-fit h-fit radius ">
             <button
               className="cursor-pointer w-5"
               onClick={() => setIsOpened(false)}

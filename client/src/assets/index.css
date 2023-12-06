@@ -19,13 +19,13 @@ body,
   --background-light-300: #f6f6f6;
   /* --background-light-300: #fafbff; */
   --background-light-alt: #eaedfb;
-  --main-transition: 0.1s !important;
+  --main-transition: 0.2s !important;
 }
 
 * {
   box-sizing: border-box;
 }
-@media (max-width: 280px) {
+@media (max-width: 350px) {
   html {
     font-size: 0.75rem;
   }
@@ -89,9 +89,6 @@ aside,
 .sidebar {
   height: calc(100vh - 62px);
 }
-aside img {
-  aspect-ratio: 1;
-}
 input,
 textarea {
   background: inherit;
@@ -106,12 +103,14 @@ textarea {
   font-size: 8px;
 }
 .text-hovered,
+.text-hovered:focus,
 .icon,
 .icon * {
   transition: var(--main-transition);
 }
 .text-hovered:hover,
 .primary-text,
+.text-hovered:focus svg,
 .text-hovered:hover svg {
   color: var(--primary-color);
   stroke: var(--primary-color) !important;
@@ -176,9 +175,17 @@ svg.hovered:hover,
   color: var(--primary-color) !important;
 }
 @media (min-width: 640px) {
-  .prompt {
+  .dialog {
     border-radius: 12px;
   }
+}
+.dialog img {
+  max-width: 90vw;
+  max-height: 80vh;
+}
+.dialog .circle img {
+  max-width: 100%;
+  max-height: unset;
 }
 .alert.error {
   border: solid 2px #b0050587;

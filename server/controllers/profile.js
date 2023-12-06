@@ -13,7 +13,9 @@ export const getProfile = async (req, res) => {
       return res.status(404).json({ error: error.message });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const getFollowers = async (req, res) => {
@@ -27,7 +29,9 @@ export const getFollowers = async (req, res) => {
       return res.status(404).json({ error: "No followers found" });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const getFollowing = async (req, res) => {
@@ -41,7 +45,9 @@ export const getFollowing = async (req, res) => {
       return res.status(404).json({ error: "No following found" });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 /*UPDATE*/

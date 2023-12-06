@@ -1,7 +1,5 @@
-import PostList from "../models/postList.js";
-import Comment from "../models/comment.js";
-import Reply from "../models/reply.js";
-import Post from "../models/post.js";
+import Posts from "../models/posts.js";
+// import Post from "../models/post.js";
 //TODO: find a way to send comments on patches
 /*CREATE*/
 export const createPost = async (req, res) => {
@@ -29,29 +27,31 @@ export const createPost = async (req, res) => {
           }
         });
       }
-      const newPost = new Post({
+      const newPost = {
         creatorId: id,
         text,
         files: media ? filesPaths : null,
         createdAt: Date.now(),
         location,
-      });
-      const postList = await PostList.findById(id);
-      postList.posts.push(newPost);
+      };
+      const postList = await Posts.findById(id);
+      postList.posts.addToSet(newPost);
       await postList.save();
       return res.status(201).json(newPost);
     } else {
       return res.status(409).json({ error: error.message });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 
 /*READ*/
 export const getFeedPosts = async (req, res) => {
   try {
-    const postList = await PostList.find();
+    const postList = await Posts.find();
     if (!postList) {
       return res.status(404).json({ error: error.message });
     } else {
@@ -60,33 +60,40 @@ export const getFeedPosts = async (req, res) => {
       return res.status(200).json(posts.reverse());
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const getComment = async (req, res) => {
   try {
     return res.status(200).json(req.comment);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    let postList = await PostList.findById(userId);
+    let postList = await Posts.findById(userId);
     postList = postList.posts.reverse();
     return res.status(200).json(postList);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const getPost = async (req, res) => {
   try {
     const { post } = req;
-    console.log(post);
     return res.status(200).json(post);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const getReactionInfo = async (req, res) => {
@@ -96,18 +103,38 @@ export const getReactionInfo = async (req, res) => {
       .status(200)
       .json({ commentsCount: post.comments.length, likes: post.likes });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
+export const toggleComments = async (req, res) => {
+  try {
+    const { postList, post } = req;
+    post.isCommentsDisabled = !post.isCommentsDisabled;
+    await postList.save();
+    return res.status(200).json(post);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
+  }
+};
+
 /*UPDATE*/
 export const addComment = async (req, res) => {
   try {
-    const { comment } = req.body;
+    const { text } = req.body;
     const { user, postList, post } = req;
-    if (comment) {
+    if (post.isCommentsDisabled) {
+      return res.status(409).json({ error: "comments are disabled" });
+    }
+    const { fileInfo } = req;
+    if (text || fileInfo) {
       post.comments.addToSet({
         creatorId: user.id,
-        content: comment,
+        text,
+        file: fileInfo ? fileInfo : null,
         createdAt: Date.now(),
       });
       await postList.save();
@@ -116,7 +143,9 @@ export const addComment = async (req, res) => {
       return res.status(409).json({ error: "comment cannot be empty" });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const addReply = async (req, res) => {
@@ -126,7 +155,7 @@ export const addReply = async (req, res) => {
 
     if (reply) {
       comment.replies.addToSet({
-        creatorId: req.user.id,
+        creatorId: user.id,
         rootCommentId: comment.id,
         content: reply,
       });
@@ -136,18 +165,20 @@ export const addReply = async (req, res) => {
       return res.status(409).json({ message: "reply cannot be empty" });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const editComment = async (req, res) => {
   try {
-    const { comment: newComment } = req.body;
-    const { user, post, comment } = req;
-    if (newComment) {
+    const { text } = req.body;
+    const { user, postList, post, comment } = req;
+    if (text) {
       if (comment.creatorId === user.id) {
-        comment.content = newComment;
-        await post.save();
-        return res.status(200).json(post);
+        comment.text = text;
+        await postList.save();
+        return res.status(200).json(comment);
       } else {
         return res.status(401).send("Unauthorized");
       }
@@ -155,11 +186,13 @@ export const editComment = async (req, res) => {
       return res.status(409).json({ error: "comment cannot be empty" });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
-
-export const likePost = async (req, res) => {
+//TODO:
+export const likePostToggle = async (req, res) => {
   try {
     const { user, postList, post } = req;
     if (post.likes.includes(user.id)) {
@@ -171,7 +204,9 @@ export const likePost = async (req, res) => {
     const likes = post.likes;
     return res.status(200).json({ likes });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const likeComment = async (req, res) => {
@@ -186,13 +221,16 @@ export const likeComment = async (req, res) => {
     const likesCount = comment.likes.length;
     return res.status(200).json({ likes: comment.likes, likesCount });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const editPost = async (req, res) => {
   try {
     const { user, postList, post } = req;
     const { text, location } = req.body;
+    console.log(req.body);
     if (post.creatorId === user.id) {
       text ? (post.text = text) : null;
       location ? (post.location = location) : null;
@@ -202,7 +240,9 @@ export const editPost = async (req, res) => {
       return res.status(401).send("Unauthorized");
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 
@@ -219,22 +259,26 @@ export const deletePost = async (req, res) => {
       return res.status(401).send("Unauthorized");
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 
 export const deleteComment = async (req, res) => {
   try {
-    const { user, post, comment } = req;
+    const { user, postList, post, comment } = req;
     if (user.id === comment.creatorId || user.id === post.creatorId) {
       post.comments.id(comment.id).deleteOne();
-      await post.save();
+      await postList.save();
       return res.status(200).json(post);
     } else {
       return res.status(401).send("Unauthorized");
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const deleteReply = async (req, res) => {
@@ -248,7 +292,9 @@ export const deleteReply = async (req, res) => {
       return res.status(401).json("Unauthorized");
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const editReply = async (req, res) => {
@@ -267,7 +313,9 @@ export const editReply = async (req, res) => {
       return res.status(401).json("Unauthorized");
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const likeReply = async (req, res) => {
@@ -282,6 +330,8 @@ export const likeReply = async (req, res) => {
     await post.save();
     res.status(200).json(post);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };

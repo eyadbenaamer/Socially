@@ -12,11 +12,20 @@ import { fileURLToPath } from "url";
 import authRoute from "./routes/auth.js";
 import profileRoute from "./routes/profile.js";
 import postRoute from "./routes/post.js";
+import userRoute from "./routes/user.js";
 
-import { createPost, getFeedPosts } from "./controllers/post.js";
+import {
+  addComment,
+  addReply,
+  createPost,
+  getFeedPosts,
+} from "./controllers/post.js";
 import { verifyToken } from "./middleware/auth.js";
 import { renameFile } from "./utils/renameFile.js";
 import { setProfile } from "./controllers/profile.js";
+import { verifyId } from "./middleware/check.js";
+import { getPostData, uploadSingleFile } from "./middleware/post.js";
+import session, { Session } from "express-session";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -51,8 +60,26 @@ app.post(
   upload.fields([{ name: "media", maxCount: 5 }]),
   createPost
 );
-
+app.post(
+  "/posts/add_comment/:userId/:postId/",
+  verifyId,
+  verifyToken,
+  upload.single("media"),
+  uploadSingleFile,
+  getPostData,
+  addComment
+);
+app.post(
+  "/posts/add_reply/:userId/:postId/:commentId",
+  verifyId,
+  verifyToken,
+  upload.single("media"),
+  uploadSingleFile,
+  getPostData,
+  addReply
+);
 /*ROUTES*/
+app.use("/", userRoute);
 app.use("/", authRoute);
 app.use("/home", getFeedPosts);
 app.use("/profile", profileRoute);

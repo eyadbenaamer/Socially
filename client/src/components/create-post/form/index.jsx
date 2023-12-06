@@ -19,17 +19,17 @@ const Form = (props) => {
   return (
     <div className="flex flex-col gap-3">
       <textarea
-        autoFocus={true}
+        autoFocus
         value={data.text}
         className="mt-2"
-        type="text"
+        dir="auto"
         name="text"
         placeholder="Type Anything!"
         onChange={(e) => {
           setData((prev) => ({ ...prev, text: e.target.value }));
         }}
       />
-      <DropZone multiple={true} onChange={(files) => setMedia(files)} />
+      <DropZone multiple onChange={(files) => setMedia(files)} />
       <button
         disabled={!isValidPost}
         className={`${

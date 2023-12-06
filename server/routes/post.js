@@ -4,7 +4,6 @@ import {
   getUserPosts,
   getPost,
   getComment,
-  likePost,
   createPost,
   addComment,
   editComment,
@@ -17,6 +16,8 @@ import {
   likeComment,
   likeReply,
   getReactionInfo,
+  likePostToggle,
+  toggleComments,
 } from "../controllers/post.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
@@ -43,7 +44,14 @@ router.patch(
   verifyId,
   verifyToken,
   getPostData,
-  likePost
+  likePostToggle
+);
+router.patch(
+  "/toggle_comments/:userId/:postId",
+  verifyId,
+  verifyToken,
+  getPostData,
+  toggleComments
 );
 router.patch(
   "/like_comment/:userId/:postId/:commentId",
@@ -59,20 +67,7 @@ router.patch(
   getPostData,
   editPost
 );
-router.patch(
-  "/add_comment/:userId/:postId",
-  verifyId,
-  verifyToken,
-  getPostData,
-  addComment
-);
-router.patch(
-  "/add_reply/:userId/:postId/:commentId",
-  verifyId,
-  verifyToken,
-  getPostData,
-  addReply
-);
+
 router.patch(
   "/edit_comment/:userId/:postId/:commentId",
   verifyId,
@@ -87,14 +82,14 @@ router.patch(
   getPostData,
   editReply
 );
-router.patch(
+router.delete(
   "/delete_comment/:userId/:postId/:commentId",
   verifyId,
   verifyToken,
   getPostData,
   deleteComment
 );
-router.patch(
+router.delete(
   "/delete_reply/:userId/:postId/:commentId/:replyId",
   verifyId,
   verifyToken,

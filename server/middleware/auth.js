@@ -22,6 +22,8 @@ export const verifyToken = async (req, res, next) => {
       return res.status(403).json("invalid token or user doesn't exist");
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };

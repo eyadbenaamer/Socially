@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
 import { generateCode } from "../utils/generateCode.js";
-import PostList from "../models/postList.js";
+import Posts from "../models/posts.js";
 /*REGISTER USER*/
 export const signup = async (req, res) => {
   //TODO: set validatior for this route
@@ -43,7 +43,7 @@ export const signup = async (req, res) => {
       birthDate,
       gender,
     });
-    const newPostList = new PostList({ id: newUser.id });
+    const newPostList = new Posts({ id: newUser.id });
     await newPostList.save();
     await newProfile.save();
     return res.status(201).send("user created.");

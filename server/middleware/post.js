@@ -1,10 +1,10 @@
-import PostList from "../models/postList.js";
+import Posts from "../models/posts.js";
 
 export const getPostData = async (req, res, next) => {
   try {
     const { userId, postId, commentId, replyId } = req.params;
     let postList, post, comment, reply;
-    postList = await PostList.findById(userId);
+    postList = await Posts.findById(userId);
     if (postId) {
       post = postList.posts.id(postId);
       if (post) {
@@ -16,7 +16,6 @@ export const getPostData = async (req, res, next) => {
     }
     if (commentId) {
       comment = post.comments.id(commentId);
-
       if (comment) {
         req.comment = comment;
       } else {
@@ -34,5 +33,28 @@ export const getPostData = async (req, res, next) => {
     next();
   } catch (error) {
     return res.status(500).json({ message: error.message });
+  }
+};
+export const uploadSingleFile = (req, res, next) => {
+  try {
+    const uploadsFolder = `${process.env.API_URL}/assets/`;
+
+    const { file } = req;
+    if (file) {
+      if (file.mimetype.startsWith("image")) {
+        req.fileInfo = {
+          path: `${uploadsFolder}${file.filename}`,
+          fileType: "photo",
+        };
+      } else if (file.mimetype.startsWith("video")) {
+        req.fileInfo = {
+          path: `${uploadsFolder}${file.filename}`,
+          fileType: "video",
+        };
+      }
+    }
+    next();
+  } catch (error) {
+    console.log(error);
   }
 };

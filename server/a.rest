@@ -39,11 +39,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MTg4ZDNhO
 
 { "description":"hi", "picturePath":"gsders","location":"benghazi" }
 ###
-PATCH  http://localhost:3001/posts/add_comment/655b952cb6ccf1900f3478f0/655de37da20933679d2a5300
+PATCH  http://localhost:3001/posts/delete_comment/655b952cb6ccf1900f3478f0/655de37da20933679d2a5300/65653a360e125ac80ea0b5d7
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NWI5NTJjYjZjY2YxOTAwZjM0NzhmMCIsImlhdCI6MTcwMDUwMDgxMCwiZXhwIjoxNzAxMzY0ODEwfQ.EUNa05M03ol-sCYmmu69raHJ62fmpEU5Yr8TvYTKlgk
 
-{ "comment":"this is a comment"}
+{ "comment":"hello"}
 ###
 PATCH  http://localhost:3001/posts/edit_post/655c9f82e85104860f0a3491/655e69e002c6903b7fd5727c
 Content-Type: application/json
@@ -71,8 +71,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MTg4ZDNhO
 
 
 ###
-###eyad
+###
+POST http://localhost:3001/posts/add_comment/65676fc87142433e54f9ac76/65701f0b82d35ba3e7de5457
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Njc2ZmM4NzE0MjQzM2U1NGY5YWM3NiIsImlhdCI6MTcwMTI3NzY2MiwiZXhwIjoxNzAyMTQxNjYyfQ.sAss3y9rfLkxqIzhmC31B2peBkr0UdHes7hW9qKK0KE
+Content-Type: application/json
 
+{"text":"hi"}
+###
+GET http://localhost:3001/saved_posts/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Njc2ZmM4NzE0MjQzM2U1NGY5YWM3NiIsImlhdCI6MTcwMTI3NzY2MiwiZXhwIjoxNzAyMTQxNjYyfQ.sAss3y9rfLkxqIzhmC31B2peBkr0UdHes7hW9qKK0KE
+
+###
 PATCH  http://localhost:3001/user/follow/64fde60ff9697bdc0c4bfcbb
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MTg4ZDNhOTIwNGY4ZjJiMzlkYTdmZCIsImlhdCI6MTY5NjEwNzg0MywiZXhwIjoxNjk3MzE3NDQzfQ.vT7P3otks2zGnVxdw1lgS580a0m8wzWH_vzJovadwaw
 

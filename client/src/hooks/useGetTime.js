@@ -18,7 +18,11 @@ const useGetTime = (createdAt) => {
         // clearInterval()
         interval = Math.floor(interval / 24);
         if (interval < 7) {
-          setTime(`${interval}d ago`);
+          let postedDay =
+            new Date(createdAt).getMonth() !== new Date().getMonth()
+              ? new Date(createdAt).getDate() - 30
+              : new Date(createdAt).getDate();
+          setTime(`${new Date().getDate() - postedDay}d ago`);
         } else {
           setTime(`${new Date().toDateString(createdAt)}`);
         }

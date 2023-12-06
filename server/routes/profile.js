@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   getProfile,
   getFollowers,
@@ -10,7 +10,7 @@ import {
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
 
-const router = express.Router();
+const router = Router();
 
 /*READ*/
 router.get("/:id", verifyId, getProfile);
