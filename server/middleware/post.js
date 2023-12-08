@@ -4,12 +4,20 @@ export const getPostData = async (req, res, next) => {
   try {
     const { userId, postId, commentId, replyId } = req.params;
     let postList, post, comment, reply;
-    postList = await Posts.findById(userId);
+    if (userId) {
+      postList = await Posts.findById(userId);
+      console.log(postList);
+      if (postList) {
+        req.postList = postList;
+      } else {
+        return res.status(404).json({ message: "user doesn't exist" });
+      }
+    }
+
     if (postId) {
       post = postList.posts.id(postId);
       if (post) {
         req.post = post;
-        req.postList = postList;
       } else {
         return res.status(404).json({ message: "post doesn't exist" });
       }

@@ -90,8 +90,7 @@ export const getComment = async (req, res) => {
 };
 export const getUserPosts = async (req, res) => {
   try {
-    const { userId } = req.params;
-    let postList = await Posts.findById(userId);
+    const postList = { req };
     postList.posts = postList.posts.reverse();
     const result = postList.posts.map((post) => {
       return {

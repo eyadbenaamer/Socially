@@ -30,7 +30,7 @@ router.post("/create_post", verifyToken, createPost);
 
 /*READ*/
 router.get("/", verifyId, getFeedPosts); // get feed posts
-router.get("/:userId", verifyId, getUserPosts); // get all user's posts
+router.get("/:userId", verifyId, getPostData, getUserPosts); // get all user's posts
 router.get("/:userId/:postId", verifyId, getPostData, getPost); // get a pirticular post
 router.get(
   "/post_preview/:userId/:postId",
