@@ -3,10 +3,9 @@ import { Schema, model } from "mongoose";
 const ReplySchema = new Schema({
   creatorId: String,
   rootCommentId: String,
-  content: {
-    type: String,
-    required: true,
-  },
+  text: String,
+  file: { fileType: String, path: String },
+
   likes: [],
   createdAt: Number,
 });
