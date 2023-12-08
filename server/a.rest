@@ -1,24 +1,31 @@
-POST http://localhost:3001/signup/
+POST https://socially-uemy.onrender.com/signup/
 Content-Type: application/json
 
 {
-  "firstName":"eyad",
-  "lastName":"binamir",
-    "email":"s2@email.com",
+  "firstName":"ali",
+  "lastName":"b",
+    "email":"alib@email.com",
     "password":"1234",
        "birthDate":"2015-5-7",
         "gender":"male"
 }
 
 ###
-POST http://localhost:3001/login/
+POST https://socially-uemy.onrender.com/login/
 Content-Type: application/json
 
 {
-  "email":"bbb@email.com",
+  "email":"alib@email.com",
   "password":"1234"
 }
+###
+POST https://socially-uemy.onrender.com/verify_account/
+Content-Type: application/json
 
+{
+  "email":"alib@email.com",
+  "code":"533157"
+}
 ###
 ###ddd
 GET http://localhost:3001/posts

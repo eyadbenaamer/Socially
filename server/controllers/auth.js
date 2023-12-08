@@ -103,6 +103,7 @@ export const login = async (req, res) => {
       return res.status(404).json({ message: "The user doesn't exist." });
     }
   } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ message: "An error occurred. try again later." });
