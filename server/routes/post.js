@@ -18,6 +18,7 @@ import {
   getReactionInfo,
   likePostToggle,
   toggleComments,
+  getPostPreview,
 } from "../controllers/post.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
@@ -31,6 +32,12 @@ router.post("/create_post", verifyToken, createPost);
 router.get("/", verifyId, getFeedPosts); // get feed posts
 router.get("/:userId", verifyId, getUserPosts); // get all user's posts
 router.get("/:userId/:postId", verifyId, getPostData, getPost); // get a pirticular post
+router.get(
+  "/post_preview/:userId/:postId",
+  verifyId,
+  getPostData,
+  getPostPreview
+); // get a pirticular post
 router.get("/userId/:postId/:commentId", verifyId, getPostData, getComment);
 router.get(
   "/reaction_details/:userId/:postId",
