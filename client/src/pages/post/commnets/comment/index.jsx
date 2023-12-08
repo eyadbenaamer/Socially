@@ -4,7 +4,9 @@ import useFetchUser from "hooks/useFetchUser";
 import { useState } from "react";
 import Replies from "./replies";
 import OptionsBtn from "./options-btn";
-import MediaViewer from "./MediaViewer";
+import Media from "./Media";
+import { useParams } from "react-router-dom";
+import AddComment from "pages/post/AddComment";
 
 const Comment = (props) => {
   const {
@@ -13,11 +15,15 @@ const Comment = (props) => {
   } = props;
   const [user] = useFetchUser(creatorId);
   const [isModifying, setIsModifying] = useState(false);
-
+  const { commentId } = useParams();
   return (
     <>
       {props.comment && (
-        <div className="flex flex-col gap-2">
+        <div
+          tabIndex={0}
+          id={commentId === id ? "targetComment" : ""}
+          className="flex flex-col gap-2 outline-1 radius items-start justify-start"
+        >
           <div className="flex items-center gap-2">
             <div className="flex gap-2 items-start">
               <div className="flex scale-90">
@@ -29,19 +35,17 @@ const Comment = (props) => {
               </div>
               <div className="flex gap-2 items-center">
                 <div className="flex flex-col gap-2">
-                  {text && (
-                    <div className="bg-300 radius p-3 shadow-sm w-fit">
-                      <Text
-                        text={text}
-                        type="comment"
-                        postId={postId}
-                        commentId={id}
-                        isModifying={isModifying}
-                        setIsModifying={setIsModifying}
-                      />
-                    </div>
-                  )}
-                  <MediaViewer>
+                  <div className={`bg-300 radius shadow-sm w-fit`}>
+                    <Text
+                      text={text}
+                      type="comment"
+                      postId={postId}
+                      commentId={id}
+                      isModifying={isModifying}
+                      setIsModifying={setIsModifying}
+                    />
+                  </div>
+                  <Media>
                     <div className="radius overflow-hidden w-fit">
                       {file && file.fileType === "photo" && (
                         <img src={file.path} alt="" />
@@ -50,7 +54,7 @@ const Comment = (props) => {
                         <video controls src={file.path} />
                       )}
                     </div>
-                  </MediaViewer>
+                  </Media>
                 </div>
                 <OptionsBtn
                   commentId={id}
@@ -62,6 +66,9 @@ const Comment = (props) => {
             </div>
           </div>
           {replies && <Replies replies={replies} />}
+          <div className="scale-7500 ">
+            <AddComment type="reply" commentId={id} />
+          </div>
         </div>
       )}
     </>

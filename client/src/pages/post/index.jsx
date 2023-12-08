@@ -1,11 +1,12 @@
 import { createContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Comments from "./commnets";
-import CreateComment from "pages/post/CreateComment";
+import AddComment from "pages/post/AddComment";
 import Bar from "components/bar";
 import { useWindowWidth } from "hooks/useWindowWidth";
 import PostContent from "./post-content";
 import ReactionsBar from "./reactions-bar";
+import { useSelector } from "react-redux";
 
 export const PostContext = createContext();
 
@@ -23,29 +24,35 @@ const Post = () => {
       })
     );
   }, []);
+
+  const user = useSelector((state) => state.user);
   return (
     <>
       <div className="p-2 w-full md:w-1/2 lg:w-2/5 py-5 mx-auto min-h-screen pt-5 pb-20">
         {post && (
-          <div className="bg-200 radius">
+          <div className="bg-200 radius shadow-sm">
             <PostContext.Provider
               value={{
                 ...post,
                 setPost,
               }}
             >
-              <div className="flex flex-col gap-4 bg-200 radius w-full py-3 shadow-sm">
+              <div className="flex flex-col gap-4 bg-200 radius w-full py-3">
                 <PostContent />
                 <ReactionsBar />
               </div>
               <Comments />
-              {post.isCommentsDisabled === false ? (
-                <CreateComment />
-              ) : (
-                <div className="text-center p-4 bg-300 radius ">
-                  The post creator has turned off the comments.
-                </div>
-              )}
+              {user &&
+                (post.isCommentsDisabled === false ? (
+                  <AddComment />
+                ) : (
+                  <div className="text-center p-4 bg-300 radius ">
+                    {user && user._id === userId
+                      ? "You had"
+                      : "The post creator has"}{" "}
+                    turned off the comments.
+                  </div>
+                ))}
             </PostContext.Provider>
           </div>
         )}

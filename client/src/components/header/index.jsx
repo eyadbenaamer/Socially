@@ -8,7 +8,7 @@ const Header = () => {
     useSelector((state) => state.user && state.isVerified)
   );
   return (
-    <header className="sticky top-0 z-10 w-full">
+    <header className="sticky top-0 z-50 w-full">
       {isLoggedIn && <LoggedIn />}
       {!isLoggedIn && <UnloggedIn />}
     </header>

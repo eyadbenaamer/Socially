@@ -20,7 +20,12 @@ const ToggleComments = () => {
       method: "PATCH",
       headers: { Authorization: user.token },
     }).then((response) =>
-      response.json().then((response) => setPost(response))
+      response.json().then((response) =>
+        setPost((prev) => ({
+          ...prev,
+          isCommentsDisabled: !isCommentsDisabled,
+        }))
+      )
     );
   };
   return (

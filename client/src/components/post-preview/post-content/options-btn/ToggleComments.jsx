@@ -1,14 +1,14 @@
 import { useContext } from "react";
 import { ReactComponent as CommentsEnabledIcon } from "../../../../assets/icons/comments.svg";
-import { ReactComponent as CommentsDisabledIcon } from "../../../../assets/icons/comments.svg";
+import { ReactComponent as CommentsDisabledIcon } from "../../../../assets/icons/comments-turnedoff.svg";
 import { useSelector } from "react-redux";
-import { PostContext } from "pages/post";
+import { PostContext } from "components/post-preview";
 
 const ToggleComments = () => {
   const {
     isCommentsDisabled,
-    setIsCommentsDisabled,
-    creatorId: id,
+    creatorId,
+    setPost,
     _id: postId,
   } = useContext(PostContext);
 
@@ -16,10 +16,17 @@ const ToggleComments = () => {
 
   const toggleComments = () => {
     const API_URL = process.env.REACT_APP_API_URL;
-    fetch(`${API_URL}/posts/toggle_comments/${id}/${postId}`, {
+    fetch(`${API_URL}/posts/toggle_comments/${creatorId}/${postId}`, {
       method: "PATCH",
       headers: { Authorization: user.token },
-    }).then(() => setIsCommentsDisabled(!isCommentsDisabled));
+    }).then((response) =>
+      response.json().then(() => {
+        setPost((prev) => ({
+          ...prev,
+          isCommentsDisabled: !isCommentsDisabled,
+        }));
+      })
+    );
   };
   return (
     <li>
@@ -31,7 +38,7 @@ const ToggleComments = () => {
           {isCommentsDisabled ? (
             <CommentsEnabledIcon />
           ) : (
-            <CommentsEnabledIcon />
+            <CommentsDisabledIcon />
           )}
         </span>
         {isCommentsDisabled ? "Turn on comments" : "Turn off comments"}

@@ -16,7 +16,7 @@ const CopyLink = (props) => {
         <span className="w-6">
           <TrashIcon />
         </span>
-        Copy the comment link.
+        Copy the comment link
       </button>
     </li>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import PrimaryBtn from "./PrimaryBtn";
 import SubmitBtn from "./SubmitBtn";
 import axios from "axios";
@@ -8,7 +8,6 @@ const Text = (props) => {
   const [text, setText] = useState("");
   const { type, postId, commentId, replyId, isModifying, setIsModifying } =
     props;
-
   const textArea = useRef(null);
   const [modifiedText, setModifiedText] = useState(null);
   const [originalText, setOriginalText] = useState(props.text);
@@ -35,7 +34,7 @@ const Text = (props) => {
         setIsModifying(false);
       });
   };
-
+  console.log(originalText);
   useEffect(() => {
     let text = originalText;
     if (text.length > 100) {
@@ -47,7 +46,7 @@ const Text = (props) => {
   return (
     <>
       {isModifying ? (
-        <>
+        <div className="bg-inherit p-3 radius">
           <textarea
             defaultValue={text}
             autoFocus
@@ -72,14 +71,9 @@ const Text = (props) => {
               </SubmitBtn>
             </span>
           </div>
-        </>
+        </div>
       ) : (
-        <p
-          dir="auto"
-          style={{
-            visibility: text || isModifying ? "visible" : "hidden",
-          }}
-        >
+        <p dir="auto" className={`${text != "" || isModifying ? " p-3" : ""} `}>
           {text}{" "}
           {text.length > 100 && originalText.length !== text.length && (
             <button

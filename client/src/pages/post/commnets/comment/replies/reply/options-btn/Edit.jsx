@@ -1,4 +1,4 @@
-import { ReactComponent as EditIcon } from "../../../../assets/icons/edit.svg";
+import { ReactComponent as EditIcon } from "../../../../../../../assets/icons/edit.svg";
 
 const Edit = (props) => {
   const { setIsModifying } = props;
@@ -14,7 +14,7 @@ const Edit = (props) => {
         <span className="w-6">
           <EditIcon />
         </span>
-        Edit the post
+        Edit the reply
       </button>
     </li>
   );

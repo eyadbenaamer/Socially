@@ -8,7 +8,7 @@ const Like = (props) => {
   const { id, creatorId } = props;
   const user = useSelector((state) => state.user);
   const [likes, setLikes] = useState(props.likes);
-  const [isLiked, setIsliked] = useState(likes.includes(user._id));
+  const [isLiked, setIsliked] = useState(likes.includes(user && user._id));
   const [showLikes, setShowLikes] = useState(false);
   const likeToggle = async () => {
     const API_URL = process.env.REACT_APP_API_URL;

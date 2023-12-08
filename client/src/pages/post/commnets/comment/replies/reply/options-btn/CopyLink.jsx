@@ -1,11 +1,11 @@
-import { useSelector } from "react-redux";
-import { ReactComponent as TrashIcon } from "../../../../assets/icons/copy.svg";
+import { ReactComponent as TrashIcon } from "../../../../../../../assets/icons/copy.svg";
 
 const CopyLink = (props) => {
-  const { postPath } = props;
-  const user = useSelector((state) => state.user);
+  const { commentPath } = props;
   const copyLink = () => {
-    navigator.clipboard.writeText(`${window.location.host}/post/${postPath}`);
+    navigator.clipboard.writeText(
+      `${window.location.host}/post/${commentPath}`
+    );
   };
   return (
     <li>
@@ -16,7 +16,7 @@ const CopyLink = (props) => {
         <span className="w-6">
           <TrashIcon />
         </span>
-        Copy the post link
+        Copy the reply link
       </button>
     </li>
   );

@@ -1,10 +1,19 @@
 import MediaPreview from "./MediaPreview";
 import Text from "../../Text";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { CreatorInfo } from "./CreatorInfo";
 import OptionsBtn from "./options-btn";
-const PostContent = (props) => {
-  const { id, user, createdAt, location, media, text } = props;
+import { PostContext } from "..";
+import Media from "components/post/Media";
+const PostContent = () => {
+  const {
+    _id: id,
+    user,
+    createdAt,
+    location,
+    files,
+    text,
+  } = useContext(PostContext);
   const [isModifying, setIsModifying] = useState(false);
 
   return (
@@ -20,7 +29,7 @@ const PostContent = (props) => {
           <OptionsBtn id={id} user={user} setIsModifying={setIsModifying} />
         </div>
       </div>
-      <div className="px-4 flex flex-col">
+      <div className="px-1 sm:px-4 flex flex-col">
         <Text
           text={text}
           type="post"
@@ -28,8 +37,7 @@ const PostContent = (props) => {
           isModifying={isModifying}
           setIsModifying={setIsModifying}
         />
-
-        {media && <MediaPreview media={media} />}
+        {files && <Media media={files} />}
       </div>
     </>
   );

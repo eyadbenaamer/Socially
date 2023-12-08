@@ -33,11 +33,11 @@ const OptionsBtn = (props) => {
       </button>
       {isOpen && (
         <ul
-          className={`absolute top-[100%] right-0 radius w-max overflow-hidden z-10 ${
+          className={`menu absolute top-[100%] right-0 radius w-max overflow-hidden z-20 ${
             mode === "dark" ? "bg-300" : "bg-100"
           }`}
           ref={optionsList}
-          onClick={() => setIsOpen(!isOpen)}
+          // onClick={() => setIsOpen(!isOpen)}
         >
           {(user._id === commentCreatorId || user._id === post.creatorId) && (
             <Delete

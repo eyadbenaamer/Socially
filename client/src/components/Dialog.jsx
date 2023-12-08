@@ -29,7 +29,7 @@ const Dialog = (props) => {
           <section className="dialog bg-200 z-20 px-4 py-3 w-fit h-fit radius ">
             <button
               className="cursor-pointer w-5"
-              onClick={() => setIsOpened(false)}
+              onClick={() => setIsOpened(!isOpened)}
             >
               <CloseIcon className="hover:text-white" />
             </button>

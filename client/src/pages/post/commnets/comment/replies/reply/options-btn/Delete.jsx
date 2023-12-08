@@ -1,30 +1,27 @@
-import axios from "axios";
 import Dialog from "components/Dialog";
 import RedBtn from "components/RedBtn";
-import { useState } from "react";
-import { ReactComponent as TrashIcon } from "../../../../assets/icons/trash-basket.svg";
+import { useContext, useState } from "react";
+import { ReactComponent as TrashIcon } from "../../../../../../../assets/icons/trash-basket.svg";
 import PrimaryBtn from "components/PrimaryBtn";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { PostContext } from "pages/post";
 
 const Delete = (props) => {
-  const { id } = props;
+  const { replyPath } = props;
   const user = useSelector((state) => state.user);
-  const location = useLocation();
-  const deletePost = async () => {
+
+  const { setPost } = useContext(PostContext);
+  const deleteReply = async () => {
     const API_URL = process.env.REACT_APP_API_URL;
-    await fetch(`${API_URL}/posts/delete_post/${user._id}/${id}`, {
+    await fetch(`${API_URL}/posts/delete_reply/${replyPath}`, {
       method: "DELETE",
       headers: { authorization: user.token },
+    }).then((response) => {
+      setIsOpen((prev) => !prev);
+      response.json().then((response) => setPost(response));
     });
-    if (location.pathname.startsWith("/post")) {
-      window.history.back();
-    } else {
-      window.location.reload();
-    }
   };
   const [isOpen, setIsOpen] = useState(false);
-  const mode = useSelector((state) => state.settings.mode);
 
   return (
     <li>
@@ -35,15 +32,15 @@ const Delete = (props) => {
         <span className="w-6">
           <TrashIcon />
         </span>
-        Delete the post
+        Delete the reply
       </button>
       <Dialog isOpened={isOpen} setIsOpened={setIsOpen}>
         <div className="w-full py-4 ">
-          Are you sure you want to delete this post?
+          Are you sure you want to delete this reply?
         </div>
         <div className="flex justify-between mt-2">
           <PrimaryBtn onClick={() => setIsOpen(false)}>Cancel</PrimaryBtn>
-          <RedBtn onClick={deletePost}>Delete</RedBtn>
+          <RedBtn onClick={deleteReply}>Delete</RedBtn>
         </div>
       </Dialog>
     </li>

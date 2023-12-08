@@ -1,4 +1,4 @@
-import Media from "./Media";
+import Media from "components/post/Media";
 import { useState } from "react";
 import { CreatorInfo } from "./CreatorInfo";
 import OptionsBtn from "./options-btn";
@@ -11,7 +11,7 @@ const PostContent = (props) => {
     creatorId,
     createdAt,
     location,
-    media,
+    files,
     text,
   } = useContext(PostContext);
   const [isModifying, setIsModifying] = useState(false);
@@ -29,7 +29,7 @@ const PostContent = (props) => {
           <OptionsBtn setIsModifying={setIsModifying} />
         </div>
       </div>
-      <div className="px-4 flex flex-col">
+      <div className="md:px-4 flex flex-col gap-3">
         <Text
           text={text}
           type="post"
@@ -38,7 +38,7 @@ const PostContent = (props) => {
           setIsModifying={setIsModifying}
         />
 
-        {media && <Media media={media} />}
+        {files && <Media media={files} />}
       </div>
     </>
   );

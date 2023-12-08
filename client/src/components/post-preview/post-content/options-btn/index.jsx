@@ -6,13 +6,13 @@ import Delete from "./Delete";
 import Edit from "./Edit";
 import SavePost from "./SavePost";
 import ToggleComments from "./ToggleComments";
+import CopyLink from "./CopyLink";
 
 const OptionsBtn = (props) => {
   const { id, user, setIsModifying } = props;
   const currentUser = useSelector((state) => state.user);
   const mode = useSelector((state) => state.settings.mode);
   const [isOpen, setIsOpen] = useState(false);
-  // const { isCommentsDisabled, setIsCommentsDisabled } = useContext(PostContext);
   const optionsList = useRef(null);
   useCloseWidget(optionsList, setIsOpen);
   return (
@@ -30,11 +30,11 @@ const OptionsBtn = (props) => {
       </button>
       {isOpen && (
         <ul
-          className={`absolute top-[100%] right-0 radius w-max overflow-hidden z-10 ${
+          className={`absolute top-[100%] right-0 radius w-max overflow-hidden z-20 ${
             mode === "dark" ? "bg-300" : "bg-100"
           }`}
           ref={optionsList}
-          onClick={() => setIsOpen(!isOpen)}
+          // onClick={() => setIsOpen(!isOpen)}
         >
           {currentUser._id === user._id && (
             <>
@@ -44,6 +44,7 @@ const OptionsBtn = (props) => {
             </>
           )}
           <SavePost id={id} user={user} />
+          <CopyLink postPath={`${user._id}/${id}`} />
         </ul>
       )}
     </div>

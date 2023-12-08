@@ -4,7 +4,7 @@ import { ReactComponent as VideoIcon } from "../../assets/icons/video.svg";
 
 import { useSelector } from "react-redux";
 import Dialog from "components/Dialog";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Form from "./form";
 import UserPicture from "components/UserPicture";
 

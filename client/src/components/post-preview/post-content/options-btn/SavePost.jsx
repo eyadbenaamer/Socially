@@ -1,4 +1,4 @@
-import { ReactComponent as TrashIcon } from "../../../../assets/icons/trash-basket.svg";
+import { ReactComponent as SaveIcon } from "../../../../assets/icons/save.svg";
 
 const SavePost = (props) => {
   const { id, user } = props;
@@ -16,7 +16,7 @@ const SavePost = (props) => {
         onClick={() => savePost()}
       >
         <span className="w-6">
-          <TrashIcon />
+          <SaveIcon />
         </span>
         Save the post
       </button>
