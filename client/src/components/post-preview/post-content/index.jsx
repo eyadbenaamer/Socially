@@ -1,4 +1,3 @@
-import MediaPreview from "./MediaPreview";
 import Text from "../../Text";
 import { useContext, useState } from "react";
 import { CreatorInfo } from "./CreatorInfo";
@@ -11,6 +10,7 @@ const PostContent = () => {
     user,
     createdAt,
     location,
+    creatorId,
     files,
     text,
   } = useContext(PostContext);
@@ -31,6 +31,7 @@ const PostContent = () => {
       </div>
       <div className="px-1 sm:px-4 flex flex-col">
         <Text
+          postCreatorId={creatorId}
           text={text}
           type="post"
           postId={id}

@@ -5,12 +5,13 @@ import OptionsBtn from "./options-btn";
 import { useContext } from "react";
 import { PostContext } from "..";
 import Text from "components/Text";
-const PostContent = (props) => {
+const PostContent = () => {
   const {
     _id: id,
     creatorId,
     createdAt,
     location,
+
     files,
     text,
   } = useContext(PostContext);
@@ -31,6 +32,7 @@ const PostContent = (props) => {
       </div>
       <div className="md:px-4 flex flex-col gap-3">
         <Text
+          postCreatorId={creatorId}
           text={text}
           type="post"
           postId={id}

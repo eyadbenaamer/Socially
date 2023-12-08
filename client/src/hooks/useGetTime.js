@@ -13,7 +13,7 @@ const useGetTime = (createdAt) => {
     if (interval > 3600000) {
       interval = Math.floor(interval / 3600000);
       if (interval < 24) {
-        setTime(`${interval}h ago`);
+        setTime(`${interval}h`);
       } else if (interval >= 24) {
         // clearInterval()
         interval = Math.floor(interval / 24);
@@ -22,7 +22,7 @@ const useGetTime = (createdAt) => {
             new Date(createdAt).getMonth() !== new Date().getMonth()
               ? new Date(createdAt).getDate() - 30
               : new Date(createdAt).getDate();
-          setTime(`${new Date().getDate() - postedDay}d ago`);
+          setTime(`${new Date().getDate() - postedDay}d`);
         } else {
           setTime(`${new Date().toDateString(createdAt)}`);
         }
@@ -32,7 +32,7 @@ const useGetTime = (createdAt) => {
       if (interval < 1) {
         setTime("just now");
       } else {
-        setTime(`${interval}m ago`);
+        setTime(`${interval}m`);
       }
     }
   };

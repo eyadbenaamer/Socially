@@ -6,22 +6,28 @@ import { useSelector } from "react-redux";
 
 const Text = (props) => {
   const [text, setText] = useState("");
-  const { type, postId, commentId, replyId, isModifying, setIsModifying } =
-    props;
+  const {
+    type,
+    postCreatorId,
+    postId,
+    commentId,
+    replyId,
+    isModifying,
+    setIsModifying,
+  } = props;
   const textArea = useRef(null);
   const [modifiedText, setModifiedText] = useState(null);
   const [originalText, setOriginalText] = useState(props.text);
   const user = useSelector((state) => state.user);
-
   const editText = async () => {
     const API_URL = process.env.REACT_APP_API_URL;
     let requestUrl;
     if (type === "post") {
-      requestUrl = `${API_URL}/posts/edit_post/${user._id}/${postId}`;
+      requestUrl = `${API_URL}/posts/edit_post/${postCreatorId}/${postId}`;
     } else if (type === "comment") {
-      requestUrl = `${API_URL}/posts/edit_comment/${user._id}/${postId}/${commentId}/`;
+      requestUrl = `${API_URL}/posts/edit_comment/${postCreatorId}/${postId}/${commentId}/`;
     } else if (type === "reply") {
-      requestUrl = `${API_URL}/posts/edit_reply/${user._id}/${postId}/${commentId}/${replyId}`;
+      requestUrl = `${API_URL}/posts/edit_reply/${postCreatorId}/${postId}/${commentId}/${replyId}`;
     }
     axios
       .patch(
@@ -46,7 +52,7 @@ const Text = (props) => {
   return (
     <>
       {isModifying ? (
-        <div className="bg-inherit p-3 radius">
+        <>
           <textarea
             defaultValue={text}
             autoFocus
@@ -71,9 +77,9 @@ const Text = (props) => {
               </SubmitBtn>
             </span>
           </div>
-        </div>
+        </>
       ) : (
-        <p dir="auto" className={`${text != "" || isModifying ? " p-3" : ""} `}>
+        <p dir="auto">
           {text}{" "}
           {text.length > 100 && originalText.length !== text.length && (
             <button

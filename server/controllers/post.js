@@ -90,7 +90,7 @@ export const getComment = async (req, res) => {
 };
 export const getUserPosts = async (req, res) => {
   try {
-    const postList = { req };
+    const { postList } = req;
     postList.posts = postList.posts.reverse();
     const result = postList.posts.map((post) => {
       return {
@@ -216,6 +216,7 @@ export const addReply = async (req, res) => {
         creatorId: user.id,
         rootCommentId: comment.id,
         file: fileInfo ? fileInfo : null,
+        createdAt: Date.now(),
 
         text: text,
       });
