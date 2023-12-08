@@ -14,13 +14,13 @@ export const createPost = async (req, res) => {
         media.map((file, index) => {
           if (file.mimetype.startsWith("image")) {
             filesPaths.push({
-              name: `${uploadsFolder}${file.filename}`,
+              path: `${uploadsFolder}${file.filename}`,
               order: index,
               fileType: "photo",
             });
           } else if (file.mimetype.startsWith("video")) {
             filesPaths.push({
-              name: `${uploadsFolder}${file.filename}`,
+              path: `${uploadsFolder}${file.filename}`,
               order: index,
               fileType: "vedio",
             });
@@ -56,7 +56,21 @@ export const getFeedPosts = async (req, res) => {
       return res.status(404).json({ error: error.message });
     } else {
       let posts = [];
-      postList.map((list) => posts.push(...list.posts));
+      postList.map((item) => {
+        let list = item.posts.map((post) => {
+          return {
+            _id: post._id,
+            creatorId: post.creatorId,
+            files: post.files,
+            text: post.text,
+            createdAt: post.createdAt,
+            location: post.location,
+            likes: post.likes,
+            commentsCount: post.comments.length,
+          };
+        });
+        posts.push(...list);
+      });
       return res.status(200).json(posts.reverse());
     }
   } catch (error) {
@@ -78,8 +92,20 @@ export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
     let postList = await Posts.findById(userId);
-    postList = postList.posts.reverse();
-    return res.status(200).json(postList);
+    postList.posts = postList.posts.reverse();
+    const result = postList.posts.map((post) => {
+      return {
+        _id: post._id,
+        creatorId: post.creatorId,
+        files: post.files,
+        text: post.text,
+        createdAt: post.createdAt,
+        location: post.location,
+        likes: post.likes,
+        commentsCount: post.comments.length,
+      };
+    });
+    return res.status(200).json(result);
   } catch (error) {
     return res
       .status(500)
@@ -90,6 +116,35 @@ export const getPost = async (req, res) => {
   try {
     const { post } = req;
     return res.status(200).json(post);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
+  }
+};
+export const getPostPreview = async (req, res) => {
+  try {
+    const { post } = req;
+    const {
+      _id,
+      creatorId,
+      files,
+      text,
+      createdAt,
+      location,
+      likes,
+      comments,
+    } = post;
+    return res.status(200).json({
+      _id,
+      creatorId,
+      files,
+      text,
+      createdAt,
+      location,
+      likes,
+      commentsCount: comments.length,
+    });
   } catch (error) {
     return res
       .status(500)
@@ -113,7 +168,10 @@ export const toggleComments = async (req, res) => {
     const { postList, post } = req;
     post.isCommentsDisabled = !post.isCommentsDisabled;
     await postList.save();
-    return res.status(200).json(post);
+    const message = post.isCommentsDisabled
+      ? "comments disabled"
+      : "comments enabled";
+    return res.status(200).json({ message });
   } catch (error) {
     return res
       .status(500)
@@ -150,14 +208,17 @@ export const addComment = async (req, res) => {
 };
 export const addReply = async (req, res) => {
   try {
-    const { reply } = req.body;
+    const { text } = req.body;
     const { user, postList, post, comment } = req;
+    const { fileInfo } = req;
 
-    if (reply) {
+    if (text || fileInfo) {
       comment.replies.addToSet({
         creatorId: user.id,
         rootCommentId: comment.id,
-        content: reply,
+        file: fileInfo ? fileInfo : null,
+
+        text: text,
       });
       await postList.save();
       return res.status(200).json(post);
@@ -230,7 +291,6 @@ export const editPost = async (req, res) => {
   try {
     const { user, postList, post } = req;
     const { text, location } = req.body;
-    console.log(req.body);
     if (post.creatorId === user.id) {
       text ? (post.text = text) : null;
       location ? (post.location = location) : null;
@@ -283,10 +343,10 @@ export const deleteComment = async (req, res) => {
 };
 export const deleteReply = async (req, res) => {
   try {
-    let { post, comment, reply } = req;
+    let { postList, post, comment, reply } = req;
     if (req.user.id === reply.creatorId) {
       comment.replies.id(reply.id).deleteOne();
-      await post.save();
+      await postList.save();
       res.status(200).json(post);
     } else {
       return res.status(401).json("Unauthorized");
@@ -299,13 +359,13 @@ export const deleteReply = async (req, res) => {
 };
 export const editReply = async (req, res) => {
   try {
-    let { post, comment, reply } = req;
+    let { postList, post, comment, reply } = req;
     if (req.user.id === reply.creatorId) {
-      let { reply: newReply } = req.body;
-      if (newReply) {
-        comment.replies.id(reply.id).content = newReply;
-        await post.save();
-        return res.status(200).json(post);
+      const { text } = req.body;
+      if (text) {
+        comment.replies.id(reply.id).text = text;
+        await postList.save();
+        return res.status(200).json(reply);
       } else {
         return res.status(409).json({ message: "reply cannot be empty" });
       }

@@ -33,7 +33,6 @@ export const getSavedPosts = async (req, res) => {
     let savedPosts = [];
     for (let i = 0; i < user.savedPosts.length; i++) {
       let { posts } = await Posts.findById(user.savedPosts[i].userId);
-      console.log(posts);
       if (posts) {
         const savedPost = posts.id(user.savedPosts[i].postId);
         if (savedPost) {

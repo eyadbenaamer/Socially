@@ -48,10 +48,9 @@ export const signup = async (req, res) => {
     await newProfile.save();
     return res.status(201).send("user created.");
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
-      .json({ message: "An error occured. please try again later." });
+      .json({ message: "An error occurred. please try again later." });
   }
 };
 /*LOGIN USER*/
@@ -112,7 +111,6 @@ export const login = async (req, res) => {
 
 export const verifyAccount = async (req, res) => {
   try {
-    console.log(req.body);
     const { email, code } = req.body;
     const { verificationToken } = req.params;
 
@@ -208,7 +206,6 @@ export const resetPassword = async (req, res) => {
         user: { token: loginToken, ...profile._doc },
       });
     } catch (error) {
-      console.log(error);
       return res.status(401).json({ message: "Link expired." });
     }
   } catch (error) {
@@ -277,6 +274,8 @@ export const verifyResetPasswordCode = async (req, res) => {
       return res.status(401).json({ message: "Invalid code." });
     }
   } catch (error) {
-    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
