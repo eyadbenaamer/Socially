@@ -1,13 +1,14 @@
+import { AuthContext } from "App";
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "state";
+import state, { setAuthStatus, setUser } from "state";
 
 const Form = (props) => {
   const { setMessage } = props;
   const [code, setCode] = useState("");
   const dispatch = useDispatch();
-  const { email } = useSelector((state) => state.loginStatus);
+  const { email } = useSelector((state) => state.authStatus);
   const sendCode = async () => {
     const API_URL = process.env.REACT_APP_API_URL;
     const response = await axios
@@ -65,7 +66,8 @@ const Form = (props) => {
           sendCode().then((response) => {
             e.target.style.background = null;
             const { user, isVerified, message } = response;
-            dispatch(setUser({ user, isVerified }));
+            dispatch(setAuthStatus({ isVerified }));
+            dispatch(setUser(user));
             setMessage(message);
           });
         }}

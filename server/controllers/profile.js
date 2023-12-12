@@ -10,7 +10,7 @@ export const getProfile = async (req, res) => {
     if (profile) {
       return res.status(200).json(profile);
     } else {
-      return res.status(404).json({ error: error.message });
+      return res.status(404).json({ message: "user not found" });
     }
   } catch (error) {
     return res
@@ -57,9 +57,9 @@ export const setProfile = async (req, res) => {
     const { id } = req.user;
     const { file } = req;
     const profile = await Profile.findById(id);
-    profile.picturePath = `${process.env.API_URL}/assets/${file.filename}`;
+    profile.picturePath = `${process.env.API_URL}/storage/${file.filename}`;
     await profile.save();
-    return res.status(200).json(profile.picturePath);
+    return res.status(200).json({ token: req.user.token, ...profile._doc });
   } catch (error) {
     return res.status(404).json({ error: error.message });
   }

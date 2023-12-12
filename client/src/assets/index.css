@@ -10,16 +10,16 @@ body,
 :root {
   --primary-color: #4361ee;
   --secondary-color: #899dfc;
-  --background-dark-100: #171923;
-  --background-dark-200: #212330;
-  --background-dark-300: #2a2d3d;
-  --background-dark-alt: #303343;
-  --background-light-100: #f4f5f9;
-  --background-light-200: #ffffff;
-  --background-light-300: #f6f6f6;
-  /* --background-light-300: #fafbff; */
-  --background-light-alt: #eaedfb;
-  --main-transition: 0.2s !important;
+  --bg-dark-100: #171923;
+  --bg-dark-200: #212330;
+  --bg-dark-300: #2a2d3d;
+  --bg-dark-alt: #303343;
+  --bg-light-100: #f4f5f9;
+  --bg-light-200: #ffffff;
+  /* --bg-light-300: #f6f6f6; */
+  --bg-light-300: #fafbff;
+  --bg-light-alt: #eaedfb;
+  --main-transition: 0.15s !important;
 }
 
 * {
@@ -84,7 +84,13 @@ body,
 .menu {
   box-shadow: 0 0 3px 7px #00000012;
 }
+.dark .text-50 {
+  color: rgba(255, 255, 255, 0.5);
+}
 
+.light .text-50 {
+  color: rgba(0, 0, 0, 0.5);
+}
 aside,
 .sidebar {
   height: calc(100vh - 62px);
@@ -103,14 +109,14 @@ textarea {
   font-size: 8px;
 }
 .text-hovered,
-.text-hovered:focus,
+.text-hovered *,
 .icon,
 .icon * {
+  outline: none;
   transition: var(--main-transition);
 }
 .text-hovered:hover,
 .primary-text,
-.text-hovered:focus svg,
 .text-hovered:hover svg {
   color: var(--primary-color);
   stroke: var(--primary-color) !important;
@@ -134,34 +140,35 @@ textarea {
   background-color: var(--secondary-color);
 }
 .light .bg-100 {
-  background-color: var(--background-light-100);
+  background-color: var(--bg-light-100);
 }
 .light .bg-200 {
-  background-color: var(--background-light-200);
+  background-color: var(--bg-light-200);
 }
 .light .bg-300 {
-  background-color: var(--background-light-300);
+  background-color: var(--bg-light-300);
 }
 .dark.bg-100,
 .dark .bg-100 {
-  background-color: var(--background-dark-100);
+  background-color: var(--bg-dark-100);
 }
 .dark .bg-200 {
-  background-color: var(--background-dark-200);
+  background-color: var(--bg-dark-200);
 }
 .dark .bg-300 {
-  background-color: var(--background-dark-300);
+  background-color: var(--bg-dark-300);
 }
 .light .bg-hovered:hover {
-  background-color: var(--background-light-alt);
+  background-color: var(--bg-light-alt);
 }
 .dark .bg-hovered:hover {
-  background-color: var(--background-dark-alt);
+  background-color: var(--bg-dark-alt);
 }
 .light svg:not(.selected) {
   stroke: #5b5d67;
 }
-svg,
+/* svg, */
+:not(.text-hovered) svg,
 .dark .icon:not(.selected) svg,
 .dark .icon:not(.text-hovered) svg {
   stroke: #c3c5cd;

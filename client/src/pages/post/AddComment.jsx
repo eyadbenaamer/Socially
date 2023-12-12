@@ -7,7 +7,7 @@ import { ReactComponent as AddCommentIcon } from "../../assets/icons/create-comm
 import { ReactComponent as CloseIcon } from "../../assets/icons/cross.svg";
 
 const AddComment = (props) => {
-  const { type, commentId } = props;
+  const { type, commentId, autoFocus } = props;
   const { setPost, _id: postId, creatorId } = useContext(PostContext);
   const user = useSelector((state) => state.user);
   const [text, setText] = useState("");
@@ -37,25 +37,36 @@ const AddComment = (props) => {
   };
   const [file, setFile] = useState(null);
   return (
-    <div className=" px-4 py-3">
-      <div className="flex gap-2 items-center">
+    <div className="px-4 py-3">
+      <div className={`flex gap-2 ${media ? "items-start" : "items-center"}`}>
         <UserPicture
           id={user._id}
           src={user.picturePath}
           name={`${user.firstName} ${user.lastName}`}
         />
         <div className="flex flex-col gap-2 w-full">
-          <div className="flex items-center justify-between bg-300 py-2 px-2 radius shadow-sm">
+          <div className="flex items-center gap-2 bg-300 py-2 px-2 radius shadow-md">
             <textarea
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.ctrlKey) {
+                  addComment();
+                  setMedia(null);
+                  setFile(null);
+                  setText("");
+                } else if (e.key === "Enter") {
+                  e.target.value += "\n";
+                }
+              }}
+              autoFocus={autoFocus}
               value={text}
               dir="auto"
-              className="comment-input h-6 w-3/4"
+              className="comment-input h-6 w-4/5"
               placeholder={
                 type === "reply" ? "Write a reply" : "Write a comment"
               }
               onChange={(e) => setText(e.target.value)}
             ></textarea>
-            <div className="flex gap-1">
+            <div className="flex gap-1 w-1/5">
               <input
                 accept="video/*, video/x-m4v, video/webm, video/x-ms-wmv, video/x-msvideo, video/3gpp, video/flv, video/x-flv, video/mp4, video/quicktime, video/mpeg, video/ogv, .ts, .mkv, image/*, image/heic, image/heif"
                 style={{ display: "none" }}

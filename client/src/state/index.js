@@ -3,13 +3,13 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   settings: { mode: "light" },
   user: null,
-  loginStatus: {
+  authStatus: {
     email: null,
     isLoggedIn: false,
+    isVerified: false,
   },
-  isVerified: null,
-  currentPost: null,
 };
+
 export const slice = createSlice({
   name: "state",
   initialState,
@@ -20,28 +20,25 @@ export const slice = createSlice({
         [action.payload.property]: action.payload.value,
       };
     },
-    setIsVerified: (state, action) => {
-      state.isVerified = action.payload;
-    },
+
     setUser: (state, action) => {
-      state.user = action.payload.user;
-      state.isVerified = action.payload.isVerified;
+      state.user = { ...state.user, ...action.payload };
     },
-    setLoginStatus: (state, action) => {
-      state.loginStatus.email = action.payload.email;
-      state.loginStatus.isLoggedIn = action.payload.isLoggedIn;
-      state.loginStatus.message = action.payload.message;
+    setAuthStatus: (state, action) => {
+      if (action.payload === null) state.authStatus = null;
+      state.authStatus = { ...state.authStatus, ...action.payload };
     },
 
     logout: (state) => {
       delete state.user;
-      state.loginStatus.email = null;
-      state.loginStatus.isLoggedIn = false;
-      state.isVerified = false;
+      sessionStorage.clear();
+      state.authStatus.email = null;
+      state.authStatus.isLoggedIn = false;
+      state.authStatus.isVerified = false;
       state.settings.mode = "light";
     },
   },
 });
-export const { setUser, setSettings, setIsVerified, setLoginStatus, logout } =
+export const { setUser, setSettings, setIsVerified, setAuthStatus, logout } =
   slice.actions;
 export default slice.reducer;

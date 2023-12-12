@@ -4,7 +4,8 @@ import submit from "./submit";
 import { useRef, useState } from "react";
 import Alert from "components/Alert";
 import { useDispatch } from "react-redux";
-import { setLoginStatus } from "state";
+import { setAuthStatus } from "state";
+import SubmitBtn from "components/SubmitBtn";
 const Form = (props) => {
   const { setIsSignup } = props;
   const [data, setData] = useState({
@@ -16,7 +17,7 @@ const Form = (props) => {
     gender: sessionStorage.getItem("gender") ?? "male",
   });
   const [message, setMessage] = useState("");
-
+  const [isOpened, setIsOpened] = useState(false);
   const handleChange = async (e) => {
     window.sessionStorage.setItem([e.target.name], e.target.value);
     setData((prev) => ({
@@ -24,10 +25,8 @@ const Form = (props) => {
       [e.target.name]: e.target.value,
     }));
   };
-
   const submitButton = useRef(null);
   const dispatch = useDispatch();
-  dispatch(setLoginStatus({ message: "" }));
 
   const handleEnterSubmit = (e) => {
     if (e.key === "Enter") {
@@ -36,67 +35,92 @@ const Form = (props) => {
   };
   return (
     <>
-      {message && (
+      {isOpened && (
         <div>
-          <Alert type={"error"} message={message} />
+          <Alert
+            type={"error"}
+            message={message}
+            isOpened={isOpened}
+            setIsOpened={setIsOpened}
+          />
         </div>
       )}
       <section>
-        <form>
-          <input
-            type="text"
-            name="firstName"
-            value={data.firstName}
-            onChange={handleChange}
-            onKeyDown={handleEnterSubmit}
-          />
-          <input
-            type="text"
-            name="lastName"
-            value={data.lastName}
-            onChange={handleChange}
-            onKeyDown={handleEnterSubmit}
-          />
-          <input
-            type="email"
-            name="email"
-            value={data.email}
-            onChange={handleChange}
-            onKeyDown={handleEnterSubmit}
-          />
-          <input
-            type="password"
-            name="password"
-            value={data.password}
-            onChange={handleChange}
-            onKeyDown={handleEnterSubmit}
-          />
-          <DateInput setData={setData} />
-
-          <select name="gender" onChange={handleChange}>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </form>
-        <button
-          ref={submitButton}
-          onClick={() =>
-            submit(data).then((response) => {
-              dispatch(setLoginStatus({ email: data.email }));
-              const { message, isSignup } = response;
-              sessionStorage.setItem("isNotVerified", true);
-              setIsSignup(isSignup);
-              setMessage(message);
-            })
-          }
-        >
-          Signup
-        </button>
-        <div>
-          Already have an account?{" "}
-          <Link to="/login" replace={true}>
-            Log in here
-          </Link>
+        <div className="flex flex-col gap-4 w-fit">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="col-span-1">
+              <label htmlFor="firstName">First Name</label>
+              <input
+                type="text"
+                name="firstName"
+                value={data.firstName}
+                onChange={handleChange}
+                onKeyDown={handleEnterSubmit}
+              />
+            </div>
+            <div className="col-span-1">
+              <label htmlFor="lastName">Last Name</label>
+              <input
+                type="text"
+                name="lastName"
+                value={data.lastName}
+                onChange={handleChange}
+                onKeyDown={handleEnterSubmit}
+              />
+            </div>
+            <div className="col-span-1">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={data.email}
+                onChange={handleChange}
+                onKeyDown={handleEnterSubmit}
+              />
+            </div>
+            <div className="col-span-1">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                name="password"
+                value={data.password}
+                onChange={handleChange}
+                onKeyDown={handleEnterSubmit}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block">Birthdate</label>
+            <DateInput setData={setData} />
+          </div>
+          <div>
+            <label className="block" htmlFor="gender">
+              Gender
+            </label>
+            <select name="gender" onChange={handleChange}>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div className=" self-center">
+            <SubmitBtn
+              onClick={() =>
+                submit(data).then((response) => {
+                  const { message, isSignup } = response;
+                  dispatch(setAuthStatus({ email: data.email }));
+                  setIsSignup(isSignup);
+                  // setMessage((prev) => {
+                  //   prev = "";
+                  //   return prev;
+                  // });
+                  setIsOpened(true);
+                  setMessage(message);
+                })
+              }
+            >
+              Signup
+            </SubmitBtn>
+          </div>
         </div>
       </section>
     </>

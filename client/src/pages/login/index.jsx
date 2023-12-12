@@ -1,11 +1,7 @@
-import { useDispatch } from "react-redux";
 import Form from "./Form";
 import { useWindowWidth } from "hooks/useWindowWidth.js";
-import { setLoginStatus } from "state";
 const Login = () => {
   const isMobileScreen = useWindowWidth({ maxWidth: 768 });
-  const dispatch = useDispatch();
-  // dispatch(setLoginStatus({ message: "" }));
 
   return (
     <>

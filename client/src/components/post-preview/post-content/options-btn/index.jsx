@@ -2,11 +2,11 @@ import { useSelector } from "react-redux";
 import { ReactComponent as MoreIcon } from "../../../../assets/icons/more.svg";
 import { useRef, useState } from "react";
 import useCloseWidget from "hooks/useCloseWidget";
-import Delete from "./Delete";
-import Edit from "./Edit";
-import SavePost from "./SavePost";
 import ToggleComments from "./ToggleComments";
-import CopyLink from "./CopyLink";
+import Delete from "components/post/options-btn/Delete";
+import Edit from "components/post/options-btn/Edit";
+import CopyLink from "components/post/options-btn/CopyLink";
+import SavePost from "components/post/options-btn/SavePost";
 
 const OptionsBtn = (props) => {
   const { id, user, setIsModifying } = props;
@@ -43,7 +43,7 @@ const OptionsBtn = (props) => {
               <ToggleComments />
             </>
           )}
-          <SavePost id={id} user={user} />
+          <SavePost path={`${user._id}/${id}`} />
           <CopyLink postPath={`${user._id}/${id}`} />
         </ul>
       )}

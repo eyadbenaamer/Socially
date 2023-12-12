@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import submit from "./submit";
-import { useDispatch, useSelector } from "react-redux";
-import { setLoginStatus, setUser } from "state";
+import { useDispatch } from "react-redux";
+import { setAuthStatus, setUser } from "state";
 import { Link, Navigate } from "react-router-dom";
 
 const Form = () => {
@@ -43,15 +43,18 @@ const Form = () => {
             submit(data).then((response) => {
               let { message, user, isVerified } = response;
               !isVerified &&
-                dispatch(setLoginStatus({ email: data.email, message }));
+                dispatch(
+                  setAuthStatus({ email: data.email, message, isVerified })
+                );
               isVerified &&
                 dispatch(
-                  setLoginStatus({
+                  setAuthStatus({
                     email: data.email,
                     isLoggedIn: true,
+                    isVerified,
                   })
                 );
-              dispatch(setUser({ user, isVerified }));
+              dispatch(setUser(user));
               setIsVerified(isVerified);
             });
           }}

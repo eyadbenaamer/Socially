@@ -3,7 +3,7 @@ import Posts from "../models/posts.js";
 //TODO: find a way to send comments on patches
 /*CREATE*/
 export const createPost = async (req, res) => {
-  const uploadsFolder = `${process.env.API_URL}/assets/`;
+  const uploadsFolder = `${process.env.API_URL}/storage/`;
   try {
     const { id } = req.user;
     let { text, location } = req.body;
@@ -262,8 +262,7 @@ export const likePostToggle = async (req, res) => {
       post.likes.push(user.id);
     }
     await postList.save();
-    const likes = post.likes;
-    return res.status(200).json({ likes });
+    return res.status(200).json({ likes: post.likes });
   } catch (error) {
     return res
       .status(500)
@@ -272,15 +271,14 @@ export const likePostToggle = async (req, res) => {
 };
 export const likeComment = async (req, res) => {
   try {
-    const { user, post, comment } = req;
+    const { postList, user, comment } = req;
     if (comment.likes.includes(user.id)) {
       comment.likes = comment.likes.filter((id) => id !== user.id);
     } else {
       comment.likes.push(user.id);
     }
-    await post.save();
-    const likesCount = comment.likes.length;
-    return res.status(200).json({ likes: comment.likes, likesCount });
+    await postList.save();
+    return res.status(200).json({ likes: comment.likes });
   } catch (error) {
     return res
       .status(500)
@@ -380,15 +378,15 @@ export const editReply = async (req, res) => {
 };
 export const likeReply = async (req, res) => {
   try {
-    let { post, reply, user } = req;
+    let { postList, reply, user } = req;
 
     if (reply.likes.includes(user.id)) {
       reply.likes = reply.likes.filter((item) => item !== user.id);
     } else {
       reply.likes.push(user.id);
     }
-    await post.save();
-    res.status(200).json(post);
+    await postList.save();
+    res.status(200).json({ likes: reply.likes });
   } catch (error) {
     return res
       .status(500)

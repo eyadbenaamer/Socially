@@ -7,7 +7,7 @@ const Posts = (props) => {
   const [postsCollection, setPostsCollection] = useState(0);
   const [message, setMessage] = useState(null);
   const [isFetched, setIsFetched] = useState(false);
-  const [posts, setPosts] = useState(props.posts);
+  const [posts, setPosts] = useState(null);
   const lastPost = useRef(null);
 
   const fetchPosts = async () => {

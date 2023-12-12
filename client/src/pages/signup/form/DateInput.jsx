@@ -30,7 +30,7 @@ const DateInput = (props) => {
     setDate({ ...date, [e.target.name]: e.target.value });
   };
   return (
-    <div>
+    <div className="flex gap-1">
       <select name="day" value={date.day} onChange={handleChange}>
         {dayArray.map((item) => (
           <option value={item} key={item}>

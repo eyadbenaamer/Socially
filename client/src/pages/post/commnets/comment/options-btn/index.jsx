@@ -39,12 +39,13 @@ const OptionsBtn = (props) => {
           ref={optionsList}
           // onClick={() => setIsOpen(!isOpen)}
         >
-          {(user._id === commentCreatorId || user._id === post.creatorId) && (
-            <Delete
-              commentPath={`${post.creatorId}/${post._id}/${commentId}`}
-            />
-          )}
-          {user._id === commentCreatorId && (
+          {user &&
+            (user._id === commentCreatorId || user._id === post.creatorId) && (
+              <Delete
+                commentPath={`${post.creatorId}/${post._id}/${commentId}`}
+              />
+            )}
+          {user && user._id === commentCreatorId && (
             <Edit setIsModifying={setIsModifying} />
           )}
           <CopyLink

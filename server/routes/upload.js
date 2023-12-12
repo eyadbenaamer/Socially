@@ -7,7 +7,7 @@ import { createPost } from "../controllers/posts.js";
 const router = express.Router();
 const accountPictureFolder = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/assets/account-pictue");
+    cb(null, "public/storage/account-pictue");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -15,7 +15,7 @@ const accountPictureFolder = multer.diskStorage({
 });
 const postPhotoFolder = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/assets/post/photo/");
+    cb(null, "public/storage/post/photo/");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -23,7 +23,7 @@ const postPhotoFolder = multer.diskStorage({
 });
 const postVideoFolder = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/assets/post/video");
+    cb(null, "public/storage/post/video");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);

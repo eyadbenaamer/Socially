@@ -16,12 +16,11 @@ const Sidebar = () => {
             className={`${location.pathname === "/" ? "primary-text" : ""}`}
           />
         </SidebarItem>
-
         <SidebarItem
           to={`/profile/${user._id}`}
           name={`${user.firstName} ${user.lastName}`}
         >
-          <span className="circle w-9">
+          <span className="circle w-9 border-2">
             <img src={user.picturePath} />
           </span>
         </SidebarItem>

@@ -39,12 +39,12 @@ app.use(morgan("short"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
-app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+app.use("/storage", express.static(path.join(__dirname, "public/storage")));
 // app.use(cookieParser(process.env.JWT_SECRET));
 /*FILE STORAGE*/
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/assets");
+    cb(null, "public/storage");
   },
   filename: function (req, file, cb) {
     cb(null, renameFile(file.originalname));

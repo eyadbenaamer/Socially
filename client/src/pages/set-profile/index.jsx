@@ -2,13 +2,15 @@ import axios from "axios";
 import DropZone from "components/dropzone";
 import SubmitBtn from "components/SubmitBtn";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { setAuthStatus, setUser } from "state";
 
 const SetProfile = () => {
   const { token } = useSelector((state) => state.user);
   const [picture, setPicture] = useState(null);
   const [isProfileSet, setIsProfileSet] = useState(false);
+  const dispatch = useDispatch();
   return (
     <div>
       {isProfileSet && <Navigate to={"/"} replace={true} />}
@@ -25,7 +27,11 @@ const SetProfile = () => {
             method: "PATCH",
             headers: { Authorization: token },
           }).then(
-            (resolved) => setIsProfileSet(true),
+            (resposnse) => {
+              dispatch(setAuthStatus({ isLoggedIn: true }));
+              setIsProfileSet(true);
+              resposnse.json().then((data) => dispatch(setUser(data)));
+            },
             () => {}
           );
         }}

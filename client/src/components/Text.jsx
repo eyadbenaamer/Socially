@@ -40,7 +40,6 @@ const Text = (props) => {
         setIsModifying(false);
       });
   };
-  console.log(originalText);
   useEffect(() => {
     let text = originalText;
     if (text.length > 100) {

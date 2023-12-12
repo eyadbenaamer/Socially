@@ -13,9 +13,14 @@ const CreatePost = ({ setCreatedPost }) => {
   const [isOpened, setIsOpened] = useState(false);
   const [data, setData] = useState({ text: "", location: "" });
   const [media, setMedia] = useState(null);
+  const mode = useSelector((state) => state.settings.mode);
 
   return (
-    <section className="create-post bg-200 w-full px-4 pt-5 pb-1 radius flex flex-col gap-3">
+    <section
+      className={`create-post bg-200 w-full px-4 pt-5 pb-1 radius flex flex-col gap-3 shadow-md ${
+        mode === "light" ? "border" : ""
+      }`}
+    >
       <div className="flex gap-3 items-center">
         <UserPicture
           id={user._id}

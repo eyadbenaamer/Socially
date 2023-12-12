@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import Home from "pages/home";
 import Login from "pages/login";
@@ -15,23 +15,39 @@ import "./assets/index.css";
 import ResetPassword from "pages/reset-password";
 import SetProfile from "pages/set-profile";
 import Post from "pages/post";
+import { useEffect } from "react";
+import { logout, setAuthStatus, setUser } from "state";
 
 const App = () => {
-  const isLoggedin = useSelector((state) => state.loginStatus.isLoggedIn);
-  const isVerified = useSelector((state) => state.isVerified);
-  const isNotVerified = sessionStorage.getItem("isNotVerified") && !isVerified;
+  //if user is stored in redux state, then the user is logged in
+  const { isLoggedIn } = useSelector((state) => state.authStatus);
   const mode = useSelector((state) => state.settings.mode);
-
+  const user = useSelector((state) => state.user);
+  const { isVerified } = useSelector((state) => state.authStatus);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const API_URL = process.env.REACT_APP_API_URL;
+    if (user) {
+      fetch(`${API_URL}/profile/${user._id}`).then((response) => {
+        if (response.status === 200) {
+          response.json().then((data) => dispatch(setUser(data)));
+        } else {
+          sessionStorage.clear();
+          dispatch(setAuthStatus(null));
+        }
+      });
+    }
+  }, []);
   return (
     <BrowserRouter>
-      <div className={`App ${mode} bg-100`}>
+      <div className={`App ${mode} bg-100 min-h-screen`}>
         <Header />
-        <main className="bg-100 ">
+        <main>
           <Routes>
             <Route
               path="/"
               element={
-                isLoggedin ? (
+                isLoggedIn ? (
                   <Home />
                 ) : (
                   <Navigate to={"/login"} replace={true} />
@@ -41,19 +57,19 @@ const App = () => {
             <Route
               path="/login"
               element={
-                isLoggedin ? <Navigate to="/" replace={true} /> : <Login />
+                isLoggedIn ? <Navigate to="/" replace={true} /> : <Login />
               }
             />
             <Route
               path="/signup"
               element={
-                isLoggedin ? <Navigate to="/" replace={true} /> : <Signup />
+                isLoggedIn ? <Navigate to="/" replace={true} /> : <Signup />
               }
             />
             <Route
               path="/reset-password"
               element={
-                isLoggedin ? (
+                isLoggedIn ? (
                   <Navigate to={"/"} replace={true} />
                 ) : (
                   <ResetPassword />
@@ -63,7 +79,7 @@ const App = () => {
             <Route
               path="/verify-account"
               element={
-                isNotVerified ? (
+                true ? (
                   <VerifyAccount />
                 ) : (
                   <Navigate to="/set-profile" replace={true} />
@@ -73,16 +89,19 @@ const App = () => {
             <Route
               path="/set-profile"
               element={
-                isVerified ? <SetProfile /> : <Navigate to="/" replace={true} />
+                isVerified && !isLoggedIn ? (
+                  <SetProfile />
+                ) : (
+                  <Navigate to="/" replace={true} />
+                )
               }
             />
             <Route path="/post/:userId/:postId" element={<Post />} />
             <Route path="/post/:userId/:postId/:commentId" element={<Post />} />
-
             <Route
               path="/notifications"
               element={
-                isLoggedin ? (
+                isLoggedIn ? (
                   <Notifications />
                 ) : (
                   <Navigate to="/" replace={true} />
@@ -92,20 +111,18 @@ const App = () => {
             <Route
               path="/messages"
               element={
-                isLoggedin ? <Messages /> : <Navigate to="/" replace={true} />
+                isLoggedIn ? <Messages /> : <Navigate to="/" replace={true} />
               }
             />
             <Route
               path="/saved-posts"
               element={
-                isLoggedin ? <SavedPosts /> : <Navigate to="/" replace={true} />
+                isLoggedIn ? <SavedPosts /> : <Navigate to="/" replace={true} />
               }
             />
             <Route
               path="/profile/:id"
-              element={
-                isLoggedin ? <Profile /> : <Navigate to="/" replace={true} />
-              }
+              element={true ? <Profile /> : <Navigate to="/" replace={true} />}
             />
           </Routes>
         </main>

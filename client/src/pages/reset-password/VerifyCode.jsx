@@ -43,7 +43,7 @@ const VerifyCode = (props) => {
       <div
         className={`${
           mode === "light" ? "text-slate-800" : ""
-        } my-8 bg-300 radius p-4 shadow-sm`}
+        } my-8 bg-300 radius p-4 shadow-md`}
       >
         Enter the code that has been sent to your email address
         <div className="code my-3">

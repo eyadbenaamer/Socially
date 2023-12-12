@@ -1,0 +1,23 @@
+.signup input {
+  width: 100%;
+}
+.signup label {
+  font-size: 0.75rem;
+}
+.dark .signup select,
+.dark .signup input,
+.dark .signup option {
+  background-color: var(--bg-dark-alt);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0px 1px 3px 0px #00000026;
+  border: solid 1px;
+}
+.light .signup select,
+.light .signup input,
+.light .signup option {
+  background-color: var(--bg-light-200);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0px 1px 3px 0px #00000026;
+}

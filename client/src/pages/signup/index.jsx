@@ -1,17 +1,28 @@
 import Form from "./form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Navigate } from "react-router-dom";
-import { setIsVerified } from "state";
+import { Link, Navigate } from "react-router-dom";
+import "./index.css";
 const Signup = () => {
-  const [isSignup, setIsSignup] = useState(false);
-  const dispatch = useDispatch();
-  dispatch(setIsVerified(false));
+  const [isSignedup, setIsSignedup] = useState(false);
   return (
     <>
-      <h2>hello</h2>
-      {!isSignup && <Form setIsSignup={setIsSignup} />}
-      {isSignup && <Navigate to={"/verify-account"} />}
+      {isSignedup && <Navigate to={"/verify-account"} />}
+      <div className="container m-auto">
+        <div className="signup flex flex-col gap-3 w-fit my-5 mx-auto shadow-md radius p-4 bg-300">
+          <h2 className="text-2xl">Sign up</h2>
+          <Form setIsSignup={setIsSignedup} />
+          <div>
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className=" hover:underline hover:text-[var(--primary-color)]"
+            >
+              Log in here
+            </Link>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

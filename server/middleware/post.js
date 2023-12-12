@@ -12,7 +12,7 @@ export const getPostData = async (req, res, next) => {
         return res.status(404).json({ message: "user doesn't exist" });
       }
     }
-
+    console.log(userId, postId);
     if (postId) {
       post = postList.posts.id(postId);
       if (post) {

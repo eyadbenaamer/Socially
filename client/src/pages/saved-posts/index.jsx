@@ -4,6 +4,7 @@ import Bar from "components/bar";
 import Posts from "components/posts";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import PostPreview from "components/post-preview";
 
 const SavedPosts = () => {
   const windowWidth = useWindowWidth();
@@ -14,7 +15,7 @@ const SavedPosts = () => {
     const API_URL = process.env.REACT_APP_API_URL;
     fetch(`${API_URL}/saved_posts/`, {
       method: "GET",
-      headers: { authorization: user.token },
+      headers: { Authorization: user.token },
     }).then((response) =>
       response.json().then((response) => setPosts(response))
     );
@@ -32,7 +33,8 @@ const SavedPosts = () => {
         )}
         <div className="content sm:col-span-5 lg:col-span-4 col-span-8">
           <div className="flex flex-col px-2 gap-3 justify-center">
-            {posts && <Posts posts={posts} />}
+            {posts &&
+              posts.map((post) => <PostPreview key={post._id} post={post} />)}
           </div>
         </div>
       </div>

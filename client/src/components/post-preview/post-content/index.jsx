@@ -29,15 +29,17 @@ const PostContent = () => {
           <OptionsBtn id={id} user={user} setIsModifying={setIsModifying} />
         </div>
       </div>
-      <div className="px-1 sm:px-4 flex flex-col">
-        <Text
-          postCreatorId={creatorId}
-          text={text}
-          type="post"
-          postId={id}
-          isModifying={isModifying}
-          setIsModifying={setIsModifying}
-        />
+      <div className="px-1 sm:px-4 flex flex-col gap-3">
+        <div className="p-1">
+          <Text
+            postCreatorId={creatorId}
+            text={text}
+            type="post"
+            postId={id}
+            isModifying={isModifying}
+            setIsModifying={setIsModifying}
+          />
+        </div>
         {files && <Media media={files} />}
       </div>
     </>

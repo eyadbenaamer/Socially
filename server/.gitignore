@@ -7,7 +7,7 @@ node_modules/
 
 # testing
 /coverage
-public/assets/
+public/storage/
 # production
 /build
 

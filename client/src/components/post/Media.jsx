@@ -1,4 +1,6 @@
 import Dialog from "components/Dialog";
+import { ReactComponent as NextIcon } from "../../assets/icons/arrow-next.svg";
+import { ReactComponent as PrevIcon } from "../../assets/icons/arrow-prev.svg";
 import { useState } from "react";
 
 const Media = (props) => {
@@ -14,7 +16,7 @@ const Media = (props) => {
             style={{ borderRadius: "50%" }}
             onClick={() => setIndex(index + 1)}
           >
-            &gt;
+            <NextIcon fill="currentColor" />
           </div>
         )}
         {index != 0 && (
@@ -23,7 +25,7 @@ const Media = (props) => {
             style={{ borderRadius: "50%" }}
             onClick={() => setIndex(index - 1)}
           >
-            &lt;
+            <PrevIcon fill="currentColor" />
           </div>
         )}
         <div
@@ -31,7 +33,11 @@ const Media = (props) => {
           onClick={() => setIsOpen(true)}
         >
           {media[index].fileType === "photo" ? (
-            <img src={media[index].path} className="cursor-pointer" />
+            <img
+              loading="lazy"
+              src={media[index].path}
+              className="cursor-pointer"
+            />
           ) : (
             <video
               controls

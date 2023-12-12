@@ -30,15 +30,17 @@ const PostContent = () => {
           <OptionsBtn setIsModifying={setIsModifying} />
         </div>
       </div>
-      <div className="md:px-4 flex flex-col gap-3">
-        <Text
-          postCreatorId={creatorId}
-          text={text}
-          type="post"
-          postId={id}
-          isModifying={isModifying}
-          setIsModifying={setIsModifying}
-        />
+      <div className="flex flex-col gap-3 px-1 sm:px-4">
+        <div className="p-1">
+          <Text
+            postCreatorId={creatorId}
+            text={text}
+            type="post"
+            postId={id}
+            isModifying={isModifying}
+            setIsModifying={setIsModifying}
+          />
+        </div>
 
         {files && <Media media={files} />}
       </div>

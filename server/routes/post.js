@@ -47,7 +47,7 @@ router.get(
 );
 /*UPDATE*/
 router.patch(
-  "/post_like_toggle/:userId/:postId",
+  "/like_post_toggle/:userId/:postId",
   verifyId,
   verifyToken,
   getPostData,
@@ -61,7 +61,7 @@ router.patch(
   toggleComments
 );
 router.patch(
-  "/like_comment/:userId/:postId/:commentId",
+  "/like_comment_toggle/:userId/:postId/:commentId",
   verifyId,
   verifyToken,
   getPostData,
@@ -104,7 +104,7 @@ router.delete(
   deleteReply
 );
 router.patch(
-  "/like_reply/:userId/:postId/:commentId/:replyId",
+  "/like_reply_toggle/:userId/:postId/:commentId/:replyId",
   verifyId,
   verifyToken,
   getPostData,
