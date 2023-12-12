@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import DateInput from "./DateInput";
 import submit from "./submit";
 import { useRef, useState } from "react";
@@ -6,6 +5,10 @@ import Alert from "components/Alert";
 import { useDispatch } from "react-redux";
 import { setAuthStatus } from "state";
 import SubmitBtn from "components/SubmitBtn";
+
+import { ReactComponent as ShowPasswordIcon } from "../../../assets/icons/show.svg";
+import { ReactComponent as HidePasswordIcon } from "../../../assets/icons/hide.svg";
+
 const Form = (props) => {
   const { setIsSignup } = props;
   const [data, setData] = useState({
@@ -27,7 +30,7 @@ const Form = (props) => {
   };
   const submitButton = useRef(null);
   const dispatch = useDispatch();
-
+  const [passwordInputType, setPasswordInputType] = useState("password");
   const handleEnterSubmit = (e) => {
     if (e.key === "Enter") {
       submitButton.current.click();
@@ -78,15 +81,31 @@ const Form = (props) => {
                 onKeyDown={handleEnterSubmit}
               />
             </div>
-            <div className="col-span-1">
+            <div className="col-span-1 ">
               <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={data.password}
-                onChange={handleChange}
-                onKeyDown={handleEnterSubmit}
-              />
+              <div
+                className="flex border p-[6px]"
+                style={{ borderRadius: "8px" }}
+              >
+                <input
+                  type={passwordInputType}
+                  name="password"
+                  value={data.password}
+                  onChange={handleChange}
+                  onKeyDown={handleEnterSubmit}
+                />
+                <button
+                  onClick={() =>
+                    setPasswordInputType(
+                      passwordInputType === "password" ? "text" : "password"
+                    )
+                  }
+                  className="w-5"
+                >
+                  {passwordInputType === "password" && <ShowPasswordIcon />}
+                  {passwordInputType === "text" && <HidePasswordIcon />}
+                </button>
+              </div>
             </div>
           </div>
           <div>

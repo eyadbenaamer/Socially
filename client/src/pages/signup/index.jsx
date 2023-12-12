@@ -1,6 +1,5 @@
 import Form from "./form";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import "./index.css";
 const Signup = () => {
