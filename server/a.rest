@@ -1,4 +1,4 @@
-POST https://socially-uemy.onrender.com/signup/
+POST https://socially-5u3q.onrender.com/signup/
 Content-Type: application/json
 
 {
