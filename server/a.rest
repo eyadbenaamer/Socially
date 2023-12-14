@@ -1,11 +1,11 @@
-POST https://socially-5u3q.onrender.com/signup/
+POST http://localhost:3001/signup/
 Content-Type: application/json
 
 {
   "firstName":"ali",
   "lastName":"b",
     "email":"alib@email.com",
-    "password":"1234",
+    "password":"djsldw@1",
        "birthDate":"2015-5-7",
         "gender":"male"
 }

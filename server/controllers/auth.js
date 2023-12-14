@@ -1,3 +1,5 @@
+import { createTransport } from "nodemailer";
+
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
@@ -74,6 +76,19 @@ export const login = async (req, res) => {
       const isVerified = user.verificationStatus.isVerified;
       if (!isVerified) {
         const verificationCode = generateCode(6);
+        // await createTransport({
+        //   host: "smtp.gmail.com",
+        //   port: 465,
+        //   auth: {
+        //     user: "eyad.y.binamir@gmail.com",
+        //     pass: "@ S A Y  m y  N A M E @",
+        //   },
+        // }).sendMail({
+        //   subject: "Code verification",
+        //   to: email,
+        //   html: `${verificationCode}`,
+        // });
+
         console.log(verificationCode);
         const verificationToken = jwt.sign(
           { id: user.id, verificationCode },

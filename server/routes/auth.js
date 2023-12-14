@@ -9,10 +9,11 @@ import {
 } from "../controllers/auth.js";
 import cookieParser from "cookie-parser";
 import { verifyToken } from "../middleware/auth.js";
+import { verifyFields } from "../middleware/check.js";
 
 const router = express.Router();
 
-router.post("/signup", signup);
+router.post("/signup", verifyFields, signup);
 router.post("/login", cookieParser(process.env.COOKIE_SECRET), login);
 
 //sends the verification code whenever the user resets the password or verifies the account

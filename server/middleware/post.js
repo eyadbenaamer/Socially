@@ -44,7 +44,7 @@ export const getPostData = async (req, res, next) => {
 };
 export const uploadSingleFile = (req, res, next) => {
   try {
-    const uploadsFolder = `${process.env.API_URL}/assets/`;
+    const uploadsFolder = `${process.env.API_URL}/storage/`;
 
     const { file } = req;
     if (file) {

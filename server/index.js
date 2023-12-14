@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
+import { createTransport } from "nodemailer";
 import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
@@ -51,6 +52,7 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
+/* Email configurations*/
 
 /*ROUTES WITH FILES*/
 app.patch("/set_profile", verifyToken, upload.single("picture"), setProfile);

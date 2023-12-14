@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { ReactComponent as CloseIcon } from "../assets/icons/cross.svg";
 
 const Alert = (props) => {
-  const { type, isOpened, setIsOpened } = props;
-  const [message, setMessage] = useState(props.message);
-  useEffect(() => setIsOpened(true), [message]);
+  const { message, type, isOpened, setIsOpened } = props;
   return (
     <>
       {isOpened && (

@@ -41,23 +41,33 @@ const Comment = (props) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2">
                   <div className="flex flex-col gap-2">
-                    <div className={`bg-300 radius shadow-md w-fit px-3 py-2`}>
-                      <Link
-                        to={`/profile/${user._id}`}
-                        className="hover:underline"
+                    <div className="flex  items-center gap-2">
+                      <div
+                        className={`bg-300 radius shadow-md w-fit px-3 py-2`}
                       >
-                        {user.firstName} {user.lastName}
-                      </Link>
-                      <Text
-                        postCreatorId={post.creatorId}
-                        text={text}
-                        type="comment"
-                        postId={post._id}
+                        <Link
+                          to={`/profile/${user._id}`}
+                          className="hover:underline"
+                        >
+                          {user.firstName} {user.lastName}
+                        </Link>
+                        <Text
+                          postCreatorId={post.creatorId}
+                          text={text}
+                          type="comment"
+                          postId={post._id}
+                          commentId={id}
+                          isModifying={isModifying}
+                          setIsModifying={setIsModifying}
+                        />
+                      </div>
+                      <OptionsBtn
                         commentId={id}
-                        isModifying={isModifying}
+                        commentCreatorId={creatorId}
                         setIsModifying={setIsModifying}
+                        id={id}
                       />
                     </div>
                     <Media>
@@ -71,12 +81,6 @@ const Comment = (props) => {
                       </div>
                     </Media>
                   </div>
-                  <OptionsBtn
-                    commentId={id}
-                    commentCreatorId={creatorId}
-                    setIsModifying={setIsModifying}
-                    id={id}
-                  />
                 </div>
                 <div className="flex gap-3 items-center justify-start">
                   <Like

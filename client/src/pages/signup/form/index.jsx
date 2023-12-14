@@ -2,7 +2,7 @@ import DateInput from "./DateInput";
 import submit from "./submit";
 import { useRef, useState } from "react";
 import Alert from "components/Alert";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAuthStatus } from "state";
 import SubmitBtn from "components/SubmitBtn";
 
@@ -30,12 +30,17 @@ const Form = (props) => {
   };
   const submitButton = useRef(null);
   const dispatch = useDispatch();
-  const [passwordInputType, setPasswordInputType] = useState("password");
+  const mode = useSelector((state) => state.settings.mode);
+  const [passwordInputType, setPasswordInputType] = useState([
+    "password",
+    "password",
+  ]);
   const handleEnterSubmit = (e) => {
     if (e.key === "Enter") {
       submitButton.current.click();
     }
   };
+  const confirmPassword = useRef();
   return (
     <>
       {isOpened && (
@@ -55,6 +60,7 @@ const Form = (props) => {
               <label htmlFor="firstName">First Name</label>
               <input
                 type="text"
+                placeholder="John"
                 name="firstName"
                 value={data.firstName}
                 onChange={handleChange}
@@ -65,6 +71,7 @@ const Form = (props) => {
               <label htmlFor="lastName">Last Name</label>
               <input
                 type="text"
+                placeholder="Doe"
                 name="lastName"
                 value={data.lastName}
                 onChange={handleChange}
@@ -76,6 +83,7 @@ const Form = (props) => {
               <input
                 type="email"
                 name="email"
+                placeholder="email@example.com"
                 value={data.email}
                 onChange={handleChange}
                 onKeyDown={handleEnterSubmit}
@@ -84,30 +92,88 @@ const Form = (props) => {
             <div className="col-span-1 ">
               <label htmlFor="password">Password</label>
               <div
-                className="flex border p-[6px]"
-                style={{ borderRadius: "8px" }}
+                className={`flex ${
+                  mode === "light" ? "bg-200" : "bg-alt"
+                } border p-[6px]`}
+                style={{
+                  borderRadius: "8px",
+                  boxShadow: "0px 1px 3px 0px #00000026",
+                }}
               >
                 <input
-                  type={passwordInputType}
+                  autoComplete="false"
+                  type={passwordInputType[0]}
                   name="password"
+                  placeholder="Password"
                   value={data.password}
                   onChange={handleChange}
                   onKeyDown={handleEnterSubmit}
                 />
                 <button
                   onClick={() =>
-                    setPasswordInputType(
-                      passwordInputType === "password" ? "text" : "password"
-                    )
+                    setPasswordInputType([
+                      passwordInputType[0] === "password" ? "text" : "password",
+                      passwordInputType[1],
+                    ])
                   }
                   className="w-5"
                 >
-                  {passwordInputType === "password" && <ShowPasswordIcon />}
-                  {passwordInputType === "text" && <HidePasswordIcon />}
+                  {passwordInputType[0] === "password" ? (
+                    <ShowPasswordIcon />
+                  ) : (
+                    "text" && <HidePasswordIcon />
+                  )}
+                </button>
+              </div>
+            </div>
+            <div className="col-span-1 ">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <div
+                ref={confirmPassword}
+                className={`flex ${
+                  mode === "light" ? "bg-200" : "bg-alt"
+                } border p-[6px]`}
+                style={{
+                  borderRadius: "8px",
+                  boxShadow: "0px 1px 3px 0px #00000026",
+                }}
+              >
+                <input
+                  type={passwordInputType[1]}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  onChange={handleChange}
+                  onFocus={(e) =>
+                    (confirmPassword.current.style.border = "none")
+                  }
+                  onBlur={(e) => {
+                    if (e.target.value !== data.password) {
+                      confirmPassword.current.style.border = "solid red 2px";
+                    } else {
+                      confirmPassword.current.style.border = "solid green 2px";
+                    }
+                  }}
+                  onKeyDown={handleEnterSubmit}
+                />
+                <button
+                  onClick={() =>
+                    setPasswordInputType([
+                      passwordInputType[0],
+                      passwordInputType[1] === "password" ? "text" : "password",
+                    ])
+                  }
+                  className="w-5"
+                >
+                  {passwordInputType[1] === "password" ? (
+                    <ShowPasswordIcon />
+                  ) : (
+                    <HidePasswordIcon />
+                  )}
                 </button>
               </div>
             </div>
           </div>
+
           <div>
             <label className="block">Birthdate</label>
             <DateInput setData={setData} />

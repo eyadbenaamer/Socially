@@ -1,17 +1,22 @@
+import { Link } from "react-router-dom";
 import Form from "./Form";
-import { useWindowWidth } from "hooks/useWindowWidth.js";
 const Login = () => {
-  const isMobileScreen = useWindowWidth({ maxWidth: 768 });
-
   return (
-    <>
-      <div className="container m-auto ">
-        <h1 style={{ fontSize: isMobileScreen ? "1.5rem" : "2rem" }}>
-          Welcome to Socially!
-        </h1>
+    <div className="container m-auto">
+      <div className="auth flex flex-col gap-3 w-fit my-5 mx-auto shadow-md radius p-4 bg-300">
+        <h2 className="text-2xl">Welcome to Socially!</h2>
         <Form />
+        <div>
+          Don't have an account?{" "}
+          <Link
+            to="/signup"
+            className=" hover:underline hover:text-[var(--primary-color)]"
+          >
+            Sign up here
+          </Link>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 export default Login;
