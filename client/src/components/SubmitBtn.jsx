@@ -4,7 +4,7 @@ const SubmitBtn = (props) => {
     <button
       disabled={disabled}
       className="py-2 px-4 border-solid bg-primary radius text-white disabled:opacity-70"
-      onClick={onClick}
+      onClick={() => !disabled && onClick()}
     >
       {children}
     </button>

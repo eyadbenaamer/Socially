@@ -21,7 +21,7 @@ const Form = (props) => {
   });
   const [message, setMessage] = useState("");
   const [isOpened, setIsOpened] = useState(false);
-  const handleChange = async (e) => {
+  const handleChange = (e) => {
     window.sessionStorage.setItem([e.target.name], e.target.value);
     setData((prev) => ({
       ...prev,
@@ -84,8 +84,14 @@ const Form = (props) => {
                 type="email"
                 name="email"
                 placeholder="email@example.com"
-                value={data.email}
-                onChange={handleChange}
+                defaultValue={data.email}
+                onChange={(e) => {
+                  window.sessionStorage.setItem("email", e.target.value);
+                  setData((prev) => ({
+                    ...prev,
+                    email: e.target.value.trim().toLowerCase(),
+                  }));
+                }}
                 onKeyDown={handleEnterSubmit}
               />
             </div>

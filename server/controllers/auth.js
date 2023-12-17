@@ -23,10 +23,22 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      email,
+      email: email.trim().toLowerCase(),
       password: hashedPassword,
     });
     const verificationCode = generateCode(6);
+    const transporter = createTransport({
+      service: "gmail",
+      auth: {
+        user: "eyad.y.binamir@gmail.com",
+        pass: "fykj sqsk xlom cpyn",
+      },
+    });
+    transporter.sendMail({
+      subject: "Code verification",
+      to: email,
+      html: `${verificationCode}`,
+    });
     console.log(verificationCode);
     const verificationToken = jwt.sign(
       { id: newUser._id, verificationCode },
@@ -36,18 +48,17 @@ export const signup = async (req, res) => {
       }
     );
     newUser.verificationStatus.verificationToken = verificationToken;
-
-    await newUser.save();
+    newUser.save();
     const newProfile = new Profile({
       _id: newUser.id,
-      firstName,
-      lastName,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
       birthDate,
-      gender,
+      gender: firstName.trim(),
     });
     const newPostList = new Posts({ id: newUser.id });
-    await newPostList.save();
-    await newProfile.save();
+    newPostList.save();
+    newProfile.save();
     return res.status(201).send("user created.");
   } catch (error) {
     return res
@@ -58,7 +69,8 @@ export const signup = async (req, res) => {
 /*LOGIN USER*/
 export const login = async (req, res) => {
   try {
-    const { email, userName, password } = req.body;
+    let { email, userName, password } = req.body;
+    email = email.trim().toLowerCase();
     if (!password && (userName || email)) {
       return res.status(400).json({ message: "Invalid credentials." });
     }
@@ -76,18 +88,18 @@ export const login = async (req, res) => {
       const isVerified = user.verificationStatus.isVerified;
       if (!isVerified) {
         const verificationCode = generateCode(6);
-        // await createTransport({
-        //   host: "smtp.gmail.com",
-        //   port: 465,
-        //   auth: {
-        //     user: "eyad.y.binamir@gmail.com",
-        //     pass: "@ S A Y  m y  N A M E @",
-        //   },
-        // }).sendMail({
-        //   subject: "Code verification",
-        //   to: email,
-        //   html: `${verificationCode}`,
-        // });
+        const transporter = createTransport({
+          service: "gmail",
+          auth: {
+            user: "eyad.y.binamir@gmail.com",
+            pass: "fykj sqsk xlom cpyn",
+          },
+        });
+        transporter.sendMail({
+          subject: "Code verification",
+          to: email,
+          html: `${verificationCode}`,
+        });
 
         console.log(verificationCode);
         const verificationToken = jwt.sign(
@@ -131,7 +143,7 @@ export const verifyAccount = async (req, res) => {
     const { verificationToken } = req.params;
 
     if (code && email) {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email: email.trim().toLowerCase() });
       if (!user) {
         return res.status(404).json({ message: "User not found." });
       }
@@ -231,7 +243,8 @@ export const resetPassword = async (req, res) => {
 
 export const sendVerificationCode = async (req, res) => {
   try {
-    const { type, email } = req.body;
+    let { type, email } = req.body;
+    email = email.trim().toLowerCase();
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -247,10 +260,10 @@ export const sendVerificationCode = async (req, res) => {
         }
       );
       user.resetPasswordToken = token;
-      await user.save();
+      user.save();
       return res
         .status(200)
-        .json({ message: "We have sent a verification code to your email." });
+        .json({ message: `We have sent a verification code to ${email}.` });
     } else if (type === "verify_account") {
       if (user.verificationStatus.isVerified) {
         return res.status(400).send("already verified");
@@ -262,7 +275,7 @@ export const sendVerificationCode = async (req, res) => {
           expiresIn: "10m",
         }
       );
-      await user.save();
+      user.save();
       return res.status(200).json({ message: "Code sent." });
     } else {
       return res.status(400).send("Bad request");
@@ -275,7 +288,8 @@ export const sendVerificationCode = async (req, res) => {
 };
 export const verifyResetPasswordCode = async (req, res) => {
   try {
-    const { code, email } = req.body;
+    let { code, email } = req.body;
+    email = email.trim().toLowerCase();
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json("Bad Request");

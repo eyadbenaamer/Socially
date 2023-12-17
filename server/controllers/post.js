@@ -28,11 +28,11 @@ export const createPost = async (req, res) => {
         });
       }
       const newPost = {
-        creatorId: id,
-        text,
+        creatorId: id.trim(),
+        text: text.trim(),
         files: media ? filesPaths : null,
         createdAt: Date.now(),
-        location,
+        location: location.trim(),
       };
       const postList = await Posts.findById(id);
       postList.posts.addToSet(newPost);

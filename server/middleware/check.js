@@ -40,9 +40,11 @@ export const verifyFields = async (req, res, next) => {
     const { firstName, lastName, email, password, birthDate, gender } =
       req.body;
     const regex = {
-      email: /((\w)+.?)+@\w+\.\w{2,}/gi,
-      firstName: /[a-z]{2,}/gi,
-      lastName: /[a-z]{2,}/gi,
+      email: /((\w)+.?)+@\w{1,}\.\w{2,}/gi,
+      firstName:
+        /.[^!|@|#|$|%|^|&|*|(|)|_|-|=|+|<|>|/|\\|'|"|:|;|[|]|\{|\}]{2,}/gi,
+      lastName:
+        /.[^!|@|#|$|%|^|&|*|(|)|_|-|=|+|<|>|/|\\|'|"|:|;|[|]|\{|\}]{2,}/gi,
       password: /(\d+|\W+|.+){8,}/gi,
       confirmPassword: /(\d+|\W+|.+){8,}/gi,
     };
@@ -63,7 +65,7 @@ export const verifyFields = async (req, res, next) => {
     }
     if (password) {
       if (!regex.password.test(password)) {
-        return res.status(400).json({ message: "Invalid password" });
+        return res.status(400).json({ message: "Invalid password format" });
       }
     }
     if (birthDate) {

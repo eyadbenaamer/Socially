@@ -31,6 +31,7 @@ const Form = () => {
 
   const [passwordInputType, setPasswordInputType] = useState("password");
   const [inputError, setInputError] = useState({ email: "", password: "" });
+  const passwordInput = useRef();
   return (
     <>
       {isVerified === false && <Navigate to={"/verify-account"} />}
@@ -38,44 +39,70 @@ const Form = () => {
       <section className="flex flex-col gap-4 w-fit center">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="col-span-1">
-            <Input
-              setIsValid={(isValid) =>
-                setInputError({ ...inputError, email: isValid })
-              }
-              autoFocus={true}
-              label={"Email"}
-              name={"email"}
-              fieldValue={data.email}
-              setData={setData}
-            />
-          </div>
-          <div className="col-span-1">
-            <label htmlFor="password">Password</label>
-            <div
-              className={`flex ${
-                mode === "light" ? "bg-200" : "bg-alt"
-              } border p-[6px]`}
+            <label htmlFor="email">Email</label>
+            <input
               style={{
+                border: "2px solid transparent",
                 borderRadius: "8px",
                 boxShadow: "0px 1px 3px 0px #00000026",
               }}
-            >
+              className={`flex ${
+                mode === "light" ? "bg-200" : "bg-alt"
+              } p-[4px]`}
+              type="text"
+              name="email"
+              placeholder="email"
+              value={data.email}
+              onChange={handleChange}
+              onBlur={(e) => {
+                if (e.target.value) {
+                  e.target.style.border = "2px solid transparent";
+                  setInputError({ ...inputError, email: "" });
+                } else {
+                  e.target.style.border = "2px solid red";
+                  setInputError({ ...inputError, email: "Required" });
+                }
+              }}
+              // onKeyDown={handleEnterSubmit}
+            />
+            <div className="text-[red]">{inputError.email}</div>
+          </div>
+          <div className="col-span-1">
+            <label htmlFor="password">Password</label>
+            <div className="relative w-full">
               <input
+                style={{
+                  border: "2px solid transparent",
+                  borderRadius: "8px",
+                  boxShadow: "0px 1px 3px 0px #00000026",
+                }}
+                className={`pe-7 ${
+                  mode === "light" ? "bg-200" : "bg-alt"
+                } p-[4px]`}
                 autoComplete="false"
                 type={passwordInputType}
                 name="password"
                 placeholder="Password"
                 value={data.password}
                 onChange={handleChange}
+                onBlur={(e) => {
+                  if (e.target.value) {
+                    e.target.style.border = "2px solid transparent";
+                    setInputError({ ...inputError, password: "" });
+                  } else {
+                    e.target.style.border = "2px solid red";
+                    setInputError({ ...inputError, password: "Required" });
+                  }
+                }}
                 // onKeyDown={handleEnterSubmit}
               />
               <button
+                className="absolute w-5 right-[5px] top-[8px]"
                 onClick={() =>
                   setPasswordInputType(
                     passwordInputType === "password" ? "text" : "password"
                   )
                 }
-                className="w-5"
               >
                 {passwordInputType === "password" ? (
                   <ShowPasswordIcon />
@@ -84,6 +111,7 @@ const Form = () => {
                 )}
               </button>
             </div>
+            <div className="text-[red]">{inputError.password}</div>
           </div>
         </div>
         {message && <div className="text-[red]">{message}</div>}
