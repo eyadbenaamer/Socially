@@ -1,23 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import submit from "./submit";
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthStatus, setUser } from "state";
-import { Link, Navigate, useLocation } from "react-router-dom";
-import SubmitBtn from "components/SubmitBtn";
+import { Link, Navigate } from "react-router-dom";
 import { ReactComponent as ShowPasswordIcon } from "../../assets/icons/show.svg";
 import { ReactComponent as HidePasswordIcon } from "../../assets/icons/hide.svg";
-import Input from "components/Input";
 
 const Form = () => {
   const [data, setData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
-
-  const handleChange = (e) => {
-    setData({
-      ...data,
-      [e.target.name]: e.target.value,
-    });
-  };
   const dispatch = useDispatch();
   const [isVerified, setIsVerified] = useState(null);
   const submitButton = useRef(null);
@@ -31,7 +22,6 @@ const Form = () => {
 
   const [passwordInputType, setPasswordInputType] = useState("password");
   const [inputError, setInputError] = useState({ email: "", password: "" });
-  const passwordInput = useRef();
   return (
     <>
       {isVerified === false && <Navigate to={"/verify-account"} />}
@@ -53,8 +43,7 @@ const Form = () => {
               name="email"
               placeholder="email"
               value={data.email}
-              onChange={handleChange}
-              onBlur={(e) => {
+              onChange={(e) => {
                 if (e.target.value) {
                   e.target.style.border = "2px solid transparent";
                   setInputError({ ...inputError, email: "" });
@@ -62,8 +51,9 @@ const Form = () => {
                   e.target.style.border = "2px solid red";
                   setInputError({ ...inputError, email: "Required" });
                 }
+                setData({ ...data, email: e.target.value });
               }}
-              // onKeyDown={handleEnterSubmit}
+              onKeyDown={handleEnterSubmit}
             />
             <div className="text-[red]">{inputError.email}</div>
           </div>
@@ -84,8 +74,7 @@ const Form = () => {
                 name="password"
                 placeholder="Password"
                 value={data.password}
-                onChange={handleChange}
-                onBlur={(e) => {
+                onChange={(e) => {
                   if (e.target.value) {
                     e.target.style.border = "2px solid transparent";
                     setInputError({ ...inputError, password: "" });
@@ -93,8 +82,9 @@ const Form = () => {
                     e.target.style.border = "2px solid red";
                     setInputError({ ...inputError, password: "Required" });
                   }
+                  setData({ ...data, password: e.target.value });
                 }}
-                // onKeyDown={handleEnterSubmit}
+                onKeyDown={handleEnterSubmit}
               />
               <button
                 className="absolute w-5 right-[5px] top-[8px]"
@@ -122,33 +112,37 @@ const Form = () => {
           Forgot password?
         </Link>
         <div className="self-center sm:self-start">
-          <SubmitBtn
+          <button
+            ref={submitButton}
+            className="py-2 px-4 border-solid bg-primary radius text-white disabled:opacity-70"
             disabled={disabled || inputError.email || inputError.password}
             onClick={() => {
-              setDisabled(true);
-              submit(data).then((response) => {
-                let { message, user, isVerified } = response;
-                setMessage(message);
-                setDisabled(false);
-                !isVerified &&
-                  dispatch(
-                    setAuthStatus({ email: data.email, message, isVerified })
-                  );
-                isVerified &&
-                  dispatch(
-                    setAuthStatus({
-                      email: data.email,
-                      isLoggedIn: true,
-                      isVerified,
-                    })
-                  );
-                dispatch(setUser(user));
-                setIsVerified(isVerified);
-              });
+              if (!(disabled || inputError.email || inputError.password)) {
+                setDisabled(true);
+                submit(data).then((response) => {
+                  let { message, user, isVerified } = response;
+                  setMessage(message);
+                  setDisabled(false);
+                  !isVerified &&
+                    dispatch(
+                      setAuthStatus({ email: data.email, message, isVerified })
+                    );
+                  isVerified &&
+                    dispatch(
+                      setAuthStatus({
+                        email: data.email,
+                        isLoggedIn: true,
+                        isVerified,
+                      })
+                    );
+                  dispatch(setUser(user));
+                  setIsVerified(isVerified);
+                });
+              }
             }}
           >
             Log in
-          </SubmitBtn>
+          </button>
         </div>
       </section>
     </>

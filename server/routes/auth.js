@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  checkEmail,
   login,
   resetPassword,
   sendVerificationCode,
@@ -14,6 +15,7 @@ import { verifyFields } from "../middleware/check.js";
 const router = express.Router();
 
 router.post("/signup", verifyFields, signup);
+router.get("/check_email/:email", checkEmail);
 router.post("/login", cookieParser(process.env.COOKIE_SECRET), login);
 
 //sends the verification code whenever the user resets the password or verifies the account

@@ -151,6 +151,9 @@ textarea {
 .light .bg-300 {
   background-color: var(--bg-light-300);
 }
+.light .bg-alt {
+  background-color: var(--bg-light-alt);
+}
 .dark.bg-100,
 .dark .bg-100 {
   background-color: var(--bg-dark-100);
@@ -160,6 +163,9 @@ textarea {
 }
 .dark .bg-300 {
   background-color: var(--bg-dark-300);
+}
+.dark .bg-alt {
+  background-color: var(--bg-dark-alt);
 }
 .light .bg-hovered:hover {
   background-color: var(--bg-light-alt);
@@ -222,19 +228,19 @@ svg.hovered:hover,
 }
 
 .dark .auth select,
-/* .dark .auth input:not([name="password"]):not([name="confirmPassword"]), */
+.dark .auth input:not([name="password"]):not([name="confirmPassword"]),
 .dark .auth option {
   background-color: var(--bg-dark-alt);
   border-radius: 8px;
-  padding: 6px;
+  padding: 4px;
   box-shadow: 0px 1px 3px 0px #00000026;
-  border: solid 1px;
+  border: solid 2px transparent;
 }
 .light .auth select,
-/* .light .auth input:not([name="password"]):not([name="confirmPassword"]), */
+.light .auth input:not([name="password"]):not([name="confirmPassword"]),
 .light .auth option {
   background-color: var(--bg-light-200);
   border-radius: 8px;
-  padding: 6px;
+  padding: 4px;
   box-shadow: 0px 1px 3px 0px #00000026;
 }

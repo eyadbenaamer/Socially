@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
-import { createTransport } from "nodemailer";
 import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
@@ -26,7 +25,7 @@ import { renameFile } from "./utils/renameFile.js";
 import { setProfile } from "./controllers/profile.js";
 import { verifyId } from "./middleware/check.js";
 import { getPostData, uploadSingleFile } from "./middleware/post.js";
-import session, { Session } from "express-session";
+import cookieParser from "cookie-parser";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -42,7 +41,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/storage", express.static(path.join(__dirname, "public/storage")));
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
-// app.use(cookieParser(process.env.JWT_SECRET));
+app.use(cookieParser(process.env.JWT_SECRET));
 /*FILE STORAGE*/
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

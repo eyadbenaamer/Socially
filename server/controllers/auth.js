@@ -17,7 +17,7 @@ export const signup = async (req, res) => {
     }
     const isEmailUsed = (await User.findOne({ email })) ? true : false;
     if (isEmailUsed) {
-      return res.status(409).json({ message: "This email is used." });
+      return res.status(409).json({ message: "This email is registered." });
     }
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -60,6 +60,21 @@ export const signup = async (req, res) => {
     newPostList.save();
     newProfile.save();
     return res.status(201).send("user created.");
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. please try again later." });
+  }
+};
+export const checkEmail = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({ email });
+    if (user) {
+      res.status(409).json({ message: "This email address is registered." });
+    } else {
+      res.status(200).send("available");
+    }
   } catch (error) {
     return res
       .status(500)
