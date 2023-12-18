@@ -30,8 +30,8 @@ export const signup = async (req, res) => {
     const transporter = createTransport({
       service: "gmail",
       auth: {
-        user: "eyad.y.binamir@gmail.com",
-        pass: "fykj sqsk xlom cpyn",
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASSWORD,
       },
     });
     transporter.sendMail({
@@ -106,8 +106,8 @@ export const login = async (req, res) => {
         const transporter = createTransport({
           service: "gmail",
           auth: {
-            user: "eyad.y.binamir@gmail.com",
-            pass: "fykj sqsk xlom cpyn",
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_PASSWORD,
           },
         });
         transporter.sendMail({
