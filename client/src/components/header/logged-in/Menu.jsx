@@ -7,6 +7,7 @@ import useHover from "hooks/useHover";
 import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
 import { ReactComponent as SettingsIcon } from "../../../assets/icons/settings.svg";
 import useCloseWidget from "hooks/useCloseWidget";
+import { Navigate } from "react-router-dom";
 const Menu = () => {
   const mode = useSelector((state) => state.settings.mode);
   const [showMenu, setShowMenu] = useState(false);
@@ -47,7 +48,7 @@ const Menu = () => {
             </li>
             <li
               className="icon  py-2 px-3 radius gap-3 bg-hovered text-hovered"
-              onClick={async () => {
+              onClick={() => {
                 dispatch(logout());
               }}
             >

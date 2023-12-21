@@ -5,6 +5,7 @@ import { setAuthStatus, setUser } from "state";
 import { Link, Navigate } from "react-router-dom";
 import { ReactComponent as ShowPasswordIcon } from "../../assets/icons/show.svg";
 import { ReactComponent as HidePasswordIcon } from "../../assets/icons/hide.svg";
+import { ReactComponent as LoadingIcon } from "../../assets/icons/loading-circle.svg";
 
 const Form = () => {
   const [data, setData] = useState({ email: "", password: "" });
@@ -22,6 +23,7 @@ const Form = () => {
 
   const [passwordInputType, setPasswordInputType] = useState("password");
   const [inputError, setInputError] = useState({ email: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <>
       {isVerified === false && <Navigate to={"/verify-account"} />}
@@ -118,11 +120,13 @@ const Form = () => {
             disabled={disabled || inputError.email || inputError.password}
             onClick={() => {
               if (!(disabled || inputError.email || inputError.password)) {
+                setIsLoading(true);
                 setDisabled(true);
                 submit(data).then((response) => {
                   let { message, user, isVerified } = response;
                   setMessage(message);
                   setDisabled(false);
+                  setIsLoading(false);
                   !isVerified &&
                     dispatch(
                       setAuthStatus({ email: data.email, message, isVerified })
@@ -141,7 +145,7 @@ const Form = () => {
               }
             }}
           >
-            Log in
+            {isLoading ? <LoadingIcon height={24} stroke="white" /> : "Log in"}
           </button>
         </div>
       </section>

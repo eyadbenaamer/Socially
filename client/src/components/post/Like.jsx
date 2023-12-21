@@ -3,17 +3,29 @@ import { ReactComponent as LikeIcon } from "../../assets/icons/like.svg";
 import { useSelector } from "react-redux";
 import Dialog from "components/Dialog";
 import WhoLiked from "./WhoLiked";
+import Lottie from "react-lottie";
+import animationData from "../../assets/icons/like.json";
 import convertNumber from "utils/convertNumber";
 const Like = (props) => {
   const { type, path } = props;
   const user = useSelector((state) => state.user);
   const [likes, setLikes] = useState(props.likes);
+  const [firstLoad, setFirstLoad] = useState(true);
   const [isLiked, setIsliked] = useState(
     likes.includes(user ? user._id : false)
   );
   const [showLikes, setShowLikes] = useState(false);
+  const defaultOptions = {
+    loop: false,
+    autoplay: true,
+    animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
 
   const likeToggle = async () => {
+    setFirstLoad(false);
     const API_URL = process.env.REACT_APP_API_URL;
     if (user) {
       setIsliked((prev) => !prev);
@@ -56,12 +68,24 @@ const Like = (props) => {
           type !== "post" ? "scale-90" : ""
         }`}
       >
-        <button className="w-6 " onClick={likeToggle}>
-          {<LikeIcon fill={isLiked ? "red" : "none"} />}
+        <button className={`w-8 `} onClick={likeToggle}>
+          <div style={{ transform: "scale(3)" }}>
+            {isLiked && !firstLoad ? (
+              <Lottie options={defaultOptions} />
+            ) : (
+              <LikeIcon
+                color={`${
+                  props.likes.includes(user ? user._id : "")
+                    ? "#e53935"
+                    : "transparent"
+                }`}
+              />
+            )}
+          </div>
         </button>
         {likes.length > 0 ? (
           <button
-            className={"hover:underline text-hovered transition"}
+            className={"z-10 hover:underline text-hovered transition"}
             onClick={() => setShowLikes(!showLikes)}
           >
             {convertNumber(likes.length)}{" "}
