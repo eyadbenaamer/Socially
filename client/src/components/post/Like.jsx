@@ -15,7 +15,7 @@ const Like = (props) => {
     likes.includes(user ? user._id : false)
   );
   const [showLikes, setShowLikes] = useState(false);
-  const defaultOptions = {
+  const options = {
     loop: false,
     autoplay: true,
     animationData,
@@ -71,7 +71,7 @@ const Like = (props) => {
         <button className={`w-8 `} onClick={likeToggle}>
           <div style={{ transform: "scale(3)" }}>
             {isLiked && !firstLoad ? (
-              <Lottie options={defaultOptions} />
+              <Lottie options={options} />
             ) : (
               <LikeIcon
                 color={`${

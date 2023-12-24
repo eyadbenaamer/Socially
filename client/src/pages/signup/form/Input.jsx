@@ -1,4 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Lottie from "react-lottie";
+import tickAnimationData from "../../../assets/icons/tick.json";
+import crossAnimationData from "../../../assets/icons/cross.json";
+import { ReactComponent as LoadingIcon } from "../../../assets/icons/loading-circle.svg";
 
 const Input = (props) => {
   const {
@@ -10,91 +14,126 @@ const Input = (props) => {
     setIsValid,
     placeholder,
   } = props;
-  const [inputError, setInputError] = useState("");
-  const regex = {
-    email: /((\w)+.?)+@\w{1,}\.\w{2,}/gi,
-    firstName:
-      /.[^!|@|#|$|%|^|&|*|(|)|_|-|=|+|<|>|/|\\|'|"|:|;|[|]|\{|\}]{2,}/gi,
-    lastName:
-      /.[^!|@|#|$|%|^|&|*|(|)|_|-|=|+|<|>|/|\\|'|"|:|;|[|]|\{|\}]{2,}/gi,
-    password: /(\d+|\W+|.+){8,}/gi,
-    confirmPassword: /(\d+|\W+|.+){8,}/gi,
-  };
-  useEffect(() => setIsValid(inputError), [inputError]);
+  const [check, setCheck] = useState({ state: "", message: "" });
+
+  const regex =
+    /.[^!|@|#|$|%|^|&|*|(|)|_|-|=|+|<|>|/|\\|'|"|:|;|[|]|\{|\}]{2,}/gi;
+
+  const input = useRef(null);
+  useEffect(() => {
+    if (!focused && fieldValue && input.current) {
+      verifyValue(input.current);
+    }
+  }, []);
+  useEffect(
+    () => setIsValid(check.state === "success" ? true : false),
+    [check]
+  );
   const [focused, setFocused] = useState(autoFocus);
-  const verifyValue = (element) => {
-    if (!element.value) {
-      element.style.border = "solid 2px red";
-      setData((prev) => ({ ...prev, [name]: element.value }));
-      setInputError("Required");
+  const verifyValue = () => {
+    if (!fieldValue) {
+      input.current.style.border = "solid 2px red";
+      setData((prev) => ({ ...prev, [name]: fieldValue }));
+      setCheck({ state: "fail", message: "Required" });
     } else {
-      const isValid = regex[name].test(element.value);
+      const isValid = regex.test(fieldValue);
       if (isValid) {
-        if (name === "email") {
-          setData((prev) => ({
-            ...prev,
-            email: element.value.trim().toLowerCase(),
-          }));
-          fetch(
-            `${process.env.REACT_APP_API_URL}/check_email/${element.value}`
-          ).then((response) => {
-            if (response.status === 200) {
-              element.style.border = "solid 2px green";
-              setInputError(null);
-            } else {
-              response.json().then((data) => {
-                setInputError(data.message);
-                element.style.border = "solid 2px red";
-              });
-            }
-          });
-        } else {
-          element.style.border = "solid 2px green";
-          setData((prev) => ({
-            ...prev,
-            [name]: element.value.trim(),
-          }));
-        }
-        setInputError(null);
+        input.current.style.border = "solid 2px green";
+        setData((prev) => ({
+          ...prev,
+          [name]: fieldValue.trim(),
+        }));
+        setCheck({ state: "success" });
       } else {
-        element.style.border = "solid 2px red";
-        setData((prev) => ({ ...prev, [name]: element.value }));
-        setInputError(`Invalid ${label.toLowerCase()}`);
+        input.current.style.border = "solid 2px red";
+        setData((prev) => ({ ...prev, [name]: fieldValue }));
+
+        setCheck({
+          state: "fail",
+          message: `Invalid ${label.toLowerCase()}`,
+        });
       }
     }
   };
   return (
     <>
       <label htmlFor={name}>{label}</label>
-      <input
-        defaultValue={fieldValue}
-        placeholder={placeholder}
-        style={{
-          borderRadius: 8,
-          boxShadow: "0px 1px 3px 0px #00000026",
-          border: "solid 2px transparent",
-        }}
-        className="p-[4px] bg-200"
-        autoFocus={autoFocus}
-        onFocus={(e) => {
-          e.target.style.border = "solid 2px transparent";
-          setFocused(true);
-        }}
-        onChange={(e) => {
-          window.sessionStorage.setItem([e.target.name], e.target.value);
-          if (!focused) {
-            verifyValue(e.target);
-          }
-        }}
-        onBlur={(e) => {
-          verifyValue(e.target);
-          setFocused(false);
-        }}
-        type="text"
-        name={name}
-      />
+      <div className="flex gap-2 items-center">
+        <input
+          ref={input}
+          defaultValue={fieldValue}
+          placeholder={placeholder}
+          style={{
+            borderRadius: 8,
+            boxShadow: "0px 1px 3px 0px #00000026",
+            border: "solid 2px transparent",
+          }}
+          className="p-[4px] bg-200"
+          autoFocus={autoFocus}
+          onFocus={(e) => {
+            e.target.style.border = "solid 2px transparent";
 
-      <div className="text-[red] h-7">{!focused && inputError}</div>
+            setFocused(true);
+          }}
+          onChange={(e) => {
+            const value = e.target.value.trim();
+            setData((prev) => ({ ...prev, [name]: value }));
+            window.sessionStorage.setItem([e.target.name], value);
+            if (!focused) {
+              verifyValue(e.target);
+            }
+          }}
+          onBlur={(e) => {
+            verifyValue(e.target);
+            setFocused(false);
+          }}
+          type="text"
+          name={name}
+        />
+        <div className="w-10">
+          {!focused && (
+            <>
+              {check.state === "fail" ? (
+                <Lottie
+                  width={36}
+                  height={36}
+                  options={{
+                    loop: false,
+                    autoplay: true,
+                    animationData: crossAnimationData,
+                    rendererSettings: {
+                      preserveAspectRatio: "xMidYMid slice",
+                    },
+                  }}
+                />
+              ) : check.state === "success" ? (
+                <Lottie
+                  width={24}
+                  height={24}
+                  options={{
+                    loop: false,
+                    autoplay: true,
+                    animationData: tickAnimationData,
+                    rendererSettings: {
+                      preserveAspectRatio: "xMidYMid slice",
+                    },
+                  }}
+                />
+              ) : (
+                ""
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      <div
+        className={`${
+          check.state === "fail" ? "text-[red]" : "text-[green]"
+        } h-7`}
+      >
+        {!focused && check.message}
+      </div>
     </>
   );
 };

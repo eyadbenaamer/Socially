@@ -6,12 +6,12 @@
     x="0px"
     y="0px"
     width="24px"
-    height="30px"
+    height="15px"
     viewBox="0 0 24 30"
     style="enable-background: new 0 0 50 50"
     xml:space="preserve"
   >
-    <rect x="0" y="0" width="4" height="10" fill="#333">
+    <rect x="0" y="0" width="4" height="10" fill="currentColor">
       <animateTransform
         attributeType="xml"
         attributeName="transform"
@@ -22,7 +22,7 @@
         repeatCount="indefinite"
       />
     </rect>
-    <rect x="10" y="0" width="4" height="10" fill="#333">
+    <rect x="10" y="0" width="4" height="10" fill="currentColor">
       <animateTransform
         attributeType="xml"
         attributeName="transform"
@@ -33,7 +33,7 @@
         repeatCount="indefinite"
       />
     </rect>
-    <rect x="20" y="0" width="4" height="10" fill="#333">
+    <rect x="20" y="0" width="4" height="10" fill="currentColor">
       <animateTransform
         attributeType="xml"
         attributeName="transform"

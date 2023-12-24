@@ -1,89 +1,175 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ReactComponent as ShowPasswordIcon } from "../../../assets/icons/show.svg";
 import { ReactComponent as HidePasswordIcon } from "../../../assets/icons/hide.svg";
+import tickAnimationData from "../../../assets/icons/tick.json";
+import crossAnimationData from "../../../assets/icons/cross.json";
 import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
+import Lottie from "react-lottie";
 
 const PasswordInput = (props) => {
-  const { setData, data, name, placeholder } = props;
+  const { setData, fieldValue, setIsValid, data, name, placeholder } = props;
   const mode = useSelector((state) => state.settings.mode);
-  const [passwordInputType, setPasswordInputType] = useState("password");
-  const [inputError, setInputError] = useState("");
+  const [inputType, setInputType] = useState("password");
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [check, setCheck] = useState({ state: "", message: "" });
 
+  const regex =
+    /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}/gi;
+  const input = useRef(null);
+  useEffect(
+    () => setIsValid(check.state === "success" ? true : false),
+    [check]
+  );
+  useEffect(() => {
+    if (!focused && fieldValue && input.current) {
+      verifyValue(input.current);
+    }
+  }, []);
+  const verifyValue = () => {
+    if (name === "password") {
+      if (!fieldValue) {
+        input.current.style.border = "solid 2px red";
+        setData((prev) => ({ ...prev, password: fieldValue }));
+        setCheck({ state: "fail", message: "Required" });
+        return;
+      }
+      const isValid = regex.test(fieldValue);
+      if (isValid) {
+        setData((prev) => ({
+          ...prev,
+          [name]: fieldValue.trim(),
+        }));
+        input.current.style.border = "solid 2px green";
+        setCheck({ state: "success" });
+      } else {
+        input.current.style.border = "solid 2px red";
+        setData((prev) => ({ ...prev, [name]: fieldValue }));
+
+        setCheck({
+          state: "fail",
+          message: "Invalid password",
+        });
+      }
+    }
+    if (name === "confirmPassword") {
+      if (!input.current.value) {
+        input.current.style.border = "solid 2px red";
+        setCheck({ state: "fail", message: "Required" });
+        return;
+      } else {
+        if (input.current.value === data.password) {
+          input.current.style.border = "solid 2px green";
+          setCheck({ state: "success" });
+        } else {
+          input.current.style.border = "solid 2px red";
+          setCheck({ state: "fail", message: "Passwords don't match" });
+        }
+      }
+    }
+  };
   return (
     <>
       <label htmlFor={name}>{placeholder}</label>
-      <div className="relative w-full">
-        <input
-          style={{
-            border: "2px solid transparent",
-            borderRadius: "8px",
-            boxShadow: "0px 1px 3px 0px #00000026",
-          }}
-          className={`pe-7 ${mode === "light" ? "bg-200" : "bg-alt"} p-[4px]`}
-          type={passwordInputType}
-          name={name}
-          placeholder={placeholder}
-          defaultValue={data.password}
-          onFocus={(e) => {
-            setInputError(null);
-            e.target.style.border = "2px solid transparent";
-            if (name === "password") {
-              setShowPasswordForm(true);
-            }
-          }}
-          onBlur={(e) => {
-            if (name === "password") {
-              if (e.target.value) {
-                e.target.style.border = "2px solid green";
-                setInputError(null);
-              } else {
-                e.target.style.border = "2px solid red";
-                setInputError("Required");
+      <div className="flex gap-2 items-center">
+        <div className="relative w-full">
+          <input
+            ref={input}
+            style={{
+              border: "2px solid transparent",
+              borderRadius: "8px",
+              boxShadow: "0px 1px 3px 0px #00000026",
+            }}
+            className={`pe-7 ${mode === "light" ? "bg-200" : "bg-alt"} p-[4px]`}
+            type={inputType}
+            name={name}
+            placeholder={placeholder}
+            defaultValue={name === "password" ? data.password : ""}
+            onFocus={(e) => {
+              e.target.style.border = "solid 2px transparent";
+              if (name === "password") {
+                setShowPasswordForm(true);
               }
+              setFocused(true);
+            }}
+            onChange={(e) => {
+              const value = e.target.value.trim();
+              setData((prev) => ({ ...prev, [name]: value }));
+              window.sessionStorage.setItem([e.target.name], value);
+            }}
+            onBlur={(e) => {
+              verifyValue(e.target);
+              setFocused(false);
               setShowPasswordForm(false);
-              setData((prev) => ({ ...prev, password: e.target.value }));
-            } else {
-              if (e.target.value) {
-                if (e.target.value != data.password) {
-                  e.target.style.border = "2px solid red";
-                  setInputError("Passwords don't match.");
-                } else {
-                  e.target.style.border = "2px solid green";
-                  setInputError(null);
-                }
-              } else {
-                e.target.style.border = "2px solid red";
-                setInputError("Required");
-              }
+            }}
+          />
+          <button
+            tabIndex={-1}
+            className="absolute w-5 right-[5px] top-[8px]"
+            onClick={() =>
+              setInputType(inputType === "password" ? "text" : "password")
             }
-          }}
-        />
-        <button
-          className="absolute w-5 right-[5px] top-[8px]"
-          onClick={() =>
-            setPasswordInputType(
-              passwordInputType === "password" ? "text" : "password"
-            )
-          }
-        >
-          {passwordInputType === "password" ? (
-            <ShowPasswordIcon />
-          ) : (
-            "text" && <HidePasswordIcon />
+          >
+            {inputType === "password" ? (
+              <ShowPasswordIcon />
+            ) : (
+              "text" && <HidePasswordIcon />
+            )}
+          </button>
+          {showPasswordForm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
+              className="absolute text-sm right-0 bottom-16 shadow-sm z-50 min-w-full bg-200 py-2 ps-2 radius"
+            >
+              <div>Length at least 8 letters</div>
+              <div>Contains at least 1 digit</div>
+              <div>Contains at least 1 character</div>
+              <div>Contains at least 1 upper case letter</div>
+              <div>Contains at least 1 lower case letter</div>
+            </motion.div>
           )}
-        </button>
-        {showPasswordForm && (
-          <div className="absolute text-sm right-0 bottom-16 shadow-sm z-50 min-w-full bg-200 py-2 ps-2 radius">
-            <div>Length at least 8 letters</div>
-            <div>Contains at least 1 digit</div>
-            <div>Contains at least 1 character</div>
-            <div>Contains at least 1 upper case letter</div>
-            <div>Contains at least 1 lower case letter</div>
-          </div>
-        )}
+        </div>
+        <div className="w-10">
+          {!focused && (
+            <>
+              {check.state === "fail" ? (
+                <Lottie
+                  width={36}
+                  height={36}
+                  options={{
+                    loop: false,
+                    autoplay: true,
+                    animationData: crossAnimationData,
+                    rendererSettings: {
+                      preserveAspectRatio: "xMidYMid slice",
+                    },
+                  }}
+                />
+              ) : check.state === "success" ? (
+                <Lottie
+                  width={24}
+                  height={24}
+                  options={{
+                    loop: false,
+                    autoplay: true,
+                    animationData: tickAnimationData,
+                    rendererSettings: {
+                      preserveAspectRatio: "xMidYMid slice",
+                    },
+                  }}
+                />
+              ) : (
+                ""
+              )}
+            </>
+          )}
+        </div>
       </div>
-      <div className="text-[red] h-3 text-sm">{inputError}</div>
+
+      <div className="text-[red] h-3 text-sm">{check.message}</div>
     </>
   );
 };

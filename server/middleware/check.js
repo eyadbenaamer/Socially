@@ -45,8 +45,8 @@ export const verifyFields = async (req, res, next) => {
         /.[^!|@|#|$|%|^|&|*|(|)|_|-|=|+|<|>|/|\\|'|"|:|;|[|]|\{|\}]{2,}/gi,
       lastName:
         /.[^!|@|#|$|%|^|&|*|(|)|_|-|=|+|<|>|/|\\|'|"|:|;|[|]|\{|\}]{2,}/gi,
-      password: /(\d+|\W+|.+){8,}/gi,
-      confirmPassword: /(\d+|\W+|.+){8,}/gi,
+      password:
+        /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}/gi,
     };
     if (firstName) {
       if (!regex.firstName.test(firstName)) {
