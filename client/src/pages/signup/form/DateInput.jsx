@@ -31,21 +31,31 @@ const DateInput = (props) => {
   };
   return (
     <div className="flex gap-1">
-      <select name="day" value={date.day} onChange={handleChange}>
+      <select tabIndex={1} name="day" value={date.day} onChange={handleChange}>
         {dayArray.map((item) => (
           <option value={item} key={item}>
             {item}
           </option>
         ))}
       </select>
-      <select name="month" value={date.month} onChange={handleChange}>
+      <select
+        tabIndex={1}
+        name="month"
+        value={date.month}
+        onChange={handleChange}
+      >
         {monthArray.map((item) => (
           <option value={item} key={item}>
             {item}
           </option>
         ))}
       </select>
-      <select name="year" value={date.year} onChange={handleChange}>
+      <select
+        tabIndex={1}
+        name="year"
+        value={date.year}
+        onChange={handleChange}
+      >
         {yearArray.map((item) => (
           <option value={item} key={item}>
             {item}

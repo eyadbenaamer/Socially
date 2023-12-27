@@ -3,7 +3,6 @@ import CreatePost from "components/create-post";
 import Posts from "components/posts";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import Bar from "components/bar";
 import { useSelector } from "react-redux";
 import NotFound from "pages/NotFound";
@@ -35,7 +34,13 @@ const Profile = () => {
       ) : (
         <>
           <div className="mx-1 sm:mx-4">
-            <div className="bg-200 h-[200px] radius w-full">
+            <div
+              className="bg-200 h-[200px]  w-full"
+              style={{
+                borderBottomLeftRadius: 16,
+                borderBottomRightRadius: 16,
+              }}
+            >
               {profile && (
                 <img
                   className=" max-h-full w-full radius"

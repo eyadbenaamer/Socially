@@ -129,13 +129,14 @@ const Form = (props) => {
           <label className="block" htmlFor="gender">
             Gender
           </label>
-          <select name="gender" onChange={handleChange}>
+          <select tabIndex={1} name="gender" onChange={handleChange}>
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
         </div>
         <div className=" self-center">
           <SubmitBtn
+            tabIndex={1}
             disabled={disabled()}
             onClick={() => {
               setIsLoading(true);

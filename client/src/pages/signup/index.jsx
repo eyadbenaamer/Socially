@@ -19,6 +19,7 @@ const Signup = () => {
           <div>
             Already have an account?{" "}
             <Link
+              tabIndex={1}
               to="/login"
               className=" hover:underline hover:text-[var(--primary-color)]"
             >

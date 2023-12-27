@@ -63,6 +63,7 @@ const EmailInput = (props) => {
       <label htmlFor="eamil">Email</label>
       <div className="flex gap-2 items-center">
         <input
+          tabIndex={1}
           ref={input}
           defaultValue={fieldValue}
           placeholder="email.example.com"

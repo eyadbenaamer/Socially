@@ -16,7 +16,7 @@ const PasswordInput = (props) => {
   const [check, setCheck] = useState({ state: "", message: "" });
 
   const regex =
-    /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}/gi;
+    /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}/g;
   const input = useRef(null);
   useEffect(
     () => setIsValid(check.state === "success" ? true : false),
@@ -75,6 +75,7 @@ const PasswordInput = (props) => {
       <div className="flex gap-2 items-center">
         <div className="relative w-full">
           <input
+            tabIndex={1}
             ref={input}
             style={{
               border: "2px solid transparent",
@@ -169,7 +170,9 @@ const PasswordInput = (props) => {
         </div>
       </div>
 
-      <div className="text-[red] h-3 text-sm">{check.message}</div>
+      <div className="text-[red] h-3 text-sm">
+        {!focused ? check.message : ""}
+      </div>
     </>
   );
 };

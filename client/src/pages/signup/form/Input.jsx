@@ -60,6 +60,7 @@ const Input = (props) => {
       <label htmlFor={name}>{label}</label>
       <div className="flex gap-2 items-center">
         <input
+          tabIndex={1}
           ref={input}
           defaultValue={fieldValue}
           placeholder={placeholder}
