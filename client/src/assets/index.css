@@ -14,9 +14,9 @@ body,
   --bg-dark-200: #212330;
   --bg-dark-300: #2a2d3d;
   --bg-dark-alt: #303343;
-  --bg-light-100: #f4f5f9;
-  --bg-light-200: #ffffff;
-  /* --bg-light-300: #f6f6f6; */
+  --bg-light-100: #ffffff;
+  --bg-light-200: #f4f5f9;
+  /* --bg-light-200: #f6f6f6; */
   --bg-light-300: #fafbff;
   --bg-light-alt: #eaedfb;
   --main-transition: 0.15s !important;
@@ -185,7 +185,8 @@ textarea {
 .bg-secondary {
   background-color: var(--secondary-color);
 }
-.light .bg-100 {
+.light .bg-100,
+.light.bg-100 {
   background-color: var(--bg-light-100);
 }
 .light .bg-200 {

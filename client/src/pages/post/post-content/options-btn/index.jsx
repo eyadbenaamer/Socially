@@ -34,7 +34,7 @@ const OptionsBtn = (props) => {
       </button>
       {isOpen && (
         <ul
-          className={`absolute top-[100%] right-0 radius w-max overflow-hidden z-20 ${
+          className={`absolute  top-[100%] right-0 radius w-max overflow-hidden z-20 ${
             mode === "dark" ? "bg-300" : "bg-100"
           }`}
           ref={optionsList}

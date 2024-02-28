@@ -66,7 +66,7 @@ const AddComment = (props) => {
               }
               onChange={(e) => setText(e.target.value)}
             ></textarea>
-            <div className="flex gap-1 w-1/5">
+            <div className="flex justify-end w-1/5">
               <input
                 accept="video/*, video/x-m4v, video/webm, video/x-ms-wmv, video/x-msvideo, video/3gpp, video/flv, video/x-flv, video/mp4, video/quicktime, video/mpeg, video/ogv, .ts, .mkv, image/*, image/heic, image/heif"
                 style={{ display: "none" }}

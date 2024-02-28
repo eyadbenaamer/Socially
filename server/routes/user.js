@@ -3,6 +3,7 @@ import { verifyId } from "../middleware/check.js";
 import { verifyToken } from "../middleware/auth.js";
 import { getPostData } from "../middleware/post.js";
 import {
+  getUser,
   getSavedIds,
   getSavedPosts,
   toggleSavePost,
@@ -10,6 +11,7 @@ import {
 
 const router = Router();
 
+router.get("/user/", verifyId, verifyToken, getUser);
 router.get("/saved_posts/", verifyId, verifyToken, getSavedPosts);
 router.get("/saved_posts_ids/", verifyId, verifyToken, getSavedIds);
 

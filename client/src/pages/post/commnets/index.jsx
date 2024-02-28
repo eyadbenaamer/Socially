@@ -19,7 +19,7 @@ const Comments = () => {
   return (
     <div
       className={`flex flex-col gap-5 ${
-        mode === "dark" ? "border-t-[#ffffff1a]" : "border-t-[#f4f5f9]"
+        mode === "dark" ? "border-t-[#ffffff1a]" : "border-t-[#4d4e541a]"
       } border-t p-3`}
     >
       {comments.length > 0 ? (

@@ -41,7 +41,6 @@ const Form = (props) => {
   });
   const disabled = () => {
     for (const key in isValidInputs) {
-      console.log(isValidInputs);
       if (!isValidInputs[key]) {
         return true;
       }

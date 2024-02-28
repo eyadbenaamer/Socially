@@ -1,5 +1,10 @@
 import Posts from "../models/posts.js";
 
+export const getUser = async (req, res) => {
+  const { user } = req;
+  res.json(user);
+};
+
 export const toggleSavePost = async (req, res) => {
   const { userId, postId } = req.params;
   const { user } = req;

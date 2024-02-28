@@ -19,10 +19,11 @@ const ProfileSchema = new Schema({
     max: 20,
   },
   coverPath: String,
-  picturePath: {
+  avatarPath: {
     type: String,
     default: `${process.env.API_URL}/assets/default_avatar.jpg`,
   },
+  bannerPath: String,
   bio: String,
   birthDate: String,
   gender: String,
@@ -35,7 +36,6 @@ const ProfileSchema = new Schema({
     default: [],
   },
   location: String,
-  occupation: String,
   createdAt: { type: Number, default: Date.now() },
 });
 const Profile = model("Profiles", ProfileSchema);

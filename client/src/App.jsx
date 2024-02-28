@@ -31,7 +31,9 @@ const App = () => {
   useEffect(() => {
     const API_URL = process.env.REACT_APP_API_URL;
     if (user) {
-      fetch(`${API_URL}/profile/${user._id}`).then((response) => {
+      fetch(`${API_URL}/user/`, {
+        headers: { authorization: user.token },
+      }).then((response) => {
         if (response.status === 200) {
           response.json().then((data) => dispatch(setUser(data)));
         } else {

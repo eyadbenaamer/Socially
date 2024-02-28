@@ -55,7 +55,15 @@ const upload = multer({ storage });
 /* Email configurations*/
 
 /*ROUTES WITH FILES*/
-app.patch("/set_profile", verifyToken, upload.single("picture"), setProfile);
+app.patch(
+  "/set_profile",
+  verifyToken,
+  upload.fields([
+    { name: "avatar", maxCount: 1 },
+    { name: "cover", maxCount: 1 },
+  ]),
+  setProfile
+);
 app.post(
   "/posts/create_post",
   verifyToken,

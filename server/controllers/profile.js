@@ -55,9 +55,25 @@ export const getFollowing = async (req, res) => {
 export const setProfile = async (req, res) => {
   try {
     const { id } = req.user;
-    const { file } = req;
+    const { avatar, cover } = req.files;
+    const { bio, birthDate, location, occupation } = req.body;
     const profile = await Profile.findById(id);
-    profile.picturePath = `${process.env.API_URL}/storage/${file.filename}`;
+    if (avatar) {
+      profile.avatarPath = `${process.env.API_URL}/storage/${avatar.filename}`;
+    }
+    if (cover) {
+      profile.coverPath = `${process.env.API_URL}/storage/${cover.filename}`;
+    }
+    if (bio) {
+      profile.bio = bio;
+    }
+    if (birthDate) {
+      profile.birthDate = birthDate;
+    }
+    if (location) {
+      profile.location = location;
+    }
+
     await profile.save();
     return res.status(200).json({ token: req.user.token, ...profile._doc });
   } catch (error) {

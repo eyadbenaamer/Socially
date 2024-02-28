@@ -57,7 +57,6 @@ const Like = (props) => {
         }
       );
     } else {
-      console.log("login first");
     }
   };
 

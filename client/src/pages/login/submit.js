@@ -12,7 +12,6 @@ const submit = async (data) => {
       };
     },
     (rejected) => {
-      console.log(rejected.response.data);
       const { message, user, isVerified } = rejected.response.data;
       isVerified === false && sessionStorage.setItem("isNotVerified", true);
       return { isLoggedIn: false, message, user, isVerified };

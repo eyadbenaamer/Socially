@@ -264,9 +264,7 @@ export const likePostToggle = async (req, res) => {
     await postList.save();
     return res.status(200).json({ likes: post.likes });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+    return res.status(500).json({ message: error });
   }
 };
 export const likeComment = async (req, res) => {
