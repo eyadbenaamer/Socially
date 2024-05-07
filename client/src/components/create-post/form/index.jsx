@@ -34,7 +34,7 @@ const Form = (props) => {
         disabled={!isValidPost}
         className={`${
           isValidPost ? "bg-primary" : "bg-secondary"
-        } self-end py-2 px-4 radius text-white`}
+        } self-end py-2 px-4 rounded-xl text-white`}
         onClick={async () => {
           setIsOpened(false);
           setData({ text: "", location: "" });
