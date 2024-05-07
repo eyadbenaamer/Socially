@@ -1,25 +1,22 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setSettings } from "state";
-import { ReactComponent as MoonIcon } from "../assets/icons/moon.svg";
+
+import { toggleTheme } from "state";
+
+import { ReactComponent as MoonIcon } from "assets/icons/moon.svg";
+
 const ToggleTheme = () => {
-  const mode = useSelector((state) => state.settings).mode;
+  const theme = useSelector((state) => state.settings).theme;
   const dispatch = useDispatch();
   return (
     <MoonIcon
-      onClick={() => {
-        if (mode === "dark") {
-          dispatch(setSettings({ property: "mode", value: "light" }));
-        } else {
-          dispatch(setSettings({ property: "mode", value: "dark" }));
-        }
-      }}
+      onClick={() => dispatch(toggleTheme())}
       style={{
         display: "inline",
         marginRight: 10,
         transform: "translateX(1px)",
       }}
       width={16}
-      fill={mode === "dark" ? "#daa520" : "#5b5d67"}
+      fill={theme === "dark" ? "#daa520" : "#5b5d67"}
     />
   );
 };
