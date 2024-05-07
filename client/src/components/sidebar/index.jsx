@@ -1,10 +1,13 @@
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { ReactComponent as HomeIcon } from "../../assets/icons/home.svg";
-import { ReactComponent as NotificationsIcon } from "../../assets/icons/notifications.svg";
-import { ReactComponent as MessagesIcon } from "../../assets/icons/message-text.svg";
-import { ReactComponent as SavedPostsIcon } from "../../assets/icons/saved-posts.svg";
+
+import { ReactComponent as HomeIcon } from "assets/icons/home.svg";
+import { ReactComponent as NotificationsIcon } from "assets/icons/notifications.svg";
+import { ReactComponent as MessagesIcon } from "assets/icons/message-text.svg";
+import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
+
 import SidebarItem from "./SidebarItem";
+
 const Sidebar = () => {
   const user = useSelector((state) => state.user);
   const location = useLocation();
@@ -21,7 +24,7 @@ const Sidebar = () => {
           name={`${user.firstName} ${user.lastName}`}
         >
           <span className="circle w-9 border-2">
-            <img src={user.picturePath} />
+            <img src={user.avatarPath} />
           </span>
         </SidebarItem>
 

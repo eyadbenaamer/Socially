@@ -1,10 +1,10 @@
+import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import ToggleTheme from "../ToggleTheme";
 
-import darkLogo from "../../assets/icons/logo-dark.svg";
-import lightLogo from "../../assets/icons/logo-light.svg";
-import { Link } from "react-router-dom";
+import darkLogo from "assets/icons/logo-dark.svg";
+import lightLogo from "assets/icons/logo-light.svg";
 
 const UnloggedIn = () => {
   const theme = useSelector((state) => state.settings).theme;

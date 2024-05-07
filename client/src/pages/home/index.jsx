@@ -1,23 +1,24 @@
 import { useWindowWidth } from "hooks/useWindowWidth";
+
 import Sidebar from "../../components/sidebar";
 import { Content } from "./content";
-import Following from "./following";
 import Bar from "components/bar";
 
+import Following from "./following";
+
 const Home = () => {
-  // window.scrollTo({ top: -100, behavior: "smooth" });
   const windowWidth = useWindowWidth();
 
   return (
     <>
-      <div className="grid grid-cols-8 pt-5 pb-20 min-h-screen">
-        {windowWidth > 768 && (
+      <div className="grid grid-cols-8 pt-5 pb-28 min-h-screen">
+        {windowWidth >= 768 && (
           <div className="sidebar flex justify-center col-span-2">
             <Sidebar />
           </div>
         )}
-        <div className="content sm:col-span-5 lg:col-span-4 col-span-8">
-          <div className=" w-full md:w-4/5 my-0 m-auto">
+        <div className="content sm:col-span-8 md:mx-0 md:col-span-6 lg:col-span-4 col-span-8">
+          <div className="my-0 mx-auto">
             <Content />
           </div>
         </div>

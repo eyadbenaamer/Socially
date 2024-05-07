@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PrimaryBtn from "./PrimaryBtn";
 import SubmitBtn from "./SubmitBtn";
 import axios from "axios";
@@ -23,11 +23,11 @@ const Text = (props) => {
     const API_URL = process.env.REACT_APP_API_URL;
     let requestUrl;
     if (type === "post") {
-      requestUrl = `${API_URL}/posts/edit_post/${postCreatorId}/${postId}`;
+      requestUrl = `${API_URL}/post/edit?userId=${postCreatorId}&postId=${postId}`;
     } else if (type === "comment") {
-      requestUrl = `${API_URL}/posts/edit_comment/${postCreatorId}/${postId}/${commentId}/`;
+      requestUrl = `${API_URL}/comment/edit?userId=${postCreatorId}&postId=${postId}&commentId=${commentId}`;
     } else if (type === "reply") {
-      requestUrl = `${API_URL}/posts/edit_reply/${postCreatorId}/${postId}/${commentId}/${replyId}`;
+      requestUrl = `${API_URL}/reply/edit?userId=${postCreatorId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
     }
     axios
       .patch(

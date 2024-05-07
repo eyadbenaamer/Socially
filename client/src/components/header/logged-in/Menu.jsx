@@ -1,61 +1,52 @@
-import { useDispatch, useSelector } from "react-redux";
-import { ReactComponent as DropDownIcon } from "../../../assets/icons/drop-down.svg";
 import { useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import ToggleTheme from "components/ToggleTheme";
-import { logout, setLogin, setSettings } from "state";
-import useHover from "hooks/useHover";
-import { ReactComponent as LogoutIcon } from "../../../assets/icons/logout.svg";
-import { ReactComponent as SettingsIcon } from "../../../assets/icons/settings.svg";
+
+import { logout, toggleTheme } from "state";
+
 import useCloseWidget from "hooks/useCloseWidget";
-import { Navigate } from "react-router-dom";
+
+import { ReactComponent as DropDownIcon } from "assets/icons/drop-down.svg";
+import { ReactComponent as LogoutIcon } from "assets/icons/logout.svg";
+import { ReactComponent as SettingsIcon } from "assets/icons/settings.svg";
+
 const Menu = () => {
-  const mode = useSelector((state) => state.settings.mode);
+  const theme = useSelector((state) => state.settings.theme);
   const [showMenu, setShowMenu] = useState(false);
   const dispatch = useDispatch();
   const menu = useRef(null);
   useCloseWidget(menu, setShowMenu);
   return (
     <div
+      ref={menu}
       className="cursor-pointer relative flex justify-center w-10"
       onClick={() => {
         setShowMenu(!showMenu);
       }}
     >
-      <DropDownIcon className="icon hovered" />
+      <DropDownIcon className="icon" />
       {showMenu && (
-        <div
-          ref={menu}
-          className="menu bg-300 cursor-pointer absolute right-0 radius w-max"
-        >
-          <ul className="flex flex-col radius">
-            <li className="icon py-2 px-3 radius gap-3 bg-hovered text-hovered ">
-              <SettingsIcon
-                width={16}
-                style={{ display: "inline", marginRight: 10 }}
-              />
+        <div className="menu bg-300 cursor-pointer absolute top-0 right-0 rounded-xl w-max">
+          <ul className="flex flex-col rounded-xl transition">
+            <li className="flex gap-2 p-3 bg-hovered w-full">
+              <SettingsIcon className="inline mr-2 w-4" />
               Settings
             </li>
             <li
-              onClick={() => {
-                mode === "dark"
-                  ? dispatch(setSettings({ property: "mode", value: "light" }))
-                  : dispatch(setSettings({ property: "mode", value: "dark" }));
-              }}
-              className=" py-2 px-3 radius gap-3 bg-hovered text-hovered"
+              onClick={() => dispatch(toggleTheme())}
+              className="flex gap-2 p-3 bg-hovered w-full"
             >
               <ToggleTheme />
               Mode
             </li>
             <li
-              className="icon  py-2 px-3 radius gap-3 bg-hovered text-hovered"
+              className="flex gap-2 p-3 bg-hovered w-full"
               onClick={() => {
                 dispatch(logout());
               }}
             >
-              <LogoutIcon
-                width={16}
-                style={{ display: "inline", marginRight: 10, marginLeft: -1 }}
-              />
+              <LogoutIcon className="w-4 inline mr-2 -ml-1" />
               Log out
             </li>
           </ul>

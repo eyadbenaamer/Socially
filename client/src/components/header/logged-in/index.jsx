@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 
-import darkLogo from "../../../assets/icons/logo-dark.svg";
-import lightLogo from "../../../assets/icons/logo-light.svg";
+import darkLogo from "assets/icons/logo-dark.svg";
+import lightLogo from "assets/icons/logo-light.svg";
 import { Link } from "react-router-dom";
 import Menu from "./Menu";
 
