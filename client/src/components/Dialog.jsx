@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
-import { ReactComponent as CloseIcon } from "../assets/icons/cross.svg";
-import useCloseWidget from "hooks/useCloseWidget";
+
+import { ReactComponent as CloseIcon } from "assets/icons/cross.svg";
+
 const Dialog = (props) => {
   const { isOpened, setIsOpened, children } = props;
 
   const prompt = useRef(null);
-  useCloseWidget(prompt, setIsOpened);
   useEffect(() => {
     if (isOpened) {
       document.body.style.height = "100vh";
@@ -22,20 +22,21 @@ const Dialog = (props) => {
   return (
     isOpened && (
       <dialog
+        ref={prompt}
         aria-busy={true}
-        className="text-inherit w-full fixed top-0 bg-[#00000063] h-[100vh] flex items-center justify-center z-50"
+        className="text-inherit w-full fixed top-0 bg-[#00000063] h-[100dvh] flex items-center justify-center z-[100]"
       >
-        <div ref={prompt}>
-          <section className="dialog bg-200 px-4 py-3 w-fit h-fit radius ">
-            <button
-              className="cursor-pointer w-5"
-              onClick={() => setIsOpened(!isOpened)}
-            >
-              <CloseIcon className="hover:text-white" />
-            </button>
-            <>{children}</>
-          </section>
-        </div>
+        <section className="dialog bg-200 px-4 py-3 h-fit max-h-[100dvh]">
+          <button
+            className="cursor-pointer w-5"
+            onClick={() => setIsOpened(!isOpened)}
+          >
+            <CloseIcon className="icon hover:text-white" />
+          </button>
+          <div className="dialog max-h-[90vh] overflow-y-scroll p-1">
+            {children}
+          </div>
+        </section>
       </dialog>
     )
   );
