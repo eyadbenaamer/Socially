@@ -1,4 +1,4 @@
-import PostPreview from "components/post-preview";
+import Post from "components/post";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
 
@@ -12,7 +12,10 @@ const Posts = (props) => {
 
   const fetchPosts = async () => {
     const API_URL = process.env.REACT_APP_API_URL;
-    fetch(`${API_URL}/posts/${id ? id : ""}`).then(async (response) => {
+    const requestURL = id
+      ? `${API_URL}/posts?userId=${id}`
+      : `${API_URL}/posts`;
+    fetch(requestURL).then(async (response) => {
       if (response.status === 200) {
         setPosts(await response.json());
         setIsFetched(true);
@@ -33,7 +36,7 @@ const Posts = (props) => {
         posts.length > 0 &&
         posts.map((post, index) => {
           return (
-            <PostPreview
+            <Post
               key={post._id}
               // ref={index === posts.length - 1 ? lastPost : null}
               ref={lastPost}
