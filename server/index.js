@@ -8,24 +8,26 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
+import cookieParser from "cookie-parser";
 
 import authRoute from "./routes/auth.js";
 import profileRoute from "./routes/profile.js";
-import postRoute from "./routes/post.js";
 import userRoute from "./routes/user.js";
+import postsRoute from "./routes/posts.js";
+import postRoute from "./routes/post.js";
+import commentRoute from "./routes/comment.js";
+import replyRoute from "./routes/reply.js";
 
-import {
-  addComment,
-  addReply,
-  createPost,
-  getFeedPosts,
-} from "./controllers/post.js";
-import { verifyToken } from "./middleware/auth.js";
-import { renameFile } from "./utils/renameFile.js";
 import { setProfile } from "./controllers/profile.js";
+import { getFeedPosts } from "./controllers/posts.js";
+import { create, share } from "./controllers/post.js";
+import { add as addComment } from "./controllers/comment.js";
+import { add as addReply } from "./controllers/reply.js";
+
+import { verifyToken } from "./middleware/auth.js";
 import { verifyId } from "./middleware/check.js";
+import { compressImage } from "./middleware/media.js";
 import { getPostData, uploadSingleFile } from "./middleware/post.js";
-import cookieParser from "cookie-parser";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -42,17 +44,18 @@ app.use(cors());
 app.use("/storage", express.static(path.join(__dirname, "public/storage")));
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 app.use(cookieParser(process.env.JWT_SECRET));
+
 /*FILE STORAGE*/
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/storage");
   },
   filename: function (req, file, cb) {
-    cb(null, renameFile(file.originalname));
+    cb(null, file.originalname);
   },
 });
 const upload = multer({ storage });
-/* Email configurations*/
 
 /*ROUTES WITH FILES*/
 app.patch(
@@ -65,13 +68,22 @@ app.patch(
   setProfile
 );
 app.post(
-  "/posts/create_post",
+  "/post/create",
   verifyToken,
   upload.fields([{ name: "media", maxCount: 5 }]),
-  createPost
+  compressImage,
+  create
 );
 app.post(
-  "/posts/add_comment/:userId/:postId/",
+  "/post/share/",
+  verifyId,
+  verifyToken,
+  upload.fields([{ name: "media", maxCount: 5 }]),
+  compressImage,
+  share
+);
+app.post(
+  "/comment/add",
   verifyId,
   verifyToken,
   upload.single("media"),
@@ -80,7 +92,7 @@ app.post(
   addComment
 );
 app.post(
-  "/posts/add_reply/:userId/:postId/:commentId",
+  "/reply/add",
   verifyId,
   verifyToken,
   upload.single("media"),
@@ -93,7 +105,11 @@ app.use("/", userRoute);
 app.use("/", authRoute);
 app.use("/home", getFeedPosts);
 app.use("/profile", profileRoute);
-app.use("/posts", postRoute);
+app.use("/posts", postsRoute);
+app.use("/post", postRoute);
+app.use("/comment", commentRoute);
+app.use("/reply", replyRoute);
+
 /*MONGOOSE SETUP*/
 const PORT = process.env.PORT;
 mongoose.connect(process.env.DATABASE_URL, {
