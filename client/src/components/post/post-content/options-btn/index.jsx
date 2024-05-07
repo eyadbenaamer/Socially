@@ -38,7 +38,7 @@ const OptionsBtn = (props) => {
       </button>
       {isOpen && (
         <ul
-          className={`absolute  top-[100%] right-0 rounded-xl w-max overflow-hidden z-20 ${
+          className={`absolute top-[100%] right-0 rounded-xl w-max overflow-hidden z-50 ${
             theme === "dark" ? "bg-300" : "bg-100"
           }`}
         >
