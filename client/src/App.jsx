@@ -16,13 +16,14 @@ import ResetPassword from "pages/reset-password";
 import SetProfile from "pages/set-profile";
 import Post from "pages/post";
 import { useEffect, useState } from "react";
-import { logout, setAuthStatus, setUser } from "state";
+import { setAuthStatus, setUser } from "state";
 import Loading from "components/Loading";
+import InfoMessage from "components/InfoMessage";
 
 const App = () => {
   //if user is stored in redux state, then the user is logged in
   const { isLoggedIn } = useSelector((state) => state.authStatus);
-  const mode = useSelector((state) => state.settings.mode);
+  const theme = useSelector((state) => state.settings.theme);
   const user = useSelector((state) => state.user);
   const { isVerified } = useSelector((state) => state.authStatus);
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ const App = () => {
       {isLoading && !openedSession ? (
         <Loading />
       ) : (
-        <div className={`App ${mode} bg-100 min-h-screen`}>
+        <div className={`App ${theme} bg-100 min-h-screen`}>
           <Header />
           <motion.main
             initial={{ opacity: 0, y: -10 }}
@@ -118,6 +119,10 @@ const App = () => {
                 element={<Post />}
               />
               <Route
+                path="/post/:userId/:postId/:commentId/:replyId"
+                element={<Post />}
+              />
+              <Route
                 path="/notifications"
                 element={
                   isLoggedIn ? (
@@ -150,6 +155,7 @@ const App = () => {
                 }
               />
             </Routes>
+            <InfoMessage />
           </motion.main>
         </div>
       )}

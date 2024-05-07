@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+
 import PrimaryBtn from "./PrimaryBtn";
 import SubmitBtn from "./SubmitBtn";
-import axios from "axios";
-import { useSelector } from "react-redux";
 
 const Text = (props) => {
   const [text, setText] = useState("");

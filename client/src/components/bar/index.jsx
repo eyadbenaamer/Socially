@@ -1,10 +1,13 @@
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { ReactComponent as HomeIcon } from "../../assets/icons/home.svg";
-import { ReactComponent as NotificationsIcon } from "../../assets/icons/notifications.svg";
-import { ReactComponent as MessagesIcon } from "../../assets/icons/message-text.svg";
-import { ReactComponent as SavedPostsIcon } from "../../assets/icons/saved-posts.svg";
-import BarItem from "./SidebarItem";
+
+import BarItem from "./BarItem";
+
+import { ReactComponent as HomeIcon } from "assets/icons/home.svg";
+import { ReactComponent as NotificationsIcon } from "assets/icons/notifications.svg";
+import { ReactComponent as MessagesIcon } from "assets/icons/message-text.svg";
+import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
+
 const Bar = () => {
   const user = useSelector((state) => state.user);
   const location = useLocation();
@@ -13,19 +16,21 @@ const Bar = () => {
       <ul className="flex gap-3 items-center px-2 w-full">
         <BarItem to={"/"}>
           <HomeIcon
-            className={`${location.pathname === "/" ? "primary-text" : ""}`}
+            className={`icon ${
+              location.pathname === "/" ? "primary-text" : ""
+            }`}
           />
         </BarItem>
 
         <BarItem to={`/profile/${user._id}`}>
           <span className="circle w-9">
-            <img src={user.picturePath} />
+            <img src={user.avatarPath} />
           </span>
         </BarItem>
 
         <BarItem to={"/notifications"}>
           <NotificationsIcon
-            className={`${
+            className={`icon ${
               location.pathname === "/notifications" ? "primary-text" : ""
             }`}
           />
@@ -33,7 +38,7 @@ const Bar = () => {
 
         <BarItem to={"/messages"}>
           <MessagesIcon
-            className={`${
+            className={`icon ${
               location.pathname === "/messages" ? "primary-text" : ""
             }`}
           />
@@ -41,7 +46,7 @@ const Bar = () => {
 
         <BarItem to={"/saved-posts"}>
           <SavedPostsIcon
-            className={`${
+            className={`icon ${
               location.pathname === "/saved-posts" ? "primary-text" : ""
             }`}
           />

@@ -5,19 +5,12 @@ export const submit = async (data, media, token) => {
     formData.append(property, data[property]);
   }
   if (media) {
-    // let filesNames = { photos: [], videos: [] };
-    // for (const file in media) {
-    //   media[file].type.startsWith("video")
-    //     ? filesNames.videos.push(media[file].name)
-    //     : filesNames.photos.push(media[file].name);
-    // }
-    // formData.append("filesNames", JSON.stringify(filesNames));
     for (const file in media) {
       formData.append("media", media[file]);
     }
   }
 
-  return await fetch(`${API_URL}/posts/create_post`, {
+  return fetch(`${API_URL}/post/create`, {
     method: "POST",
     body: formData,
     headers: { Authorization: token },
