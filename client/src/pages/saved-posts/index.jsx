@@ -1,10 +1,11 @@
-import { useWindowWidth } from "hooks/useWindowWidth";
-import Sidebar from "components/sidebar";
-import Bar from "components/bar";
-import Posts from "components/posts";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import PostPreview from "components/post-preview";
+
+import { useWindowWidth } from "hooks/useWindowWidth";
+
+import Sidebar from "components/sidebar";
+import Bar from "components/bar";
+import Post from "components/post";
 
 const SavedPosts = () => {
   const windowWidth = useWindowWidth();
@@ -25,16 +26,15 @@ const SavedPosts = () => {
   }, []);
   return (
     <>
-      <div className="grid grid-cols-8 pt-5 pb-20 min-h-screen">
-        {windowWidth >= 1100 && (
+      <div className="grid grid-cols-8 pt-5 pb-28 min-h-screen">
+        {windowWidth >= 768 && (
           <div className="sidebar flex justify-center col-span-2">
             <Sidebar />
           </div>
         )}
         <div className="content sm:col-span-5 lg:col-span-4 col-span-8">
           <div className="flex flex-col px-2 gap-3 justify-center">
-            {posts &&
-              posts.map((post) => <PostPreview key={post._id} post={post} />)}
+            {posts && posts.map((post) => <Post key={post._id} post={post} />)}
           </div>
         </div>
       </div>
