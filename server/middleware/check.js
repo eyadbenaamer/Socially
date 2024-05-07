@@ -1,8 +1,14 @@
 export const verifyId = async (req, res, next) => {
   try {
-    const { userId, postId, commentId, accountId, replyId } = req.params;
+    const { userId, creatorId, postId, commentId, accountId, replyId } =
+      req.query;
     if (userId) {
       if (userId.length != 24) {
+        return res.status(400).send("invalid ID");
+      }
+    }
+    if (creatorId) {
+      if (creatorId.length != 24) {
         return res.status(400).send("invalid ID");
       }
     }
@@ -28,7 +34,7 @@ export const verifyId = async (req, res, next) => {
     }
 
     next();
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
@@ -76,5 +82,9 @@ export const verifyFields = async (req, res, next) => {
       }
     }
     next();
-  } catch (error) {}
+  } catch {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
+  }
 };

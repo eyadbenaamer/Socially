@@ -6,7 +6,9 @@ import User from "../models/user.js";
 import Profile from "../models/profile.js";
 import { generateCode } from "../utils/generateCode.js";
 import Posts from "../models/posts.js";
+
 /*REGISTER USER*/
+
 export const signup = async (req, res) => {
   //TODO: set validatior for this route
   try {
@@ -27,19 +29,23 @@ export const signup = async (req, res) => {
       password: hashedPassword,
     });
     const verificationCode = generateCode(6);
-    const transporter = createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASSWORD,
-      },
-    });
-    transporter.sendMail({
-      subject: "Code verification",
-      to: email,
-      html: `${verificationCode}`,
-    });
-    console.log(verificationCode);
+    try {
+      const transporter = createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_PASSWORD,
+        },
+      });
+      transporter.sendMail({
+        subject: "Code verification",
+        to: email,
+        html: `${verificationCode}`,
+      });
+      console.log(verificationCode);
+    } catch (error) {
+      console.log(error);
+    }
     const verificationToken = jwt.sign(
       { id: newUser._id, verificationCode },
       process.env.JWT_SECRET,
@@ -60,7 +66,7 @@ export const signup = async (req, res) => {
     newPostList.save();
     newProfile.save();
     return res.status(201).send("user created.");
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. please try again later." });
@@ -75,7 +81,7 @@ export const checkEmail = async (req, res) => {
     } else {
       res.status(200).send("available");
     }
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. please try again later." });
@@ -144,8 +150,7 @@ export const login = async (req, res) => {
     } else {
       return res.status(404).json({ message: "The user doesn't exist." });
     }
-  } catch (error) {
-    console.log(error);
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. try again later." });
@@ -207,7 +212,7 @@ export const verifyAccount = async (req, res) => {
         return res.status(400).json({ message: "Email cannot be empty." });
       }
     }
-  } catch (error) {
+  } catch {
     return res.status(500).json({ message: error.message });
   }
 };
@@ -248,10 +253,10 @@ export const resetPassword = async (req, res) => {
         isVerified: true,
         user: { token: loginToken, ...profile._doc },
       });
-    } catch (error) {
+    } catch {
       return res.status(401).json({ message: "Link expired." });
     }
-  } catch (error) {
+  } catch {
     return res.status(500).json({ message: error.message });
   }
 };
@@ -295,7 +300,7 @@ export const sendVerificationCode = async (req, res) => {
     } else {
       return res.status(400).send("Bad request");
     }
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. try again later." });
@@ -318,7 +323,7 @@ export const verifyResetPasswordCode = async (req, res) => {
     } else {
       return res.status(401).json({ message: "Invalid code." });
     }
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });

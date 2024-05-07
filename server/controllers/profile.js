@@ -12,7 +12,7 @@ export const getProfile = async (req, res) => {
     } else {
       return res.status(404).json({ message: "user not found" });
     }
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
@@ -28,7 +28,7 @@ export const getFollowers = async (req, res) => {
     } else {
       return res.status(404).json({ error: "No followers found" });
     }
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
@@ -44,7 +44,7 @@ export const getFollowing = async (req, res) => {
     } else {
       return res.status(404).json({ error: "No following found" });
     }
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
@@ -76,7 +76,7 @@ export const setProfile = async (req, res) => {
 
     await profile.save();
     return res.status(200).json({ token: req.user.token, ...profile._doc });
-  } catch (error) {
+  } catch {
     return res.status(404).json({ error: error.message });
   }
 };
@@ -102,7 +102,7 @@ export const follow = async (req, res) => {
     } else {
       return res.status(400).send("bad request");
     }
-  } catch (error) {
+  } catch {
     return res.status(404).json({ error: error.message });
   }
 };
@@ -128,7 +128,7 @@ export const unFollow = async (req, res) => {
     } else {
       return res.status(400).send("bad request");
     }
-  } catch (error) {
+  } catch {
     return res.status(404).json({ error: error.message });
   }
 };
@@ -154,7 +154,7 @@ export const removeFollower = async (req, res) => {
     } else {
       return res.status(400).send("bad request");
     }
-  } catch (error) {
+  } catch {
     return res.status(404).json({ error: error.message });
   }
 };

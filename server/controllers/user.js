@@ -24,7 +24,7 @@ export const toggleSavePost = async (req, res) => {
       await user.save();
       return res.status(200).send("post saved.");
     }
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Please try again later." });
@@ -40,17 +40,12 @@ export const getSavedPosts = async (req, res) => {
       if (posts) {
         let savedPost = posts.id(user.savedPosts[i].postId);
         if (savedPost) {
-          savedPost = {
-            ...savedPost._doc,
-            commentsCount: savedPost.comments.length,
-          };
-          delete savedPost.comments;
           savedPosts.push(savedPost);
         }
       }
     }
     return res.status(200).json(savedPosts);
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Please try again later." });
@@ -64,7 +59,7 @@ export const getSavedIds = async (req, res) => {
       (item) => `${item.userId}/${item.postId}`
     );
     return res.status(200).json(savedPosts);
-  } catch (error) {
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Please try again later." });
