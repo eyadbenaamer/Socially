@@ -1,11 +1,10 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types } from "mongoose";
 
 const ReplySchema = new Schema({
   creatorId: String,
   rootCommentId: String,
   text: String,
   file: { fileType: String, path: String },
-
   likes: [],
   createdAt: Number,
 });
@@ -27,12 +26,15 @@ export const PostSchema = new Schema({
   files: [
     {
       path: String,
-      order: Number,
       fileType: String,
     },
   ],
   likes: [],
   comments: [CommentSchema],
+  sharedPost: {
+    _id: Types.ObjectId,
+    creatorId: String,
+  },
   createdAt: {
     type: Number,
     default: Date.now(),

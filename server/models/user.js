@@ -20,8 +20,6 @@ const UserSchema = new Schema(
         postId: String,
       }),
     ],
-
-    // ArraySubdocument: { type:  },
   },
   { timestamps: true }
 );
