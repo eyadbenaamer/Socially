@@ -21,7 +21,7 @@ const ProfileSchema = new Schema({
   coverPath: String,
   avatarPath: {
     type: String,
-    default: `${process.env.API_URL}/assets/default_avatar.jpg`,
+    default: `${process.env.API_URL}/assets/blank_user.jpg`,
   },
   bannerPath: String,
   bio: String,
