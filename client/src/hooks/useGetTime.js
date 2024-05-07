@@ -24,7 +24,7 @@ const useGetTime = (createdAt) => {
               : new Date(createdAt).getDate();
           setTime(`${new Date().getDate() - postedDay}d`);
         } else {
-          setTime(`${new Date().toDateString(createdAt)}`);
+          setTime(`${new Date(createdAt).toDateString()}`);
         }
       }
     } else {
