@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import Lottie from "react-lottie";
-import tickAnimationData from "../../../assets/icons/tick.json";
-import crossAnimationData from "../../../assets/icons/cross.json";
-import { ReactComponent as LoadingIcon } from "../../../assets/icons/loading-circle.svg";
+
+import tickAnimationData from "assets/icons/tick.json";
+import crossAnimationData from "assets/icons/cross.json";
+import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const EmailInput = (props) => {
   const { fieldValue, setData, setIsValid } = props;
   const [check, setCheck] = useState({ state: "", message: "" });
 
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+/gi;
+  const regex = /((\w)+.?)+@\w{1,}\.\w{2,}/gi;
   const input = useRef(null);
   useEffect(
     () => setIsValid(check.state === "success" ? true : false),
