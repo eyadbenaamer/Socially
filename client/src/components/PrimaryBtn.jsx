@@ -3,7 +3,7 @@ const PrimaryBtn = (props) => {
   return (
     <button
       disabled={disabled}
-      className="py-1 px-4 border-solid bg-100 radius"
+      className="py-1 px-4 border-solid bg-100 rounded-xl"
       onClick={(e) => {
         e.target.style.opacity = "0.7";
         onClick();

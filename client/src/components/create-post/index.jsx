@@ -1,35 +1,36 @@
-import { Link } from "react-router-dom";
-import { ReactComponent as PhotoIcon } from "../../assets/icons/photo.svg";
-import { ReactComponent as VideoIcon } from "../../assets/icons/video.svg";
-
 import { useSelector } from "react-redux";
-import Dialog from "components/Dialog";
 import { useState } from "react";
-import Form from "./form";
+
+import Dialog from "components/Dialog";
 import UserPicture from "components/UserPicture";
+
+import Form from "./form";
+
+import { ReactComponent as PhotoIcon } from "assets/icons/photo.svg";
+import { ReactComponent as VideoIcon } from "assets/icons/video.svg";
 
 const CreatePost = ({ setCreatedPost }) => {
   const user = useSelector((state) => state.user);
   const [isOpened, setIsOpened] = useState(false);
   const [data, setData] = useState({ text: "", location: "" });
-  const [media, setMedia] = useState(null);
-  const mode = useSelector((state) => state.settings.mode);
+  const [media, setMedia] = useState([]);
+  const theme = useSelector((state) => state.settings.theme);
 
   return (
     <section
-      className={`create-post bg-200 w-full px-4 pt-5 pb-1 radius flex flex-col gap-3 shadow-md ${
-        mode === "light" ? "border" : ""
+      className={`create-post bg-200 w-full px-4 pt-5 pb-1 rounded-xl flex flex-col gap-3 shadow-md ${
+        theme === "light" ? "border" : ""
       }`}
     >
       <div className="flex gap-3 items-center">
         <UserPicture
           id={user._id}
-          src={user.picturePath}
+          src={user.avatarPath}
           name={`${user.firstName} ${user.lastName}`}
         />
         <div
           onClick={() => setIsOpened(!isOpened)}
-          className="cursor-pointer h-[2.75rem] text-ellipsis overflow-clip radius bg-300 p-2 w-full shadow-md"
+          className="cursor-pointer h-[2.75rem] text-ellipsis overflow-clip rounded-xl bg-300 p-2 w-full shadow-md"
           style={{ lineHeight: 2 }}
         >
           {data.text || "Type Anything!"}

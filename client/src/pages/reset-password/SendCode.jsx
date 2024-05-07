@@ -25,7 +25,7 @@ const SendCode = (props) => {
       </div>
       <button
         ref={sendBtn}
-        className="py-2 px-4 border-solid bg-primary radius text-inverse"
+        className="py-2 px-4 border-solid bg-primary rounded-xl text-inverse"
         onClick={(e) => {
           e.target.style.background = "#899dfc";
           axios

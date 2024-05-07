@@ -11,14 +11,14 @@ const CoverPicture = (props) => {
       >
         <img
           loading="lazy"
-          className=" max-h-full w-full radius"
+          className=" max-h-full w-full rounded-xl"
           src={coverPath}
         />
       </div>
       <div className="avatar-image-container absolute bottom-[-50%] left-8 circle w-32 sm:w-48 border-2 bg-300">
         <img
           loading="lazy"
-          className=" max-h-full w-full radius "
+          className=" max-h-full w-full rounded-xl "
           src={avatarPath}
         />
       </div>

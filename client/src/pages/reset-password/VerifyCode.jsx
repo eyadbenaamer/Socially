@@ -7,7 +7,7 @@ import { setLoginStatus, setUser } from "state";
 const VerifyCode = (props) => {
   const { email, setToken } = props;
   const [code, setCode] = useState("");
-  const mode = useSelector((state) => state.settings.mode);
+  const theme = useSelector((state) => state.settings.theme);
   const [alert, setAlert] = useState({ type: "", message: "" });
 
   const sendCode = async () => {
@@ -42,12 +42,13 @@ const VerifyCode = (props) => {
       </div>
       <div
         className={`${
-          mode === "light" ? "text-slate-800" : ""
-        } my-8 bg-300 radius p-4 shadow-md`}
+          theme === "light" ? "text-slate-800" : ""
+        } my-8 bg-300 rounded-xl p-4 shadow-md`}
       >
         Enter the code that has been sent to your email address
-        <div className="code my-3">
+        <div className=" my-3">
           <input
+            className="rounded-xl border-2 text-center text-3xl h-[60px] w-[120px]"
             type="text"
             value={code}
             onKeyDown={(e) => {
@@ -68,7 +69,7 @@ const VerifyCode = (props) => {
         </div>
         <button
           ref={sendBtn}
-          className="py-2 px-4 border-solid bg-primary radius text-inverse"
+          className="py-2 px-4 border-solid bg-primary rounded-xl text-inverse"
           onClick={(e) => {
             e.target.style.background = "#899dfc";
             sendCode().then((response) => {

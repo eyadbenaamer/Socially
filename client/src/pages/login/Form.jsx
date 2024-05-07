@@ -19,7 +19,7 @@ const Form = () => {
     }
   };
   const [disabled, setDisabled] = useState(false);
-  const mode = useSelector((state) => state.settings.mode);
+  const theme = useSelector((state) => state.settings.theme);
 
   const [passwordInputType, setPasswordInputType] = useState("password");
   const [inputError, setInputError] = useState({ email: "", password: "" });
@@ -39,7 +39,7 @@ const Form = () => {
                 boxShadow: "0px 1px 3px 0px #00000026",
               }}
               className={`flex ${
-                mode === "light" ? "bg-200" : "bg-alt"
+                theme === "light" ? "bg-200" : "bg-alt"
               } p-[4px]`}
               type="text"
               name="email"
@@ -69,7 +69,7 @@ const Form = () => {
                   boxShadow: "0px 1px 3px 0px #00000026",
                 }}
                 className={`pe-7 ${
-                  mode === "light" ? "bg-200" : "bg-alt"
+                  theme === "light" ? "bg-200" : "bg-alt"
                 } p-[4px]`}
                 autoComplete="false"
                 type={passwordInputType}
@@ -116,7 +116,7 @@ const Form = () => {
         <div className="self-center sm:self-start">
           <button
             ref={submitButton}
-            className="py-2 px-4 border-solid bg-primary radius text-white disabled:opacity-70"
+            className="py-2 px-4 border-solid bg-primary rounded-xl text-white disabled:opacity-70"
             disabled={disabled || inputError.email || inputError.password}
             onClick={() => {
               if (!(disabled || inputError.email || inputError.password)) {

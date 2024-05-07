@@ -9,7 +9,7 @@ import Lottie from "react-lottie";
 
 const PasswordInput = (props) => {
   const { setData, fieldValue, setIsValid, data, name, placeholder } = props;
-  const mode = useSelector((state) => state.settings.mode);
+  const theme = useSelector((state) => state.settings.theme);
   const [inputType, setInputType] = useState("password");
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -82,7 +82,9 @@ const PasswordInput = (props) => {
               borderRadius: "8px",
               boxShadow: "0px 1px 3px 0px #00000026",
             }}
-            className={`pe-7 ${mode === "light" ? "bg-200" : "bg-alt"} p-[4px]`}
+            className={`pe-7 ${
+              theme === "light" ? "bg-200" : "bg-alt"
+            } p-[4px]`}
             type={inputType}
             name={name}
             placeholder={placeholder}
@@ -123,7 +125,7 @@ const PasswordInput = (props) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.15 }}
-              className="absolute text-sm right-0 bottom-16 shadow-sm z-50 min-w-full bg-200 py-2 ps-2 radius"
+              className="absolute text-sm right-0 bottom-16 shadow-sm z-50 min-w-full bg-200 py-2 ps-2 rounded-xl"
             >
               <div>Length at least 8 letters</div>
               <div>Contains at least 1 digit</div>

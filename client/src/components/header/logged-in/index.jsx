@@ -6,21 +6,18 @@ import { Link } from "react-router-dom";
 import Menu from "./Menu";
 
 const LoggedIn = () => {
-  const mode = useSelector((state) => state.settings).mode;
+  const theme = useSelector((state) => state.settings).theme;
 
   return (
-    <div className="shadow-lg bg-300  transition-all">
-      <div className="container m-auto  flex gap-3 items-center justify-between">
-        <Link className="py-4" to="/">
-          {mode === "light" ? (
-            <img src={lightLogo} alt="Socially" />
-          ) : (
-            <img src={darkLogo} alt="Socially" />
-          )}
-        </Link>
-
-        <Menu />
-      </div>
+    <div className="m-auto flex gap-3 items-center justify-between">
+      <Link className="py-4" to="/">
+        {theme === "light" ? (
+          <img src={lightLogo} alt="Socially" />
+        ) : (
+          <img src={darkLogo} alt="Socially" />
+        )}
+      </Link>
+      <Menu />
     </div>
   );
 };
