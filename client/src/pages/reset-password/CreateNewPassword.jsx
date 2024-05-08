@@ -1,5 +1,5 @@
 import axios from "axios";
-import Alert from "components/Alert";
+import Alert from "components/alert";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "state";

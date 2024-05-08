@@ -1,4 +1,4 @@
-import Alert from "components/Alert.jsx";
+import Alert from "components/alert/index.jsx";
 import { useSelector } from "react-redux";
 import Form from "./Form.jsx";
 import { useContext, useState } from "react";

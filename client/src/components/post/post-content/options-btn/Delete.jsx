@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
-import Dialog from "components/Dialog";
+import Dialog from "components/dialog";
 import RedBtn from "components/RedBtn";
 import PrimaryBtn from "components/PrimaryBtn";
 

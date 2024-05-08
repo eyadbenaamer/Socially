@@ -4,7 +4,7 @@ import Lottie from "react-lottie";
 
 import WhoLiked from "./WhoLiked";
 
-import Dialog from "components/Dialog";
+import Dialog from "components/dialog";
 
 import convertNumber from "utils/convertNumber";
 

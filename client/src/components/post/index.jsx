@@ -8,6 +8,8 @@ import AddComment from "./AddComment";
 
 import SharedPost from "components/SharedPost";
 
+import "./index.css";
+
 export const PostContext = createContext();
 
 export const Post = (props) => {

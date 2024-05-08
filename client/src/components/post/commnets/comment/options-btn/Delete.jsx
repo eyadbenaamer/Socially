@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 import { PostContext } from "components/post";
 
-import Dialog from "components/Dialog";
+import Dialog from "components/dialog";
 import RedBtn from "components/RedBtn";
 import PrimaryBtn from "components/PrimaryBtn";
 

@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useState } from "react";
 
-import Dialog from "components/Dialog";
+import Dialog from "components/dialog";
 import UserPicture from "components/UserPicture";
 
 import Form from "./form";

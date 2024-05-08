@@ -1,0 +1,17 @@
+.menu {
+  top: 100%;
+  right: 0;
+  box-shadow: 0 0 4px 2px #00000012;
+  overflow: hidden;
+}
+.menu li {
+  gap: 12px;
+  transition: var(--main-transition);
+}
+
+.dark .menu li {
+  color: var(--bg-light-alt);
+}
+.light .menu li {
+  color: var(--bg-dark-alt);
+}

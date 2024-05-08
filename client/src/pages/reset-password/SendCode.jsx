@@ -1,5 +1,5 @@
 import axios from "axios";
-import Alert from "components/Alert";
+import Alert from "components/alert";
 import React, { useRef, useState } from "react";
 
 const SendCode = (props) => {

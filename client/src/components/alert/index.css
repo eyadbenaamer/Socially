@@ -1,0 +1,8 @@
+.alert.error {
+  border: solid 2px #b0050587;
+  background: #e05454b5;
+}
+.alert.info {
+  border: solid 2px #050db087;
+  background: #548ee0b5;
+}

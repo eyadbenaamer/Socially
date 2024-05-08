@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import UnloggedIn from "./UnloggedIn";
 import LoggedIn from "./logged-in";
 
+import "./index.css";
+
 const Header = () => {
   const isLoggedIn = Boolean(
     useSelector((state) => state.user && state.authStatus.isVerified)

@@ -1,7 +1,7 @@
 import DateInput from "./DateInput";
 import submit from "./submit";
 import { useState } from "react";
-import Alert from "components/Alert";
+import Alert from "components/alert";
 import { useDispatch } from "react-redux";
 import { setAuthStatus } from "state";
 import SubmitBtn from "components/SubmitBtn";

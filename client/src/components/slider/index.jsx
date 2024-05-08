@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+
 import ToggleButtons from "./ToggleButtons";
+
 import { useWindowWidth } from "hooks/useWindowWidth";
+
+import "./index.css";
 
 const Slider = (props) => {
   const { files } = props;

@@ -1,4 +1,4 @@
-import Dialog from "components/Dialog";
+import Dialog from "components/dialog";
 import { useState } from "react";
 
 const Media = (props) => {

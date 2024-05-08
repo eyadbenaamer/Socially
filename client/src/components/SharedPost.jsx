@@ -1,8 +1,10 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { CreatorInfo } from "./post/post-content/CreatorInfo";
+
 import Slider from "./slider";
+
+import { CreatorInfo } from "./post/post-content/CreatorInfo";
 
 const SharedPost = (props) => {
   const { _id: id, creatorId } = props.post;
@@ -24,7 +26,7 @@ const SharedPost = (props) => {
   }, []);
   return (
     <div
-      className={`post-content flex flex-col gap-4 bg-200 w-full py-3 ${
+      className={`shared-post flex flex-col gap-4 bg-200 w-full py-3 ${
         theme === "light" ? "border" : ""
       }`}
     >

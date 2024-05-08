@@ -2,7 +2,7 @@ import { useWindowWidth } from "hooks/useWindowWidth";
 import { ReactComponent as ShareIcon } from "assets/icons/share.svg";
 import Form from "./form";
 import { useState } from "react";
-import Dialog from "components/Dialog";
+import Dialog from "components/dialog";
 const Share = () => {
   const windowWidth = useWindowWidth();
   const [data, setData] = useState({ text: "", location: "" });
