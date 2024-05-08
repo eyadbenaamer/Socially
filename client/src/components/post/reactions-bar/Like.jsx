@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { ReactComponent as LikeIcon } from "assets/icons/like.svg";
 import { useSelector } from "react-redux";
-import Dialog from "components/Dialog";
-import WhoLiked from "./WhoLiked";
 import Lottie from "react-lottie";
-import animationData from "assets/icons/like.json";
+
+import WhoLiked from "./WhoLiked";
+
+import Dialog from "components/Dialog";
+
 import convertNumber from "utils/convertNumber";
+
+import animationData from "assets/icons/like.json";
+import { ReactComponent as LikeIcon } from "assets/icons/like.svg";
+
 const Like = (props) => {
   const { type, userId, postId, commentId, replyId } = props;
   const user = useSelector((state) => state.user);
@@ -98,26 +103,21 @@ const Like = (props) => {
             )}
           </div>
         </div>
-        {likes.length > 0 ? (
-          <button
-            className={
-              "z-10 hover:underline hover:text-[var(--primary-color)] transition"
-            }
-            onClick={() => setShowLikes(!showLikes)}
-          >
-            {convertNumber(likes.length)}{" "}
-            <span className="w-fit inline-block">
+        <div className="w-12">
+          {likes.length > 0 ? (
+            <button
+              className={
+                "z-10 hover:underline hover:text-[var(--primary-color)] transition"
+              }
+              onClick={() => setShowLikes(!showLikes)}
+            >
+              {convertNumber(likes.length)}{" "}
               {type === "post" ? (likes.length === 1 ? "like" : "likes") : ""}
-            </span>
-          </button>
-        ) : (
-          <div>
-            0{" "}
-            <span className="w-fit inline-block">
-              {type === "post" ? "likes" : ""}
-            </span>
-          </div>
-        )}
+            </button>
+          ) : (
+            <>0 {type === "post" ? "likes" : ""}</>
+          )}
+        </div>
       </div>
       <Dialog isOpened={showLikes} setIsOpened={setShowLikes}>
         <WhoLiked setIsOpened={setShowLikes} likes={likes} />
