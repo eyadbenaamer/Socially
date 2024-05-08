@@ -61,13 +61,15 @@ const AddComment = (props) => {
             <textarea
               ref={commentInput}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.ctrlKey) {
-                  addComment();
-                  setMedia(null);
-                  setFile(null);
-                  setText("");
-                } else if (e.key === "Enter") {
-                  e.target.value += "\n";
+                if (text) {
+                  if (e.key === "Enter" && !e.ctrlKey) {
+                    addComment();
+                    setMedia(null);
+                    setFile(null);
+                    setText("");
+                  } else if (e.key === "Enter") {
+                    e.target.value += "\n";
+                  }
                 }
               }}
               value={text}
@@ -115,7 +117,7 @@ const AddComment = (props) => {
                   setText("");
                 }}
               >
-                <AddCommentIcon />
+                <AddCommentIcon className="icon" />
               </button>
             </div>
           </div>
