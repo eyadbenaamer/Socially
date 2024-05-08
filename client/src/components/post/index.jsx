@@ -56,7 +56,7 @@ export const Post = (props) => {
                   (post.isCommentsDisabled === false ? (
                     <AddComment type="comment" />
                   ) : (
-                    <div className="text-center p-4 bg-300 rounded-xl ">
+                    <div className="text-center p-4 bg-300 rounded-xl w-full">
                       {user && user._id === creatorId
                         ? "You"
                         : "The post creator"}{" "}
