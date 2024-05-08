@@ -1,10 +1,12 @@
-import Dialog from "components/Dialog";
-import RedBtn from "components/RedBtn";
 import { useState } from "react";
-import { ReactComponent as TrashIcon } from "assets/icons/trash-basket.svg";
-import PrimaryBtn from "components/PrimaryBtn";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+
+import Dialog from "components/Dialog";
+import RedBtn from "components/RedBtn";
+import PrimaryBtn from "components/PrimaryBtn";
+
+import { ReactComponent as TrashIcon } from "assets/icons/trash-basket.svg";
 
 const Delete = (props) => {
   const { id } = props;
