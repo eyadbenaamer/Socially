@@ -9,6 +9,7 @@ const Dialog = (props) => {
   const prompt = useRef(null);
   useEffect(() => {
     if (isOpened) {
+      document.body.style.width = "calc(100% - 8px)";
       document.body.style.height = "100vh";
       document.body.style.overflow = "hidden";
     } else {
