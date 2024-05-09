@@ -32,7 +32,7 @@ const Post = () => {
         <NotFound />
       ) : (
         <div className="container min-h-screen pt-5 px-2 pb-28">
-          {post && <PostComponent post={post} />}
+          {post && <PostComponent post={post} showComments={true} />}
         </div>
       )}
       {windowWidth <= 768 && user && <Bar />}

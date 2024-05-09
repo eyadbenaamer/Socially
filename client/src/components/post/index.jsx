@@ -15,7 +15,7 @@ export const PostContext = createContext();
 export const Post = (props) => {
   const { creatorId } = props.post;
   const [post, setPost] = useState(props.post);
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(props.showComments);
 
   const user = useSelector((state) => state.user);
   const theme = useSelector((state) => state.settings.theme);
