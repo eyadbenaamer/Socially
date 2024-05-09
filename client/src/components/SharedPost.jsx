@@ -18,7 +18,6 @@ const SharedPost = (props) => {
         setPost(response.data);
       })
       .catch((error) => {
-        console.log(error);
         if (error.response.status === 404) {
           setPost({ status: "not found" });
         }
