@@ -27,7 +27,7 @@ import { add as addReply } from "./controllers/reply.js";
 import { verifyToken } from "./middleware/auth.js";
 import { verifyId } from "./middleware/check.js";
 import { compressImage } from "./middleware/media.js";
-import { getPostData, uploadSingleFile } from "./middleware/post.js";
+import { getPostsInfo, uploadSingleFile } from "./middleware/post.js";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -88,7 +88,7 @@ app.post(
   verifyToken,
   upload.single("media"),
   uploadSingleFile,
-  getPostData,
+  getPostsInfo,
   addComment
 );
 app.post(
@@ -97,7 +97,7 @@ app.post(
   verifyToken,
   upload.single("media"),
   uploadSingleFile,
-  getPostData,
+  getPostsInfo,
   addReply
 );
 /*ROUTES*/

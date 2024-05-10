@@ -2,20 +2,20 @@ import express from "express";
 import { deleteReply, edit, get, like } from "../controllers/reply.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
-import { getPostData } from "../middleware/post.js";
+import { getPostsInfo } from "../middleware/post.js";
 const router = express.Router();
 //root path: /reply
 
 /*READ*/
 
-router.get("/", verifyId, getPostData, get);
+router.get("/", verifyId, getPostsInfo, get);
 
 /*UPDATE*/
 
-router.patch("/edit", verifyId, verifyToken, getPostData, edit);
-router.patch("/like", verifyId, verifyToken, getPostData, like);
+router.patch("/edit", verifyId, verifyToken, getPostsInfo, edit);
+router.patch("/like", verifyId, verifyToken, getPostsInfo, like);
 
 /*DELETE*/
 
-router.delete("/delete", verifyId, verifyToken, getPostData, deleteReply);
+router.delete("/delete", verifyId, verifyToken, getPostsInfo, deleteReply);
 export default router;

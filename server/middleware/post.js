@@ -1,6 +1,6 @@
 import Posts from "../models/posts.js";
 
-export const getPostData = async (req, res, next) => {
+export const getPostsInfo = async (req, res, next) => {
   try {
     const { userId, postId, commentId, replyId } = req.query;
     let postList, post, comment, reply;
@@ -38,36 +38,6 @@ export const getPostData = async (req, res, next) => {
     }
     next();
   } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
-  }
-};
-export const paginatePosts = async (req, res, next) => {
-  try {
-    const { postList } = req;
-    const page = req.query.page || 1;
-    if (!postList) {
-      return res
-        .status(500)
-        .json({ message: "An error occurred. Plaese try again later." });
-    }
-    const pagesCount = Math.ceil(postList.length / 10);
-    if (page > pagesCount) {
-      return res.status(404).json({ message: "Page not found." });
-    }
-    const startingPost = (page - 1) * 10;
-    const endingPost = (page - 1) * 10 + 10;
-    const result = [];
-    for (let i = startingPost; i <= endingPost; i++) {
-      if (postList[i]) {
-        result.push(postList[i]);
-      }
-    }
-    req.postList = result;
-    next();
-  } catch {
-    console.log(error);
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
