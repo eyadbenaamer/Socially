@@ -7,7 +7,6 @@ export const getPostsInfo = async (req, res, next) => {
     if (userId) {
       postList = await Posts.findById(userId);
       if (postList) {
-        postList.posts = postList.posts.reverse();
         req.postList = postList;
       } else {
         return res.status(404).json({ message: "user doesn't exist" });

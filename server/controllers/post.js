@@ -36,9 +36,9 @@ export const create = async (req, res) => {
       sharedPost: null,
     };
     const postList = await Posts.findById(id);
-    postList.posts.addToSet(newPost);
+    postList.posts.unshift(newPost);
     await postList.save();
-    return res.status(201).json(postList.posts[postList.posts.length - 1]);
+    return res.status(201).json(postList.posts[0]);
   } catch {
     return res
       .status(500)
@@ -73,7 +73,7 @@ export const share = async (req, res) => {
       const post = user.posts.id(postId);
       return post;
     });
-    if (!share) {
+    if (!sharedPost) {
       return res.status(404).json({ message: "Post not found." });
     }
     const newPost = {
@@ -89,9 +89,9 @@ export const share = async (req, res) => {
       },
     };
     const postList = await Posts.findById(id);
-    postList.posts.addToSet(newPost);
+    postList.posts.unshift(newPost);
     await postList.save();
-    return res.status(201).json(postList.posts[postList.posts.length - 1]);
+    return res.status(201).json(postList.posts[0]);
   } catch {
     return res
       .status(500)
@@ -187,7 +187,7 @@ export const deletePost = async (req, res) => {
   try {
     const { user, postList, post } = req;
     if (post.creatorId === user.id) {
-      postList.posts.id(post.id).deleteOne();
+      postList.posts = postList.posts.filter((item) => item.id != post.id);
       await postList.save();
       return res.status(200).json({ message: "post deleted successfully" });
     } else {
