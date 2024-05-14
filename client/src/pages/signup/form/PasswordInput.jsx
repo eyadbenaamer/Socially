@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ReactComponent as ShowPasswordIcon } from "../../../assets/icons/show.svg";
+import { ReactComponent as ShowPasswordIcon } from "../../../assets/icons/eye.svg";
 import { ReactComponent as HidePasswordIcon } from "../../../assets/icons/hide.svg";
 import tickAnimationData from "../../../assets/icons/tick.json";
 import crossAnimationData from "../../../assets/icons/cross.json";
