@@ -9,37 +9,36 @@ export const create = async (req, res) => {
     let { text, location } = req.body;
     const { media } = req.files;
     let filesInfo = [];
-    if (id) {
-      if (media) {
-        media.map((file) => {
-          if (file.mimetype.startsWith("image")) {
-            filesInfo.push({
-              path: `${uploadsFolder}${file.filename}`,
-              fileType: "photo",
-            });
-          } else if (file.mimetype.startsWith("video")) {
-            filesInfo.push({
-              path: `${uploadsFolder}${file.filename}`,
-              fileType: "vedio",
-            });
-          }
-        });
-      }
-      const newPost = {
-        creatorId: id.trim(),
-        text: text.trim(),
-        files: media ? filesInfo : null,
-        createdAt: Date.now(),
-        location: location.trim(),
-        sharedPost: null,
-      };
-      const postList = await Posts.findById(id);
-      postList.posts.addToSet(newPost);
-      await postList.save();
-      return res.status(201).json(newPost);
-    } else {
-      return res.status(409).json({ error: error.message });
+    if (media) {
+      media.map((file) => {
+        if (file.mimetype.startsWith("image")) {
+          filesInfo.push({
+            path: `${uploadsFolder}${file.filename}`,
+            fileType: "photo",
+          });
+        } else if (file.mimetype.startsWith("video")) {
+          filesInfo.push({
+            path: `${uploadsFolder}${file.filename}`,
+            fileType: "vedio",
+          });
+        }
+      });
     }
+    const newPost = {
+      creatorId: id.trim(),
+      text: text.trim(),
+      likes: [],
+      comments: [],
+      views: [],
+      files: media ? filesInfo : null,
+      createdAt: Date.now(),
+      location: location.trim(),
+      sharedPost: null,
+    };
+    const postList = await Posts.findById(id);
+    postList.posts.addToSet(newPost);
+    await postList.save();
+    return res.status(201).json(postList.posts[postList.posts.length - 1]);
   } catch {
     return res
       .status(500)
@@ -55,47 +54,44 @@ export const share = async (req, res) => {
     let { userId, postId } = req.query;
     const { media } = req.files;
     let filesInfo = [];
-    if (id) {
-      if (media) {
-        media.map((file) => {
-          if (file.mimetype.startsWith("image")) {
-            filesInfo.push({
-              path: `${uploadsFolder}${file.filename}`,
-              fileType: "photo",
-            });
-          } else if (file.mimetype.startsWith("video")) {
-            filesInfo.push({
-              path: `${uploadsFolder}${file.filename}`,
-              fileType: "vedio",
-            });
-          }
-        });
-      }
-      const sharedPost = await Posts.findById(userId).then((user) => {
-        const post = user.posts.id(postId);
-        return post;
+    if (media) {
+      media.map((file) => {
+        if (file.mimetype.startsWith("image")) {
+          filesInfo.push({
+            path: `${uploadsFolder}${file.filename}`,
+            fileType: "photo",
+          });
+        } else if (file.mimetype.startsWith("video")) {
+          filesInfo.push({
+            path: `${uploadsFolder}${file.filename}`,
+            fileType: "vedio",
+          });
+        }
       });
-      if (!share) {
-        return res.status(404).json({ message: "Post not found." });
-      }
-      const newPost = {
-        creatorId: id.trim(),
-        text: text.trim(),
-        createdAt: Date.now(),
-        location: location.trim(),
-        sharedPost: {
-          _id: sharedPost._id,
-          creatorId: sharedPost.creatorId,
-        },
-      };
-      const postList = await Posts.findById(id);
-      postList.posts.addToSet(newPost);
-      console.log(postList.posts);
-      await postList.save();
-      return res.status(201).json(newPost);
-    } else {
-      return res.status(409).json({ error: error.message });
     }
+    const sharedPost = await Posts.findById(userId).then((user) => {
+      const post = user.posts.id(postId);
+      return post;
+    });
+    if (!share) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+    const newPost = {
+      creatorId: id.trim(),
+      text: text.trim(),
+      createdAt: Date.now(),
+      comments: [],
+      views: [],
+      location: location.trim(),
+      sharedPost: {
+        _id: sharedPost._id,
+        creatorId: sharedPost.creatorId,
+      },
+    };
+    const postList = await Posts.findById(id);
+    postList.posts.addToSet(newPost);
+    await postList.save();
+    return res.status(201).json(postList.posts[postList.posts.length - 1]);
   } catch {
     return res
       .status(500)
@@ -163,7 +159,25 @@ export const likeToggle = async (req, res) => {
     await postList.save();
     return res.status(200).json({ likes: post.likes });
   } catch {
-    return res.status(500).json({ message: error });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
+  }
+};
+
+export const setViewed = async (req, res) => {
+  try {
+    const { user, postList, post } = req;
+    if (post.views.includes(user.id)) {
+      return res.status(409).json({ message: "Already viewed." });
+    }
+    post.views.push(user.id);
+    await postList.save();
+    return res.status(200).send("viewed");
+  } catch {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 
