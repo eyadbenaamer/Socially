@@ -1,8 +1,12 @@
-import { useWindowWidth } from "hooks/useWindowWidth";
-import { ReactComponent as ShareIcon } from "assets/icons/share.svg";
-import Form from "./form";
 import { useState } from "react";
+
+import Form from "./form";
 import Dialog from "components/dialog";
+
+import { useWindowWidth } from "hooks/useWindowWidth";
+
+import { ReactComponent as ShareIcon } from "assets/icons/share.svg";
+
 const Share = () => {
   const windowWidth = useWindowWidth();
   const [data, setData] = useState({ text: "", location: "" });
@@ -26,7 +30,6 @@ const Share = () => {
           setData={setData}
           media={media}
           setMedia={setMedia}
-          setCreatedPost={null}
         />
       </Dialog>
     </>

@@ -9,7 +9,7 @@ import Form from "./form";
 import { ReactComponent as PhotoIcon } from "assets/icons/photo.svg";
 import { ReactComponent as VideoIcon } from "assets/icons/video.svg";
 
-const CreatePost = ({ setCreatedPost }) => {
+const CreatePost = () => {
   const user = useSelector((state) => state.user);
   const [isOpened, setIsOpened] = useState(false);
   const [data, setData] = useState({ text: "", location: "" });
@@ -57,7 +57,6 @@ const CreatePost = ({ setCreatedPost }) => {
             setData={setData}
             media={media}
             setMedia={setMedia}
-            setCreatedPost={setCreatedPost}
           />
         </Dialog>
       </div>

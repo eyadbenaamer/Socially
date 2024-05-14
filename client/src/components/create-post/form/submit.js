@@ -1,4 +1,4 @@
-export const submit = async (data, media, token) => {
+export const submit = (data, media, token) => {
   const API_URL = process.env.REACT_APP_API_URL;
   const formData = new FormData();
   for (const property in data) {

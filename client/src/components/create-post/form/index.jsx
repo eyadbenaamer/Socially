@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { submit } from "./submit";
 
 import DropZone from "components/dropzone";
+import { PostsContext } from "components/posts";
 
 const Form = (props) => {
-  const { data, setData, media, setMedia, setIsOpened, setCreatedPost } = props;
+  const { data, setData, media, setMedia, setIsOpened } = props;
+  const { posts, setPosts } = useContext(PostsContext);
+
   const [isValidPost, setIsValidPost] = useState(false);
   const { token } = useSelector((state) => state.user);
   useEffect(() => {
@@ -39,7 +42,13 @@ const Form = (props) => {
           setIsOpened(false);
           setData({ text: "", location: "" });
           setMedia(null);
-          setCreatedPost(await submit(data, media, token));
+          submit(data, media, token).then((response) => {
+            if (posts) {
+              setPosts([response, ...posts]);
+            } else {
+              setPosts(response);
+            }
+          });
         }}
       >
         Post

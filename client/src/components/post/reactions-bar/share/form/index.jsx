@@ -1,13 +1,17 @@
 import { useContext, useEffect, useState } from "react";
-import { submit } from "./submit";
 import { useSelector } from "react-redux";
+
+import { submit } from "./submit";
+
 import { PostContext } from "components/post";
+import { PostsContext } from "components/posts";
 
 const Form = (props) => {
-  const { data, setData, setIsOpened, setCreatedPost } = props;
+  const { data, setData, setIsOpened } = props;
   const [isValidPost, setIsValidPost] = useState(false);
   const { token } = useSelector((state) => state.user);
   const { _id: postId, creatorId } = useContext(PostContext);
+  const { posts, setPosts } = useContext(PostsContext);
   useEffect(() => {
     if (data.text != "") {
       setIsValidPost(true);
@@ -28,7 +32,6 @@ const Form = (props) => {
           setData((prev) => ({ ...prev, text: e.target.value }));
         }}
       />
-
       <button
         disabled={!isValidPost}
         className={`${
@@ -36,8 +39,13 @@ const Form = (props) => {
         } self-end py-2 px-4 rounded-xl text-white`}
         onClick={() => {
           setIsOpened(false);
-          submit(data, token, creatorId, postId);
-          // setCreatedPost();
+          submit(data, token, creatorId, postId).then((response) => {
+            if (posts) {
+              setPosts([response, ...posts]);
+            } else {
+              setPosts(response);
+            }
+          });
         }}
       >
         Share
