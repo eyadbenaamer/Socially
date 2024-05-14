@@ -1,6 +1,9 @@
+import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { setAuthStatus, setUser } from "state";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
+
 import Home from "pages/home";
 import Login from "pages/login";
 import VerifyAccount from "pages/verify-account";
@@ -9,16 +12,15 @@ import Profile from "pages/profile";
 import Notifications from "pages/notifications";
 import SavedPosts from "pages/saved-posts";
 import Messages from "pages/messages";
-import Header from "components/header";
-
-import "./assets/index.css";
 import ResetPassword from "pages/reset-password";
 import SetProfile from "pages/set-profile";
 import Post from "pages/post";
-import { useEffect, useState } from "react";
-import { setAuthStatus, setUser } from "state";
+
+import Header from "components/header";
 import Loading from "components/Loading";
 import InfoMessage from "components/InfoMessage";
+
+import "./assets/index.css";
 
 const App = () => {
   //if user is stored in redux state, then the user is logged in
@@ -29,6 +31,7 @@ const App = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const openedSession = sessionStorage.getItem("openedSession");
+
   useEffect(() => {
     const API_URL = process.env.REACT_APP_API_URL;
     if (user) {
@@ -48,6 +51,7 @@ const App = () => {
       sessionStorage.setItem("openedSession", true);
     }, 2200);
   }, []);
+
   return (
     <BrowserRouter>
       {isLoading && !openedSession ? (
