@@ -87,17 +87,17 @@ export const follow = async (req, res) => {
     if (id == accountId) {
       return res.status(409).json({ error: "cannot follow yourself" });
     }
-    const user = await User.findById(id);
-    const account = await User.findById(accountId);
-    if (user && account) {
+    const { user } = req;
+    const accountToFollow = await User.findById(accountId);
+    if (user && accountToFollow) {
       if (user.following.includes(accountId)) {
         return res.status(409).json({ error: "already followed" });
       } else {
         user.following.push(accountId);
-        account.followers.push(id);
+        accountToFollow.followers.push(id);
       }
       await user.save();
-      await account.save();
+      await accountToFollow.save();
       return res.status(200).json(user.following);
     } else {
       return res.status(400).send("bad request");
@@ -113,7 +113,7 @@ export const unFollow = async (req, res) => {
     if (id == accountId) {
       return res.status(409).json({ error: "cannot unfollow yourself" });
     }
-    const user = await User.findById(id);
+    const { user } = req;
     const account = await User.findById(accountId);
     if (user && account) {
       if (user.following.includes(accountId)) {
@@ -139,7 +139,7 @@ export const removeFollower = async (req, res) => {
     if (id == accountId) {
       return res.status(409).json({ error: "not applicable" });
     }
-    const user = await User.findById(id);
+    const { user } = req;
     const account = await User.findById(accountId);
     if (user && account) {
       if (user.followers.includes(accountId)) {
