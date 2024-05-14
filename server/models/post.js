@@ -30,6 +30,7 @@ export const PostSchema = new Schema({
     },
   ],
   likes: [],
+  views: [],
   comments: [CommentSchema],
   sharedPost: {
     _id: Types.ObjectId,

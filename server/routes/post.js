@@ -5,6 +5,7 @@ import {
   deletePost,
   likeToggle,
   toggleComments,
+  setViewed,
 } from "../controllers/post.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
@@ -16,6 +17,8 @@ const router = express.Router();
 router.get("/", verifyId, getPostsInfo, getPost);
 
 /*UPDATE*/
+router.patch("/edit", verifyId, verifyToken, getPostsInfo, edit);
+
 router.patch("/like", verifyId, verifyToken, getPostsInfo, likeToggle);
 
 router.patch(
@@ -26,7 +29,7 @@ router.patch(
   toggleComments
 );
 
-router.patch("/edit", verifyId, verifyToken, getPostsInfo, edit);
+router.patch("/set_viewed", verifyId, verifyToken, getPostsInfo, setViewed);
 
 /*DELETE*/
 router.delete("/delete", verifyId, verifyToken, getPostsInfo, deletePost);
