@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 import { submit } from "./submit";
 
@@ -9,9 +10,12 @@ import { PostsContext } from "components/posts";
 const Form = (props) => {
   const { data, setData, setIsOpened } = props;
   const [isValidPost, setIsValidPost] = useState(false);
-  const { token } = useSelector((state) => state.user);
+  const { _id: userId, token } = useSelector((state) => state.user);
   const { _id: postId, creatorId } = useContext(PostContext);
   const { posts, setPosts } = useContext(PostsContext);
+
+  const { id: userIdParam } = useParams();
+
   useEffect(() => {
     if (data.text != "") {
       setIsValidPost(true);
@@ -40,10 +44,16 @@ const Form = (props) => {
         onClick={() => {
           setIsOpened(false);
           submit(data, token, creatorId, postId).then((response) => {
-            if (posts) {
-              setPosts([response, ...posts]);
-            } else {
-              setPosts(response);
+            /*
+            check if the current page is niether another user's page nor the home page
+            if so, then the shared post will appear on the top of the existing posts
+            */
+            if (!userIdParam || userId == userIdParam) {
+              if (posts) {
+                setPosts([response, ...posts]);
+              } else {
+                setPosts(response);
+              }
             }
           });
         }}
