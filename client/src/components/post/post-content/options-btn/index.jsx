@@ -16,12 +16,13 @@ import { ReactComponent as MoreIcon } from "assets/icons/more.svg";
 const OptionsBtn = (props) => {
   const { setIsModifying } = props;
   const { _id: id, creatorId } = useContext(PostContext);
-
   const user = useSelector((state) => state.user);
   const theme = useSelector((state) => state.settings.theme);
   const [isOpen, setIsOpen] = useState(false);
   const optionsList = useRef(null);
+
   useCloseWidget(optionsList, setIsOpen);
+
   return (
     <div ref={optionsList} className="relative">
       <button
@@ -44,7 +45,7 @@ const OptionsBtn = (props) => {
         >
           {user._id === creatorId && (
             <>
-              <Delete id={id} user={user} />
+              <Delete />
               <Edit setIsModifying={setIsModifying} id={id} user={user} />
               <ToggleComments />
             </>
