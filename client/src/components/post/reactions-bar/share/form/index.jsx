@@ -10,7 +10,7 @@ import { PostsContext } from "components/posts";
 const Form = (props) => {
   const { data, setData, setIsOpened } = props;
   const [isValidPost, setIsValidPost] = useState(false);
-  const { _id: userId, token } = useSelector((state) => state.user);
+  const { _id: userId } = useSelector((state) => state.user);
   const { _id: postId, creatorId } = useContext(PostContext);
   const { posts, setPosts } = useContext(PostsContext);
 
@@ -43,7 +43,7 @@ const Form = (props) => {
         } self-end py-2 px-4 rounded-xl text-white`}
         onClick={() => {
           setIsOpened(false);
-          submit(data, token, creatorId, postId).then((response) => {
+          submit(data, creatorId, postId).then((response) => {
             /*
             check if the current page is niether another user's page nor the home page
             if so, then the shared post will appear on the top of the existing posts

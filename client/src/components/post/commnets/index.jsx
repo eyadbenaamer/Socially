@@ -6,6 +6,8 @@ import Comment from "./comment";
 
 import { PostContext } from "..";
 
+import axiosClient from "utils/AxiosClient";
+
 const Comments = () => {
   const { comments, _id: postId } = useContext(PostContext);
   const { userId, commentId, replyId } = useParams();
@@ -13,14 +15,11 @@ const Comments = () => {
   useEffect(() => {
     if (comments) {
       if (!document.getElementById(commentId) && commentId) {
-        const API_URL = process.env.REACT_APP_API_URL;
-        fetch(
-          `${API_URL}/comment?userId=${userId}&postId=${postId}&commentId=${commentId}`
+        axiosClient(
+          `comment?userId=${userId}&postId=${postId}&commentId=${commentId}`
         ).then((response) => {
           if (response.status === 200) {
-            response.json().then((response) => {
-              setSearchedComment(response);
-            });
+            setSearchedComment(response.data);
           }
         });
       }

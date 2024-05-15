@@ -1,8 +1,9 @@
-import { AuthContext } from "App";
-import axios from "axios";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import state, { setAuthStatus, setUser } from "state";
+
+import { setAuthStatus, setUser } from "state";
+
+import axiosClient from "utils/AxiosClient";
 
 const Form = (props) => {
   const { setMessage } = props;
@@ -10,29 +11,26 @@ const Form = (props) => {
   const dispatch = useDispatch();
   const { email } = useSelector((state) => state.authStatus);
   const sendCode = async () => {
-    const API_URL = process.env.REACT_APP_API_URL;
-    const response = await axios
-      .post(`${API_URL}/verify_account`, { code, email })
-      .then(
-        (resolved) => {
-          const { user, isVerified } = resolved.data;
-          return {
-            user,
-            isVerified,
-          };
-        },
-        async (rejected) => {
-          let { message } = rejected.response.data;
-          if (message === "jwt expired") {
-            axios.post(`${API_URL}/send_verification_code`, {
-              type: "verify_account",
-              email,
-            });
-            message = "Code has expired. we sent another code to your email";
-          }
-          return { message, isVerified: false };
+    const response = await axiosClient
+      .post(`verify_account`, { code, email })
+      .then((response) => {
+        const { user, isVerified } = response.data;
+        return {
+          user,
+          isVerified,
+        };
+      })
+      .catch(async (error) => {
+        let { message } = error.response.data;
+        if (message === "jwt expired") {
+          axiosClient.post(`send_verification_code`, {
+            type: "verify_account",
+            email,
+          });
+          message = "Code has expired. we sent another code to your email";
         }
-      );
+        return { message, isVerified: false };
+      });
     return response;
   };
   const sendBtn = useRef(null);

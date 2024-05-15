@@ -1,24 +1,26 @@
-import UserPicture from "components/UserPicture";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+
+import UserPicture from "components/UserPicture";
+
+import axiosClient from "utils/AxiosClient";
 
 const WhoLiked = (props) => {
   const { setIsOpened, likes } = props;
   const [users, setUsers] = useState([]);
+  const { id: currentId } = useParams();
+
   useEffect(() => {
     const fetchUsers = async () => {
-      const API_URL = process.env.REACT_APP_API_URL;
       likes.map((id) => {
-        fetch(`${API_URL}/profile/${id}/`).then((resolved) =>
-          resolved
-            .json()
-            .then((response) => setUsers((prev) => [...prev, response]))
+        axiosClient(`profile/${id}/`).then((response) =>
+          setUsers((prev) => [...prev, response])
         );
       });
     };
     fetchUsers();
   }, []);
-  const { id: currentId } = useParams();
+
   return (
     <div className="w-[250px] sm:w-[500px] px-2">
       <h1 className="py-2 text-lg">People Who Liked</h1>

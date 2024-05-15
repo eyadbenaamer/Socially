@@ -7,6 +7,7 @@ import WhoLiked from "./WhoLiked";
 import Dialog from "components/dialog";
 
 import convertNumber from "utils/convertNumber";
+import axiosClient from "utils/AxiosClient";
 
 import animationData from "assets/icons/like.json";
 import { ReactComponent as LikeIcon } from "assets/icons/like.svg";
@@ -29,7 +30,6 @@ const Like = (props) => {
 
   const likeToggle = async () => {
     setFirstLoad(false);
-    const API_URL = process.env.REACT_APP_API_URL;
     if (user) {
       //updating likes for user before making a request
       setIsliked((prev) => !prev);
@@ -47,18 +47,16 @@ const Like = (props) => {
       // makeing a request to update like status, if it failed then the likes will be restored
       let url;
       if (type === "post") {
-        url = `${API_URL}/post/like?userId=${userId}&postId=${postId}`;
+        url = `post/like?userId=${userId}&postId=${postId}`;
       } else if (type === "comment") {
-        url = `${API_URL}/comment/like?userId=${userId}&postId=${postId}&commentId=${commentId}`;
+        url = `comment/like?userId=${userId}&postId=${postId}&commentId=${commentId}`;
       } else {
-        url = `${API_URL}/reply/like?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
+        url = `reply/like?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
       }
-      fetch(url, {
-        method: "PATCH",
-        headers: { authorization: user.token },
-      })
-        .then((resolved) => {
-          resolved.json().then((response) => setLikes(response.likes));
+      axiosClient
+        .patch(url)
+        .then((response) => {
+          setLikes(response.data.likes);
         })
         .catch(() => {
           //if error eccoured restores likes

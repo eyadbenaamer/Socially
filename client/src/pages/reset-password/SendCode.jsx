@@ -34,9 +34,9 @@ const SendCode = (props) => {
               email,
             })
             .then(
-              (resolved) => {
+              (response) => {
                 e.target.style.background = null;
-                const { message } = resolved.data;
+                const { message } = response.data;
                 setAlert({ type: "info", message });
                 setIsCodeSent(true);
               },

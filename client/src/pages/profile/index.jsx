@@ -1,11 +1,15 @@
-import { useWindowWidth } from "hooks/useWindowWidth";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import Bar from "components/bar";
 import { useSelector } from "react-redux";
-import NotFound from "pages/NotFound";
-import CoverPicture from "./CoverPicture";
+import { useParams } from "react-router-dom";
+
 import Content from "./Content";
+import CoverPicture from "./CoverPicture";
+import Bar from "components/bar";
+import NotFound from "pages/NotFound";
+
+import { useWindowWidth } from "hooks/useWindowWidth";
+
+import axiosClient from "utils/AxiosClient";
 
 const Profile = () => {
   const windowWidth = useWindowWidth();
@@ -14,15 +18,13 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   useEffect(() => {
     const getUser = () => {
-      fetch(`${process.env.REACT_APP_API_URL}/profile/${id}`).then(
-        (response) => {
-          if (response.status === 200) {
-            response.json().then((data) => setProfile(data));
-          } else {
-            setProfile("not found");
-          }
+      axiosClient(`profile/${id}`).then((response) => {
+        if (response.status === 200) {
+          setProfile(response.data);
+        } else {
+          setProfile("not found");
         }
-      );
+      });
     };
     getUser();
   }, [id]);

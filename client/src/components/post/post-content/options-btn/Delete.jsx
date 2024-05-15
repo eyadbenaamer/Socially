@@ -1,31 +1,41 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import Dialog from "components/dialog";
 import RedBtn from "components/RedBtn";
 import PrimaryBtn from "components/PrimaryBtn";
+import { PostContext } from "components/post";
+import { PostsContext } from "components/posts";
+
+import axiosClient from "utils/AxiosClient";
 
 import { ReactComponent as TrashIcon } from "assets/icons/trash-basket.svg";
 
-const Delete = (props) => {
-  const { id } = props;
-  const user = useSelector((state) => state.user);
+const Delete = () => {
   const location = useLocation();
-  const deletePost = async () => {
-    const API_URL = process.env.REACT_APP_API_URL;
-    await fetch(`${API_URL}/post/delete?userId=${user._id}&postId=${id}`, {
-      method: "DELETE",
-      headers: { authorization: user.token },
-    });
-    if (location.pathname.startsWith("/post")) {
-      window.history.back();
-    } else {
-      window.location.reload();
-    }
-  };
+
+  const { _id: postId, creatorId } = useContext(PostContext);
+  const setPosts = useContext(PostsContext)?.setPosts;
+
   const [isOpen, setIsOpen] = useState(false);
-  const theme = useSelector((state) => state.settings.theme);
+
+  const deletePost = async () => {
+    await axiosClient
+      .delete(`post/delete?userId=${creatorId}&postId=${postId}`)
+      .then(() => {
+        setIsOpen(false);
+
+        /*
+          if the post is rendered in post page then go back to the previous page
+          otherwise update the posts list after deleting the post
+        */
+        if (location.pathname.startsWith("/post")) {
+          window.history.back();
+        } else {
+          setPosts((prev) => prev.filter((post) => post._id !== postId));
+        }
+      });
+  };
 
   return (
     <li>
@@ -44,7 +54,7 @@ const Delete = (props) => {
         </div>
         <div className="flex justify-between mt-2">
           <PrimaryBtn onClick={() => setIsOpen(false)}>Cancel</PrimaryBtn>
-          <RedBtn onClick={deletePost}>Delete</RedBtn>
+          <RedBtn onClick={async () => await deletePost()}>Delete</RedBtn>
         </div>
       </Dialog>
     </li>

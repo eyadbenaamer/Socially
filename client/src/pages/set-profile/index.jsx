@@ -1,13 +1,14 @@
-import axios from "axios";
-import DropZone from "components/dropzone";
-import SubmitBtn from "components/SubmitBtn";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { setAuthStatus, setUser } from "state";
 
+import DropZone from "components/dropzone";
+import SubmitBtn from "components/SubmitBtn";
+
+import axiosClient from "utils/AxiosClient";
+
 const SetProfile = () => {
-  const { token } = useSelector((state) => state.user);
   const [picture, setPicture] = useState(null);
   const [isProfileSet, setIsProfileSet] = useState(false);
   const dispatch = useDispatch();
@@ -22,18 +23,12 @@ const SetProfile = () => {
         onClick={() => {
           let formData = new FormData();
           formData.append("picture", picture);
-          fetch(`${process.env.REACT_APP_API_URL}/set_profile`, {
-            body: formData,
-            method: "PATCH",
-            headers: { Authorization: token },
-          }).then(
-            (resposnse) => {
-              dispatch(setAuthStatus({ isLoggedIn: true }));
-              setIsProfileSet(true);
-              resposnse.json().then((data) => dispatch(setUser(data)));
-            },
-            () => {}
-          );
+
+          axiosClient.patch(`set_profile`, formData).then((resposnse) => {
+            dispatch(setAuthStatus({ isLoggedIn: true }));
+            setIsProfileSet(true);
+            dispatch(setUser(resposnse.data));
+          });
         }}
       >
         Set

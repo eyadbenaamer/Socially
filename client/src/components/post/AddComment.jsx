@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 import UserPicture from "components/UserPicture";
 import { PostContext } from ".";
 
+import axiosClient from "utils/AxiosClient";
+
 import { ReactComponent as PhotoIcon } from "assets/icons/photo.svg";
 import { ReactComponent as AddCommentIcon } from "assets/icons/create-comment.svg";
 import { ReactComponent as CloseIcon } from "assets/icons/cross.svg";
@@ -22,24 +24,16 @@ const AddComment = (props) => {
   const mediaBtn = useRef(null);
 
   const addComment = () => {
-    const API_URL = process.env.REACT_APP_API_URL;
     const formData = new FormData();
     formData.append("text", text.trim());
     media && formData.append("media", media);
     const requestUrl =
       type === "comment"
-        ? `${API_URL}/comment/add?userId=${creatorId}&postId=${postId}`
-        : `${API_URL}/reply/add?userId=${creatorId}&postId=${postId}&commentId=${commentId}`;
-    fetch(requestUrl, {
-      method: "POST",
-      body: formData,
-      headers: { Authorization: user.token },
-    })
-      .then((response) =>
-        response.json().then((response) => {
-          setPost(response);
-        })
-      )
+        ? `comment/add?userId=${creatorId}&postId=${postId}`
+        : `reply/add?userId=${creatorId}&postId=${postId}&commentId=${commentId}`;
+    axiosClient
+      .post(requestUrl, formData)
+      .then((response) => setPost(response.data))
       .catch((err) => {});
   };
   useEffect(() => {

@@ -1,8 +1,9 @@
-import axios from "axios";
-import Alert from "components/alert";
 import { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setLoginStatus, setUser } from "state";
+import { useSelector } from "react-redux";
+
+import Alert from "components/alert";
+
+import axiosClient from "utils/AxiosClient";
 
 const VerifyCode = (props) => {
   const { email, setToken } = props;
@@ -11,26 +12,23 @@ const VerifyCode = (props) => {
   const [alert, setAlert] = useState({ type: "", message: "" });
 
   const sendCode = async () => {
-    const API_URL = process.env.REACT_APP_API_URL;
-    const response = await axios
-      .post(`${API_URL}/reset_password/verify_code`, { code, email })
-      .then(
-        (resolved) => {
-          const { token } = resolved.data;
-          return { token };
-        },
-        async (rejected) => {
-          let { message } = rejected.response.data;
-          if (message === "jwt expired") {
-            axios.post(`${API_URL}/send_verification_code`, {
-              type: "verify_account",
-              email,
-            });
-            message = "Code has expired. we sent another code to your email";
-          }
-          return { alert: { type: "error", message } };
+    const response = await axiosClient
+      .post(`reset_password/verify_code`, { code, email })
+      .then((response) => {
+        const { token } = response.data;
+        return { token };
+      })
+      .catch(async (error) => {
+        let { message } = error.response.data;
+        if (message === "jwt expired") {
+          axiosClient.post(`send_verification_code`, {
+            type: "verify_account",
+            email,
+          });
+          message = "Code has expired. we sent another code to your email";
         }
-      );
+        return { alert: { type: "error", message } };
+      });
     return response;
   };
   const sendBtn = useRef(null);

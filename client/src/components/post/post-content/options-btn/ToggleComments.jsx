@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 
 import { PostContext } from "components/post";
 
+import axiosClient from "utils/AxiosClient";
+
 import { ReactComponent as CommentsEnabledIcon } from "assets/icons/comments.svg";
 import { ReactComponent as CommentsDisabledIcon } from "assets/icons/comments-turnedoff.svg";
 
@@ -14,21 +16,15 @@ const ToggleComments = () => {
     isCommentsDisabled,
   } = useContext(PostContext);
 
-  const user = useSelector((state) => state.user);
-
   const toggleComments = () => {
-    const API_URL = process.env.REACT_APP_API_URL;
-    fetch(`${API_URL}/post/toggle_comments?userId=${id}&postId=${postId}`, {
-      method: "PATCH",
-      headers: { Authorization: user.token },
-    }).then((response) =>
-      response.json().then((response) =>
+    axiosClient
+      .patch(`/post/toggle_comments?userId=${id}&postId=${postId}`)
+      .then(() =>
         setPost((prev) => ({
           ...prev,
           isCommentsDisabled: !isCommentsDisabled,
         }))
-      )
-    );
+      );
   };
   return (
     <li>

@@ -1,20 +1,20 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+
+import { setShowMessage } from "state";
+
+import axiosClient from "utils/AxiosClient";
+
 import { ReactComponent as SaveIcon } from "assets/icons/save.svg";
 import { ReactComponent as UnsaveIcon } from "assets/icons/unsave.svg";
-import { useEffect, useState } from "react";
-import { setShowMessage } from "state";
 
 const SavePost = (props) => {
   const { path } = props;
-  const user = useSelector((state) => state.user);
   const [savedPosts, setSavedPosts] = useState([]);
+  const dispatch = useDispatch();
 
-  const API_URL = process.env.REACT_APP_API_URL;
   const savePost = () => {
-    fetch(`${API_URL}/toggle_save_post/${path}/`, {
-      method: "POST",
-      headers: { Authorization: user.token },
-    }).then(() => {
+    axiosClient(`toggle_save_post/${path}/`).then(() => {
       if (!savedPosts.includes(path)) {
         dispatch(setShowMessage("Post saved."));
       } else {
@@ -22,15 +22,12 @@ const SavePost = (props) => {
       }
     });
   };
+
   useEffect(() => {
-    fetch(`${API_URL}/saved_posts_ids/`, {
-      method: "GET",
-      headers: { Authorization: user.token },
-    }).then((resposne) =>
-      resposne.json().then((resposne) => setSavedPosts(resposne))
+    axiosClient(`saved_posts_ids/`).then((resposne) =>
+      setSavedPosts(resposne.data)
     );
   }, []);
-  const dispatch = useDispatch();
 
   return (
     <li>

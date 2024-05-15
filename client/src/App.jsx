@@ -20,6 +20,8 @@ import Header from "components/header";
 import Loading from "components/Loading";
 import InfoMessage from "components/InfoMessage";
 
+import axiosClient from "utils/AxiosClient";
+
 import "./assets/index.css";
 
 const App = () => {
@@ -33,13 +35,10 @@ const App = () => {
   const openedSession = sessionStorage.getItem("openedSession");
 
   useEffect(() => {
-    const API_URL = process.env.REACT_APP_API_URL;
     if (user) {
-      fetch(`${API_URL}/user/`, {
-        headers: { authorization: user.token },
-      }).then((response) => {
+      axiosClient(`/user/`).then((response) => {
         if (response.status === 200) {
-          response.json().then((data) => dispatch(setUser(data)));
+          dispatch(setUser(response.data));
         } else {
           sessionStorage.clear();
           dispatch(setAuthStatus(null));

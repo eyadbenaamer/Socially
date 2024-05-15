@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import Lottie from "react-lottie";
 
+import axiosClient from "utils/AxiosClient";
+
 import tickAnimationData from "assets/icons/tick.json";
 import crossAnimationData from "assets/icons/cross.json";
 import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
@@ -30,9 +32,7 @@ const EmailInput = (props) => {
           ...prev,
           email: fieldValue.trim().toLowerCase(),
         }));
-        fetch(
-          `${process.env.REACT_APP_API_URL}/check_email/${fieldValue}`
-        ).then((response) => {
+        axiosClient(`check_email/${fieldValue}`).then((response) => {
           setIsEmailChecked(true);
           if (response.status === 200) {
             input.current.style.border = "solid 2px green";
@@ -41,10 +41,8 @@ const EmailInput = (props) => {
               message: "This email is available",
             });
           } else {
-            response.json().then((data) => {
-              setCheck({ state: "fail", message: data.message });
-              input.current.style.border = "solid 2px red";
-            });
+            setCheck({ state: "fail", message: response.data.message });
+            input.current.style.border = "solid 2px red";
           }
         });
         setCheck({ state: "success" });

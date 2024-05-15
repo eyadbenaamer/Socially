@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import Reply from "./reply";
 import { useParams } from "react-router-dom";
+
+import Reply from "./reply";
+
+import axiosClient from "utils/AxiosClient";
 
 const Replies = (props) => {
   const { replies } = props;
@@ -10,14 +13,11 @@ const Replies = (props) => {
     if (replies) {
       // check if the searched reply is renderd, if not then the reply is fetched and rendered
       if (!document.getElementById(replyId) && replyId) {
-        const API_URL = process.env.REACT_APP_API_URL;
-        fetch(
-          `${API_URL}/reply?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`
+        axiosClient(
+          `reply?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`
         ).then((response) => {
           if (response.status === 200) {
-            response.json().then((response) => {
-              setSearchedReply(response);
-            });
+            setSearchedReply(response.data);
           }
         });
       }

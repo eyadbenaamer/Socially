@@ -6,25 +6,23 @@ import Dialog from "components/dialog";
 import RedBtn from "components/RedBtn";
 import PrimaryBtn from "components/PrimaryBtn";
 
+import axiosClient from "utils/AxiosClient";
+
 import { ReactComponent as TrashIcon } from "assets/icons/trash-basket.svg";
 
 const Delete = (props) => {
   const { userId, postId, commentId, replyId } = props;
-  const user = useSelector((state) => state.user);
-
   const { setPost } = useContext(PostContext);
+
   const deleteReply = async () => {
-    const API_URL = process.env.REACT_APP_API_URL;
-    await fetch(
-      `${API_URL}/reply/delete?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`,
-      {
-        method: "DELETE",
-        headers: { authorization: user.token },
-      }
-    ).then((response) => {
-      setIsOpen((prev) => !prev);
-      response.json().then((response) => setPost(response));
-    });
+    await axiosClient
+      .delete(
+        `reply/delete?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`
+      )
+      .then((response) => {
+        setIsOpen((prev) => !prev);
+        setPost(response.data);
+      });
   };
   const [isOpen, setIsOpen] = useState(false);
 

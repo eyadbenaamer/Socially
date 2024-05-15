@@ -1,17 +1,15 @@
-import axios from "axios";
+import axiosClient from "utils/AxiosClient";
 
 const submit = async (data) => {
-  const API_URL = process.env.REACT_APP_API_URL;
-
-  return await axios.post(`${API_URL}/signup`, data).then(
-    (resolved) => ({
-      isSignup: true,
-    }),
-    (rejected) => {
-      const { message } = rejected.response.data;
+  return await axiosClient
+    .post(`signup`, data)
+    .then(() => {
+      return { isSignup: true };
+    })
+    .catch((error) => {
+      const { message } = error.response.data;
       return { message, isSignup: false };
-    }
-  );
+    });
 };
 
 export default submit;

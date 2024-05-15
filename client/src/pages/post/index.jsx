@@ -1,31 +1,31 @@
-import { createContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import Bar from "components/bar";
-import { useWindowWidth } from "hooks/useWindowWidth";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import NotFound from "pages/NotFound";
+import { useParams } from "react-router-dom";
+
 import { Post as PostComponent } from "components/post";
+import Bar from "components/bar";
+import NotFound from "pages/NotFound";
+
+import { useWindowWidth } from "hooks/useWindowWidth";
+
+import axiosClient from "utils/AxiosClient";
 
 const Post = () => {
-  const { userId, postId } = useParams();
   const [post, setPost] = useState(null);
+  const user = useSelector((state) => state.user);
+  const { userId, postId } = useParams();
   const windowWidth = useWindowWidth();
+
   useEffect(() => {
-    const API_URL = process.env.REACT_APP_API_URL;
-    fetch(`${API_URL}/post?userId=${userId}&postId=${postId}`).then(
-      (response) => {
-        if (response.status === 200) {
-          response.json().then((response) => {
-            setPost(response);
-          });
-        } else {
-          setPost("not found");
-        }
+    axiosClient(`post?userId=${userId}&postId=${postId}`).then((response) => {
+      if (response.status === 200) {
+        setPost(response.data);
+      } else {
+        setPost("not found");
       }
-    );
+    });
   }, []);
 
-  const user = useSelector((state) => state.user);
   return (
     <>
       {post === "not found" ? (

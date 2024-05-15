@@ -1,5 +1,6 @@
+import axiosClient from "utils/AxiosClient";
+
 export const submit = (data, media, token) => {
-  const API_URL = process.env.REACT_APP_API_URL;
   const formData = new FormData();
   for (const property in data) {
     formData.append(property, data[property]);
@@ -10,9 +11,7 @@ export const submit = (data, media, token) => {
     }
   }
 
-  return fetch(`${API_URL}/post/create`, {
-    method: "POST",
-    body: formData,
-    headers: { Authorization: token },
-  }).then((response) => response.json());
+  return axiosClient
+    .post(`post/create`, formData)
+    .then((response) => response.data);
 };

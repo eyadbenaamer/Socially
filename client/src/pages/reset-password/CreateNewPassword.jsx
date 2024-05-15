@@ -16,8 +16,8 @@ const CreateNewPassword = ({ token }) => {
     return await axios
       .post(`${API_URL}/reset_password/${token}`, { password })
       .then(
-        (resolved) => {
-          const { user, isVerified } = resolved.data;
+        (response) => {
+          const { user, isVerified } = response.data;
           dispatch(setUser({ user, isVerified }));
         },
         (rejected) => {
