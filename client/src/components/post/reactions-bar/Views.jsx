@@ -19,11 +19,11 @@ const Views = () => {
       if (!views.includes(user._id)) {
         axiosClient
           .patch(`/post/set_viewed?userId=${creatorId}&postId=${postId}`)
-          .then(() => setViews((prev) => [user._id, ...prev]));
+          .then(() => setViews((prev) => [user._id, ...prev]))
+          .catch(() => {});
       }
     }
   }, []);
-
   return (
     <div className="flex items-center gap-1 mx-3">
       <div className="w-5">
