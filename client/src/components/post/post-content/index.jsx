@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { CreatorInfo } from "./CreatorInfo";
-import OptionsBtn from "./options-btn";
 import { useContext } from "react";
-import { PostContext } from "..";
+import { useState } from "react";
+
+import CreatorInfo from "./CreatorInfo";
+import OptionsBtn from "./options-btn";
 import Text from "components/Text";
 import Slider from "components/slider";
+
+import { PostContext } from "..";
+
 const PostContent = () => {
   const {
     _id: id,

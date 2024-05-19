@@ -3,11 +3,13 @@
 @tailwind utilities;
 
 /* GLOBAL RULES */
+
 html,
 body,
 #root {
   scroll-behavior: smooth;
 }
+
 :root {
   --primary-color: #4361ee;
   --secondary-color: #899dfc;
@@ -25,11 +27,13 @@ body,
 * {
   box-sizing: border-box;
 }
+
 @media (max-width: 350px) {
   html {
     font-size: 0.75rem;
   }
 }
+
 input,
 textarea {
   background: inherit;
@@ -40,15 +44,19 @@ textarea {
   height: unset;
   resize: none;
 }
+
 input:-internal-autofill-selected {
   background-color: transparent !important;
 }
+
 svg {
   stroke: currentColor;
 }
+
 svg.icon {
   transition: var(--main-transition);
 }
+
 .dark svg.icon {
   color: var(--bg-light-300);
 }
@@ -56,25 +64,32 @@ svg.icon {
 .light svg.icon {
   color: var(--bg-dark-alt);
 }
+
 svg.icon:hover {
   color: var(--primary-color);
 }
-/*Scrollbar   */
+
+/*Scrollbar*/
+
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background-color: inherit;
   margin: 8px;
 }
+
 ::-webkit-scrollbar-thumb {
   border-radius: 12px;
   cursor: pointer;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background-color: #222;
   border-radius: 12px;
 }
+
 ::-webkit-scrollbar-thumb {
   background-color: #333;
 }
@@ -98,6 +113,7 @@ svg.icon:hover {
   padding: 4px;
   margin: 4px;
 }
+
 .image-circle {
   display: flex;
   justify-content: center;
@@ -108,6 +124,7 @@ svg.icon:hover {
   border-width: 2px;
   overflow: hidden;
 }
+
 .image-circle img {
   max-width: 100%;
 }
@@ -120,20 +137,25 @@ svg.icon:hover {
   border-radius: 50%;
   overflow: hidden;
 }
+
 .center {
   margin: 0 auto;
 }
+
 .container {
   margin-right: auto;
   margin-left: auto;
 }
+
 .focused {
   padding: 12px;
   border-radius: 12px;
 }
+
 .dark .focused {
   animation: flash-dark 2s 1s;
 }
+
 @keyframes flash-dark {
   from {
     background-color: var(--bg-dark-alt);
@@ -142,9 +164,11 @@ svg.icon:hover {
     background-color: unset;
   }
 }
+
 .light .focused {
   animation: flash-light 2s 1s;
 }
+
 @keyframes flash-light {
   from {
     background-color: var(--bg-light-alt);
@@ -194,63 +218,82 @@ svg.icon:hover {
 .light .text-inverse {
   color: white;
 }
+
 .dark .text-inverse {
   color: black;
 }
+
 .light .bg-inverse {
   background-color: black;
 }
+
 .dark .bg-inverse {
   background-color: white;
 }
+
 .bg-primary {
   background-color: var(--primary-color);
 }
+
 .bg-secondary {
   background-color: var(--secondary-color);
 }
+
 .light .bg-100,
 .light.bg-100 {
   background-color: var(--bg-light-100);
 }
+
 .light .bg-200 {
   background-color: var(--bg-light-200);
 }
+
 .light .bg-300 {
   background-color: var(--bg-light-300);
 }
+
 .light .bg-alt {
   background-color: var(--bg-light-alt);
 }
+
 .dark.bg-100,
 .dark .bg-100 {
   background-color: var(--bg-dark-100);
 }
+
 .dark .bg-200 {
   background-color: var(--bg-dark-200);
 }
+
 .dark .bg-300 {
   background-color: var(--bg-dark-300);
 }
+
 .dark .bg-alt {
   background-color: var(--bg-dark-alt);
 }
+
 .light .bg-hovered:hover {
   background-color: var(--bg-light-alt);
 }
+
 .dark .bg-hovered:hover {
   background-color: var(--bg-dark-alt);
 }
+
 .primary-text {
   color: var(--primary-color);
 }
+
 /* Animated Logo */
+
 #logo1 {
   animation: logo-anim1 3000ms linear infinite normal forwards;
 }
 #logo2 {
   animation: logo-anim2 3000ms linear infinite normal forwards;
 }
+
 @keyframes logo-anim1 {
   0% {
     opacity: 1;
@@ -262,6 +305,7 @@ svg.icon:hover {
     opacity: 1;
   }
 }
+
 @keyframes logo-anim2 {
   0% {
     opacity: 0.4;
@@ -274,7 +318,40 @@ svg.icon:hover {
   }
 }
 
+/* Loading component */
+
+.dark .loading {
+  animation: dark-loading 1s infinite alternate;
+}
+
+.light .loading {
+  animation: light-loading 1s infinite alternate;
+}
+
+@keyframes dark-loading {
+  0% {
+    opacity: 0.8;
+    background-color: var(--bg-dark-300);
+  }
+  100% {
+    opacity: 1;
+    background-color: var(--bg-dark-alt);
+  }
+}
+
+@keyframes light-loading {
+  0% {
+    opacity: 0.8;
+    background-color: var(--bg-light-300);
+  }
+  100% {
+    opacity: 1;
+    background-color: var(--bg-light-alt);
+  }
+}
+
 /* Popup */
+
 .popup {
   animation: popup 0.5s;
 }
@@ -293,9 +370,11 @@ aside,
 }
 
 /* Signup and Login */
+
 .auth input {
   width: 100%;
 }
+
 .auth label {
   font-size: 0.75rem;
 }
@@ -309,6 +388,7 @@ aside,
   box-shadow: 0px 1px 3px 0px #00000026;
   border: solid 2px transparent;
 }
+
 .light .auth select,
 .light .auth input:not([name="password"]):not([name="confirmPassword"]),
 .light .auth option {

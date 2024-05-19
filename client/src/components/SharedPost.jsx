@@ -4,7 +4,7 @@ import axios from "axios";
 
 import Slider from "./slider";
 
-import { CreatorInfo } from "./post/post-content/CreatorInfo";
+import CreatorInfo from "./post/post-content/CreatorInfo";
 
 const SharedPost = (props) => {
   const { _id: id, creatorId } = props.post;
