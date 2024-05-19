@@ -14,7 +14,6 @@ const PostContent = () => {
     creatorId,
     createdAt,
     location,
-
     files,
     text,
   } = useContext(PostContext);
@@ -44,7 +43,6 @@ const PostContent = () => {
             setIsModifying={setIsModifying}
           />
         </div>
-
         {files?.length > 0 && <Slider files={files} />}
       </div>
     </>

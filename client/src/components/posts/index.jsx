@@ -4,54 +4,95 @@ import Post from "components/post";
 
 import axiosClient from "utils/AxiosClient";
 import CreatePost from "components/create-post";
+import LoadingPost from "./LoadingPost";
+import NoConnectionMessage from "./NoConnectionMessage";
 
 export const PostsContext = createContext();
 
 const Posts = (props) => {
   const { id } = props;
-  const [postsPage, setPostsPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [message, setMessage] = useState(null);
   const [posts, setPosts] = useState(null);
-  const lastPost = useRef(null);
+
+  const postsEnd = useRef();
+
+  const [totalPages, setTotalPages] = useState(2);
 
   const fetchPosts = () => {
     const requestURL = id
-      ? `posts/user?userId=${id}&page=${postsPage}`
+      ? `posts/user?userId=${id}&page=${currentPage}`
       : `posts`;
     axiosClient
       .get(requestURL)
       .then((response) => {
-        setPosts(response.data.posts);
+        setTotalPages(response.data.totalPages);
+        setCurrentPage(currentPage + 1);
+        setPosts((prev) => {
+          if (prev) {
+            prev = [...prev, ...response.data.posts];
+          } else {
+            prev = [...response.data.posts];
+          }
+          return prev;
+        });
       })
-      .catch((err) => {
+      .catch(() => {
         setMessage("An error occurred. please try again later.");
       });
   };
-  window.addEventListener("scroll", () => {
-    if (window.scrollY === lastPost.current?.offsetTop) {
-      setPostsPage(postsPage + 1);
-    }
-  });
+  // fetch posts once after loading the page
   useEffect(() => {
     fetchPosts();
   }, []);
+  /*
+  fetch posts whenever scrolling reaches to the half distance between the 
+  first and the last loaded post, i.e: having 10 posts, when scrolling reaches 
+  to the 5th posts, the new page of posts being requested 
+  */
+  useEffect(() => {
+    const updatePage = () => {
+      const postsEndLocation = Math.floor(postsEnd.current?.offsetTop);
+      const scroll = Math.floor(window.scrollY + window.screen.height);
+      if (scroll >= postsEndLocation / 2) {
+        if (currentPage <= totalPages) {
+          fetchPosts();
+          window.removeEventListener("scrollend", updatePage);
+        }
+      }
+    };
+    window.addEventListener("scrollend", updatePage);
+    return () => window.removeEventListener("scrollend", updatePage);
+  }, [currentPage]);
 
-  useEffect(() => {}, [lastPost.current]);
   return (
     <PostsContext.Provider value={{ posts, setPosts }}>
       <div className="flex flex-col gap-y-4 items-center">
+        {/* post creation area */}
         <CreatePost />
-        {posts?.map((post, index) => {
-          return (
-            <Post
-              key={post._id}
-              ref={index === 4 ? lastPost : null}
-              post={post}
-            />
-          );
-        })}
+        {/* posts area */}
+        {posts?.map((post) => (
+          <Post key={post._id} post={post} />
+        ))}
+        {/* the loading component appears only when there is more pages */}
+        {currentPage <= totalPages && (
+          <div className="w-full" ref={postsEnd}>
+            <LoadingPost />
+          </div>
+        )}
+
         {posts?.length === 0 && <>No posts.</>}
-        <>{message}</>
+
+        {/* message component appears the posts request fails */}
+        {message && currentPage <= totalPages && (
+          <NoConnectionMessage
+            onClick={() => {
+              setMessage("");
+              fetchPosts();
+            }}
+            message={message}
+          />
+        )}
       </div>
     </PostsContext.Provider>
   );
