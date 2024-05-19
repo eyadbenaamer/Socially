@@ -14,7 +14,7 @@ const WhoLiked = (props) => {
     const fetchUsers = async () => {
       likes.map((id) => {
         axiosClient(`profile/${id}/`).then((response) =>
-          setUsers((prev) => [...prev, response])
+          setUsers((prev) => [...prev, response.data])
         );
       });
     };
