@@ -25,7 +25,7 @@ const Menu = () => {
         setShowMenu(!showMenu);
       }}
     >
-      <DropDownIcon className="icon" />
+      <DropDownIcon className="icon-hover" />
       {showMenu && (
         <div className="menu bg-300 cursor-pointer absolute top-0 right-0 rounded-xl w-max">
           <ul className="flex flex-col rounded-xl transition">

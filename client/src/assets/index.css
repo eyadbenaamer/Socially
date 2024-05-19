@@ -49,23 +49,33 @@ input:-internal-autofill-selected {
   background-color: transparent !important;
 }
 
+/* icons */
+
 svg {
   stroke: currentColor;
 }
 
-svg.icon {
+.icon-hover svg,
+svg.icon-hover {
   transition: var(--main-transition);
 }
 
-.dark svg.icon {
+.dark .icon svg,
+.dark .icon-hover svg,
+.dark svg.icon,
+.dark svg.icon-hover {
   color: var(--bg-light-300);
 }
 
-.light svg.icon {
-  color: var(--bg-dark-alt);
+.light .icon svg,
+.light .icon-hover svg,
+.light svg.icon,
+.light svg.icon-hover {
+  color: var(--bg-dark-300);
 }
 
-svg.icon:hover {
+.icon-hover svg:hover,
+svg.icon-hover:hover {
   color: var(--primary-color);
 }
 

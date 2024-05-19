@@ -102,7 +102,7 @@ const AddComment = (props) => {
                 aria-label="send the comment"
                 disabled={!(text || media)}
                 className={`w-8 text-white stroke-white p-1 ${
-                  !(text || media) ? "opacity-30" : "text-hovered"
+                  !(text || media) ? "icon opacity-30" : "icon-hover"
                 }`}
                 onClick={() => {
                   addComment();
@@ -111,7 +111,7 @@ const AddComment = (props) => {
                   setText("");
                 }}
               >
-                <AddCommentIcon className="icon" />
+                <AddCommentIcon />
               </button>
             </div>
           </div>

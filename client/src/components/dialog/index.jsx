@@ -33,7 +33,7 @@ const Dialog = (props) => {
             className="cursor-pointer w-5"
             onClick={() => setIsOpened(!isOpened)}
           >
-            <CloseIcon className="icon hover:text-white" />
+            <CloseIcon className="icon-hover hover:text-white" />
           </button>
           <div className="dialog max-h-[90vh] overflow-y-scroll p-1">
             {children}

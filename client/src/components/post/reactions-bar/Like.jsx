@@ -23,7 +23,7 @@ const Like = (props) => {
   const [showLikes, setShowLikes] = useState(false);
   const options = {
     loop: false,
-    ariaRole: "icon",
+    ariaRole: "icon-hover",
     autoplay: true,
     animationData,
   };
