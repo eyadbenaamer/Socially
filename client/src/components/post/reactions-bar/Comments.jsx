@@ -1,30 +1,37 @@
-import { useWindowWidth } from "hooks/useWindowWidth";
-import { ReactComponent as CommentIcon } from "assets/icons/comments.svg";
-import convertNumber from "utils/convertNumber";
 import { useContext } from "react";
+
 import { PostContext } from "..";
+import { useWindowWidth } from "hooks/useWindowWidth";
+
+import convertToUnit from "utils/convertToUnit";
+
+import { ReactComponent as CommentIcon } from "assets/icons/comments.svg";
+
 const Comments = () => {
-  const { isCommentsDisabled, comments, setShowComments, commentInput } =
-    useContext(PostContext);
+  const { comments, setShowComments, commentInput } = useContext(PostContext);
+
   const windowWidth = useWindowWidth();
+
   return (
     <div className="flex w-auto justify-center gap-2 items-center transition ">
       <button
         aria-label="write a comment"
-        disabled={isCommentsDisabled}
         onClick={() => {
+          /*
+          when this buttom is clicked, the comment input will be focused
+          and comments will be shown
+          */
           setShowComments(true);
           if (commentInput.current) {
             commentInput.current.focus();
           }
         }}
-        className={`flex w-full gap-1 outline-none transition
-        ${!isCommentsDisabled ? "hover:text-[var(--primary-color)]" : ""}`}
+        className="flex w-full gap-1 outline-none transition hover:text-[var(--primary-color)]"
       >
         <CommentIcon className="w-6" />
         {windowWidth > 100 && (
           <>
-            {convertNumber(comments.length)}{" "}
+            {convertToUnit(comments.length)}{" "}
             {comments.length === 1 ? "Comment" : "Comments"}
           </>
         )}
