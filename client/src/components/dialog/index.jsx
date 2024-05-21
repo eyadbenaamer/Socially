@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 
-import "./index.css";
 import { ReactComponent as CloseIcon } from "assets/icons/cross.svg";
 
 const Dialog = (props) => {
@@ -9,7 +8,10 @@ const Dialog = (props) => {
   const prompt = useRef(null);
   useEffect(() => {
     if (isOpened) {
-      document.body.style.width = "calc(100% - 8px)";
+      if (document.body.clientWidth > 768) {
+        // adjust the width when the scrollbar is hidden due to the dialog only in non-mobile screens
+        document.body.style.width = "calc(100% - 8px)";
+      }
       document.body.style.height = "100vh";
       document.body.style.overflow = "hidden";
     } else {
@@ -28,14 +30,14 @@ const Dialog = (props) => {
         aria-busy={true}
         className="text-inherit w-full fixed top-0 bg-[#00000063] h-[100dvh] flex items-center justify-center z-[100]"
       >
-        <section className="dialog bg-200 px-4 py-3 h-fit max-h-[100dvh]">
+        <section className="dialog p-2 bg-200 h-fit max-h-[100dvh] rounded-xl">
           <button
             className="cursor-pointer w-5"
             onClick={() => setIsOpened(!isOpened)}
           >
             <CloseIcon className="icon-hover hover:text-white" />
           </button>
-          <div className="dialog max-h-[90vh] overflow-y-scroll p-1">
+          <div className="dialog max-h-[90vh] overflow-y-scroll">
             {children}
           </div>
         </section>
