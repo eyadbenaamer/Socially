@@ -30,9 +30,9 @@ const Dialog = (props) => {
         aria-busy={true}
         className="text-inherit w-full fixed top-0 bg-[#00000063] h-[100dvh] flex items-center justify-center z-[100]"
       >
-        <section className="dialog p-2 bg-200 h-fit max-h-[100dvh] rounded-xl">
+        <section className="dialog py-2 bg-200 h-fit max-h-[100dvh] rounded-xl">
           <button
-            className="cursor-pointer w-5"
+            className="ms-3 cursor-pointer w-5"
             onClick={() => setIsOpened(!isOpened)}
           >
             <CloseIcon className="icon-hover hover:text-white" />

@@ -21,7 +21,7 @@ const WhoLiked = (props) => {
   }, []);
 
   return (
-    <div className="w-[250px] sm:w-[500px] px-2">
+    <div className="w-[250px] sm:w-[500px] p-2">
       <h1 className="py-2 text-lg">People Who Liked</h1>
       <ul className="flex flex-col gap-3">
         {users &&

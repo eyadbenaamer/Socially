@@ -20,7 +20,7 @@ const Form = (props) => {
     }
   }, [data, media]);
   return (
-    <div className="flex flex-col gap-3 w-[280px] sm:w-[500px]">
+    <div className="flex flex-col gap-3 w-[280px] sm:w-[500px] p-2">
       <textarea
         autoFocus
         value={data.text}
