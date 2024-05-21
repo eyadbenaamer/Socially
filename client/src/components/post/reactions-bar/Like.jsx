@@ -82,12 +82,13 @@ const Like = (props) => {
           type !== "post" ? "scale-90" : ""
         }`}
       >
-        <div
-          tabIndex={0}
-          className="w-8 md:cursor-pointer"
-          onClick={likeToggle}
-        >
-          <div style={{ transform: "scale(3)" }}>
+        <div className="relative">
+          <button
+            tabIndex={0}
+            onClick={likeToggle}
+            className="absolute top-0 left-0 z-10 h-full w-full"
+          ></button>
+          <div className=" w-8 scale-[3]">
             {isLiked && !firstLoad ? (
               <Lottie options={options} ariaRole="" />
             ) : (
