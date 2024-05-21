@@ -83,11 +83,10 @@ const Like = (props) => {
         }`}
       >
         <div className="relative">
-          <button
-            tabIndex={0}
+          <div
+            className="md:cursor-pointer absolute top-0 left-0 z-10 h-full w-full"
             onClick={likeToggle}
-            className="absolute top-0 left-0 z-10 h-full w-full"
-          ></button>
+          ></div>
           <div className=" w-8 scale-[3]">
             {isLiked && !firstLoad ? (
               <Lottie options={options} ariaRole="" />
@@ -105,9 +104,7 @@ const Like = (props) => {
         <div className="w-12">
           {likes.length > 0 ? (
             <button
-              className={
-                "z-10 hover:underline hover:text-[var(--primary-color)] transition"
-              }
+              className={"relative z-10 link"}
               onClick={() => setShowLikes(!showLikes)}
             >
               {convertNumber(likes.length)}{" "}
