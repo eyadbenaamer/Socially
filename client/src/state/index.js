@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   settings: { theme: "light" },
-  user: { _id: "", token: "" },
+  token: null,
+  profile: null,
   authStatus: {
     email: null,
     isLoggedIn: false,
@@ -21,9 +22,11 @@ export const slice = createSlice({
         [action.payload.property]: action.payload.value,
       };
     },
-
-    setUser: (state, action) => {
-      state.user = { ...state.user, ...action.payload };
+    setToken: (state, action) => {
+      state.token = action.payload;
+    },
+    setProfile: (state, action) => {
+      state.profile = action.payload;
     },
     setAuthStatus: (state, action) => {
       if (action.payload === null) state.authStatus = null;
@@ -41,7 +44,8 @@ export const slice = createSlice({
     },
     logout: (state) => {
       sessionStorage.clear();
-      state.user = initialState.user;
+      state.token = null;
+      state.profile = null;
       state.authStatus.email = null;
       state.authStatus.isLoggedIn = false;
       state.authStatus.isVerified = false;
@@ -51,7 +55,8 @@ export const slice = createSlice({
   },
 });
 export const {
-  setUser,
+  setToken,
+  setProfile,
   setSettings,
   setIsVerified,
   setAuthStatus,
