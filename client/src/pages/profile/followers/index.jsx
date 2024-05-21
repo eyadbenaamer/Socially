@@ -9,7 +9,7 @@ import RemoveFollowerBtn from "./RemoveFollowerBtn";
 import { ProfileContext } from "..";
 
 import axiosClient from "utils/AxiosClient";
-import convertNumber from "utils/convertNumber";
+import convertToUnit from "utils/convertToUnit";
 
 const Followers = () => {
   const { followers } = useContext(ProfileContext);
@@ -37,7 +37,7 @@ const Followers = () => {
           className="hover:text-[var(--primary-color)] hover:underline underline-offset-2 cursor-pointer"
           onClick={() => setShowFollowers(true)}
         >
-          Followers {convertNumber(followers?.length)}
+          Followers {convertToUnit(followers?.length)}
         </div>
       )}
       <Dialog isOpened={showFollowers} setIsOpened={setShowFollowers}>

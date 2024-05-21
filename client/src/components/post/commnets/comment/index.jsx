@@ -16,6 +16,8 @@ import AddComment from "components/post/AddComment";
 import Like from "components/post/reactions-bar/Like";
 import Text from "components/Text";
 
+import convertToUnit from "utils/convertToUnit";
+
 import { ReactComponent as CommentIcon } from "assets/icons/comments.svg";
 
 const Comment = (props) => {
@@ -97,7 +99,7 @@ const Comment = (props) => {
                     className="flex items-center gap-1 text-hovered transition text-slate-400"
                   >
                     <CommentIcon width={24} />
-                    {replies.length}
+                    {convertToUnit(replies.length)}
                   </button>
                   <span className="block text-xs text-slate-400">{time}</span>
                 </div>

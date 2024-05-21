@@ -6,7 +6,7 @@ import WhoLiked from "./WhoLiked";
 
 import Dialog from "components/dialog";
 
-import convertNumber from "utils/convertNumber";
+import convertToUnit from "utils/convertToUnit";
 import axiosClient from "utils/AxiosClient";
 
 import animationData from "assets/icons/like.json";
@@ -107,7 +107,7 @@ const Like = (props) => {
               className={"relative z-10 link"}
               onClick={() => setShowLikes(!showLikes)}
             >
-              {convertNumber(likes.length)}{" "}
+              {convertToUnit(likes.length)}{" "}
               {type === "post" ? (likes.length === 1 ? "like" : "likes") : ""}
             </button>
           ) : (

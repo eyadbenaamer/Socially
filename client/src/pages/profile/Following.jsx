@@ -9,7 +9,7 @@ import { ProfileContext } from ".";
 
 import axiosClient from "utils/AxiosClient";
 import { useSelector } from "react-redux";
-import convertNumber from "utils/convertNumber";
+import convertToUnit from "utils/convertToUnit";
 
 const Following = () => {
   const { following } = useContext(ProfileContext);
@@ -39,7 +39,7 @@ const Following = () => {
           className="hover:text-[var(--primary-color)] hover:underline underline-offset-2 cursor-pointer"
           onClick={() => setShowFollowing(true)}
         >
-          Following {convertNumber(following?.length)}
+          Following {convertToUnit(following?.length)}
         </div>
       )}
       <Dialog isOpened={showFollowing} setIsOpened={setShowFollowing}>

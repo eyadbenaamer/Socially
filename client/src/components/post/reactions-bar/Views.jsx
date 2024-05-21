@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { PostContext } from "..";
 
 import axiosClient from "utils/AxiosClient";
-import convertNumber from "utils/convertNumber";
+import convertToUnit from "utils/convertToUnit";
 
 import { ReactComponent as ViewsIcon } from "assets/icons/eye.svg";
 
@@ -31,7 +31,7 @@ const Views = () => {
       <div className="w-5">
         <ViewsIcon className="" />
       </div>
-      <span>{convertNumber(views.length)}</span>
+      <span>{convertToUnit(views.length)}</span>
     </div>
   );
 };
