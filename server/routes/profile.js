@@ -3,7 +3,7 @@ import {
   getProfile,
   getFollowers,
   follow,
-  unFollow,
+  unfollow,
   removeFollower,
   getFollowing,
 } from "../controllers/profile.js";
@@ -13,17 +13,12 @@ import { verifyId } from "../middleware/check.js";
 const router = Router();
 
 /*READ*/
-router.get("/:id", verifyId, getProfile);
-router.get("/following/:id", verifyId, getFollowing);
-router.get("/followers/:id", verifyId, getFollowers);
+router.get("/", verifyId, getProfile);
+router.get("/following", verifyId, getFollowing);
+router.get("/followers", verifyId, getFollowers);
 
 /*UPDATE*/
-router.patch("/follow/:accountId", verifyId, verifyToken, follow);
-router.patch("/unfollow/:accountId", verifyId, verifyToken, unFollow);
-router.patch(
-  "/remove_follower/:accountId",
-  verifyId,
-  verifyToken,
-  removeFollower
-);
+router.patch("/follow", verifyId, verifyToken, follow);
+router.patch("/unfollow", verifyId, verifyToken, unfollow);
+router.patch("/remove_follower", verifyId, verifyToken, removeFollower);
 export default router;

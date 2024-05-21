@@ -1,7 +1,12 @@
 export const verifyId = async (req, res, next) => {
   try {
-    const { userId, creatorId, postId, commentId, accountId, replyId } =
+    const { id, userId, creatorId, postId, commentId, accountId, replyId } =
       req.query;
+    if (id) {
+      if (id.length != 24) {
+        return res.status(400).send("invalid ID");
+      }
+    }
     if (userId) {
       if (userId.length != 24) {
         return res.status(400).send("invalid ID");

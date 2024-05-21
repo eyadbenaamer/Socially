@@ -5,13 +5,12 @@ import User from "../models/user.js";
 
 export const getProfile = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const profile = await Profile.findById(id);
-    if (profile) {
-      return res.status(200).json(profile);
-    } else {
+    if (!profile) {
       return res.status(404).json({ message: "user not found" });
     }
+    return res.status(200).json(profile);
   } catch {
     return res
       .status(500)
@@ -20,7 +19,7 @@ export const getProfile = async (req, res) => {
 };
 export const getFollowers = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const user = await User.findById(id);
     const followers = user.followers;
     if (followers) {
@@ -36,7 +35,7 @@ export const getFollowers = async (req, res) => {
 };
 export const getFollowing = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const user = await User.findById(id);
     const following = user.following;
     if (following) {
@@ -56,7 +55,7 @@ export const setProfile = async (req, res) => {
   try {
     const { id } = req.user;
     const { avatar, cover } = req.files;
-    const { bio, birthDate, location, occupation } = req.body;
+    const { bio, birthDate, location } = req.body;
     const profile = await Profile.findById(id);
     if (avatar) {
       profile.avatarPath = `${process.env.API_URL}/storage/${avatar.filename}`;
@@ -77,84 +76,94 @@ export const setProfile = async (req, res) => {
     await profile.save();
     return res.status(200).json({ token: req.user.token, ...profile._doc });
   } catch {
-    return res.status(404).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const follow = async (req, res) => {
   try {
     const { id } = req.user;
-    const { accountId } = req.params;
-    if (id == accountId) {
+    const { userId } = req.query;
+    if (id == userId) {
       return res.status(409).json({ error: "cannot follow yourself" });
     }
-    const { user } = req;
-    const accountToFollow = await User.findById(accountId);
-    if (user && accountToFollow) {
-      if (user.following.includes(accountId)) {
-        return res.status(409).json({ error: "already followed" });
-      } else {
-        user.following.push(accountId);
-        accountToFollow.followers.push(id);
-      }
-      await user.save();
-      await accountToFollow.save();
-      return res.status(200).json(user.following);
-    } else {
+    const profile = await Profile.findById(id);
+    const accountToFollow = await Profile.findById(userId);
+    if (!accountToFollow) {
       return res.status(400).send("bad request");
     }
+    if (profile.following.includes(userId)) {
+      return res.status(409).json({ error: "already followed" });
+    }
+    profile.following.push(userId);
+    accountToFollow.followers.push(id);
+    await profile.save();
+    await accountToFollow.save();
+    return res.status(200).json(profile);
   } catch {
-    return res.status(404).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
-export const unFollow = async (req, res) => {
+export const unfollow = async (req, res) => {
   try {
     const { id } = req.user;
-    const { accountId } = req.params;
-    if (id == accountId) {
+    const { userId } = req.query;
+    if (id == userId) {
       return res.status(409).json({ error: "cannot unfollow yourself" });
     }
-    const { user } = req;
-    const account = await User.findById(accountId);
-    if (user && account) {
-      if (user.following.includes(accountId)) {
-        user.following = user.following.filter((item) => item != accountId);
-        account.followers = account.followers.filter((item) => item != id);
-      } else {
-        return res.status(409).json({ error: "not followed" });
-      }
-      await user.save();
-      await account.save();
-      return res.status(200).json(user.following);
-    } else {
+    const profile = await Profile.findById(id);
+    const accountToUnfollow = await Profile.findById(userId);
+
+    if (!(profile && accountToUnfollow)) {
       return res.status(400).send("bad request");
     }
+
+    if (profile.following.includes(userId)) {
+      profile.following = profile.following.filter((item) => item != userId);
+      accountToUnfollow.followers = accountToUnfollow.followers.filter(
+        (item) => item != id
+      );
+    } else {
+      return res.status(409).json({ error: "not followed" });
+    }
+    await profile.save();
+    await accountToUnfollow.save();
+    return res.status(200).json(profile);
   } catch {
-    return res.status(404).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };
 export const removeFollower = async (req, res) => {
   try {
     const { id } = req.user;
-    const { accountId } = req.params;
-    if (id == accountId) {
-      return res.status(409).json({ error: "not applicable" });
-    }
-    const { user } = req;
-    const account = await User.findById(accountId);
-    if (user && account) {
-      if (user.followers.includes(accountId)) {
-        user.followers = user.followers.filter((item) => item != accountId);
-        account.following = account.following.filter((item) => item != id);
-      } else {
-        return res.status(409).json({ error: "not following" });
-      }
-      await user.save();
-      await account.save();
-      return res.status(200).json(user.followers);
-    } else {
+    const { userId } = req.query;
+    if (id == userId) {
       return res.status(400).send("bad request");
     }
+    const profile = await Profile.findById(id);
+    const accountToRemove = await Profile.findById(userId);
+    if (!(profile && accountToRemove)) {
+      return res.status(400).send("bad request");
+    }
+    if (profile.followers.includes(userId)) {
+      profile.followers = profile.followers.filter((item) => item != userId);
+      accountToRemove.following = accountToRemove.following.filter(
+        (item) => item != id
+      );
+    } else {
+      return res.status(409).json({ error: "not following" });
+    }
+    await profile.save();
+    await accountToRemove.save();
+    return res.status(200).json(profile);
   } catch {
-    return res.status(404).json({ error: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
   }
 };

@@ -1,10 +1,10 @@
-import { useWindowWidth } from "hooks/useWindowWidth";
+import Following from "./following";
 
-import Sidebar from "../../components/sidebar";
 import { Content } from "./content";
+import Sidebar from "components/sidebar";
 import Bar from "components/bar";
 
-import Following from "./following";
+import { useWindowWidth } from "hooks/useWindowWidth";
 
 const Home = () => {
   const windowWidth = useWindowWidth();

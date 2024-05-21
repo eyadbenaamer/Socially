@@ -148,6 +148,11 @@ svg.icon-hover:hover {
   overflow: hidden;
 }
 
+.circle img {
+  width: 100%;
+  font-size: 8px;
+}
+
 .center {
   margin: 0 auto;
 }
@@ -164,6 +169,16 @@ svg.icon-hover:hover {
 
 .dark .focused {
   animation: flash-dark 2s 1s;
+}
+
+.link {
+  transition: var(--main-transition);
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  text-decoration: underline;
+  color: var(--primary-color);
 }
 
 @keyframes flash-dark {
@@ -187,6 +202,7 @@ svg.icon-hover:hover {
     background-color: unset;
   }
 }
+
 @media (min-width: 768px) {
   .container {
     width: 692px;
@@ -219,10 +235,6 @@ svg.icon-hover:hover {
 
 .light .text-50 {
   color: rgba(0, 0, 0, 0.5);
-}
-
-.circle img {
-  font-size: 8px;
 }
 
 .light .text-inverse {

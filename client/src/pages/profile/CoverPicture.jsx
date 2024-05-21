@@ -1,28 +1,40 @@
-const CoverPicture = (props) => {
-  const { coverPath, avatarPath } = props;
+import { useContext } from "react";
+
+import { ProfileContext } from ".";
+
+const CoverPicture = () => {
+  const { coverPath, avatarPath } = useContext(ProfileContext);
+
   return (
-    <div className="relative mx-1 sm:mx-4 mb-[100px]">
+    <>
       <div
-        className="cover-image-container bg-200 h-[200px] w-full"
+        className="cover-image-container relative bg-200 h-[150px] sm:h-[250px] w-full overflow-hidden"
         style={{
           borderBottomLeftRadius: 16,
           borderBottomRightRadius: 16,
         }}
       >
+        {coverPath && <div className="loading w-full h-full absolute"></div>}
         <img
           loading="lazy"
-          className=" max-h-full w-full rounded-xl"
+          className="max-h-full w-full"
           src={coverPath}
+          // when the image is loaded remove the loading effect
+          onLoad={() =>
+            document.querySelector(".cover-image-container .loading").remove()
+          }
         />
       </div>
-      <div className="avatar-image-container absolute bottom-[-50%] left-8 circle w-32 sm:w-48 border-2 bg-300">
-        <img
-          loading="lazy"
-          className=" max-h-full w-full rounded-xl "
-          src={avatarPath}
-        />
+      <div className="avatar-image-container absolute -translate-y-[50%] translate-x-5 circle w-32 sm:w-36 border-2 bg-300">
+        <div className="loading w-full h-full">
+          <img
+            loading="lazy"
+            className=" max-h-full w-full rounded-xl "
+            src={avatarPath}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
