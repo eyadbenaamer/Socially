@@ -1,11 +1,14 @@
-import { useSelector } from "react-redux";
-import { ReactComponent as MoreIcon } from "assets/icons/more.svg";
 import { useContext, useRef, useState } from "react";
-import useCloseWidget from "hooks/useCloseWidget";
+import { useSelector } from "react-redux";
+
 import Delete from "./Delete";
 import Edit from "./Edit";
 import CopyLink from "./CopyLink";
 import { PostContext } from "components/post";
+
+import useCloseWidget from "hooks/useCloseWidget";
+
+import { ReactComponent as MoreIcon } from "assets/icons/more.svg";
 
 const OptionsBtn = (props) => {
   const { commentId, commentCreatorId, setIsModifying } = props;
@@ -36,7 +39,6 @@ const OptionsBtn = (props) => {
           className={`menu absolute top-[100%] right-0 rounded-xl w-max overflow-hidden z-20 ${
             theme === "dark" ? "bg-300" : "bg-100"
           }`}
-          // onClick={() => setIsOpen(!isOpen)}
         >
           {profile &&
             (profile._id === commentCreatorId ||
@@ -47,12 +49,14 @@ const OptionsBtn = (props) => {
                 commentId={commentId}
               />
             )}
-          {profile && profile._id === commentCreatorId && (
-            <Edit setIsModifying={setIsModifying} />
-          )}
-          <CopyLink
-            commentPath={`${post.creatorId}/${post._id}/${commentId}`}
-          />
+          <div onClick={() => setIsOpen(!isOpen)}>
+            {profile && profile._id === commentCreatorId && (
+              <Edit setIsModifying={setIsModifying} />
+            )}
+            <CopyLink
+              commentPath={`${post.creatorId}/${post._id}/${commentId}`}
+            />
+          </div>
         </ul>
       )}
     </div>

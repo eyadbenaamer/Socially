@@ -1,12 +1,15 @@
-import Text from "components/Text";
-import UserPicture from "components/UserPicture";
-import useFetchUser from "hooks/useFetchUser";
-import Media from "../../Media";
-import OptionsBtn from "./options-btn";
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import useGetTime from "hooks/useGetTime";
+
+import Text from "components/Text";
 import Like from "components/post/reactions-bar/Like";
+import UserPicture from "components/UserPicture";
+import Media from "../../Media";
+import OptionsBtn from "./options-btn";
+
+import useFetchUser from "hooks/useFetchUser";
+import useGetTime from "hooks/useGetTime";
+
 import { PostContext } from "components/post";
 
 const Reply = (props) => {
@@ -66,7 +69,7 @@ const Reply = (props) => {
               <Like
                 likes={likes}
                 type="reply"
-                userId={creatorId}
+                userId={post.creatorId}
                 postId={post._id}
                 commentId={rootCommentId}
                 replyId={id}

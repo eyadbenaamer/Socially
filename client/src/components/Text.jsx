@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import axios from "axios";
 
 import PrimaryBtn from "./PrimaryBtn";
 import SubmitBtn from "./SubmitBtn";
 
+import axiosClient from "utils/AxiosClient";
 const Text = (props) => {
   const [text, setText] = useState("");
   const {
@@ -30,7 +30,7 @@ const Text = (props) => {
     } else if (type === "reply") {
       requestUrl = `${API_URL}/reply/edit?userId=${postCreatorId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
     }
-    axios
+    axiosClient
       .patch(
         requestUrl,
         { text: modifiedText },

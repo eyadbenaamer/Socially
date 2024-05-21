@@ -48,13 +48,16 @@ const Delete = () => {
         </span>
         Delete the post
       </button>
+
       <Dialog isOpened={isOpen} setIsOpened={setIsOpen}>
-        <div className="w-full py-4 ">
-          Are you sure you want to delete this post?
-        </div>
-        <div className="flex justify-between mt-2">
-          <PrimaryBtn onClick={() => setIsOpen(false)}>Cancel</PrimaryBtn>
-          <RedBtn onClick={async () => await deletePost()}>Delete</RedBtn>
+        <div className="p-2">
+          <div className="w-full py-4 ">
+            Are you sure you want to delete this post?
+          </div>
+          <div className="flex justify-between mt-2">
+            <PrimaryBtn onClick={() => setIsOpen(false)}>Cancel</PrimaryBtn>
+            <RedBtn onClick={async () => await deletePost()}>Delete</RedBtn>
+          </div>
         </div>
       </Dialog>
     </li>

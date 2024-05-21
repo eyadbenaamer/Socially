@@ -49,12 +49,14 @@ const OptionsBtn = (props) => {
               replyId={replyId}
             />
           )}
-          {profile && profile._id === replyCreatorId && (
-            <Edit setIsModifying={setIsModifying} />
-          )}
-          <CopyLink
-            commentPath={`${post.creatorId}/${post._id}/${commentId}/${replyId}`}
-          />
+          <div onClick={() => setIsOpen(!isOpen)}>
+            {profile && profile._id === replyCreatorId && (
+              <Edit setIsModifying={setIsModifying} />
+            )}
+            <CopyLink
+              commentPath={`${post.creatorId}/${post._id}/${commentId}/${replyId}`}
+            />
+          </div>
         </ul>
       )}
     </div>

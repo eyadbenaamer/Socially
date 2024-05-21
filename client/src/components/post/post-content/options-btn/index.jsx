@@ -46,12 +46,16 @@ const OptionsBtn = (props) => {
           {profile._id === creatorId && (
             <>
               <Delete />
-              <Edit setIsModifying={setIsModifying} id={id} user={profile} />
-              <ToggleComments />
+              <div onClick={() => setIsOpen(!isOpen)}>
+                <Edit setIsModifying={setIsModifying} id={id} user={profile} />
+                <ToggleComments />
+              </div>
             </>
           )}
-          <SavePost path={`${creatorId}/${id}`} />
-          <CopyLink postPath={`${creatorId}/${id}`} />
+          <div onClick={() => setIsOpen(!isOpen)}>
+            <SavePost path={`${creatorId}/${id}`} />
+            <CopyLink postPath={`${creatorId}/${id}`} />
+          </div>
         </ul>
       )}
     </div>
