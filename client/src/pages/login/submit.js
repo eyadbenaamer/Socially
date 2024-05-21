@@ -4,17 +4,18 @@ const submit = async (data) => {
   const response = await axiosClient
     .post(`/login`, data)
     .then((response) => {
-      const { user, isVerified } = response.data;
+      const { token, profile, isVerified } = response.data;
       return {
         isLoggedIn: true,
-        user,
+        token,
+        profile,
         isVerified,
       };
     })
     .catch((error) => {
-      const { message, user, isVerified } = error.response.data;
+      const { message, token, isVerified } = error.response.data;
       isVerified === false && sessionStorage.setItem("isNotVerified", true);
-      return { isLoggedIn: false, message, user, isVerified };
+      return { isLoggedIn: false, message, token, isVerified };
     });
   return response;
 };

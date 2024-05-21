@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { setAuthStatus, setUser } from "state";
+import { setAuthStatus, setProfile } from "state";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 
@@ -28,17 +28,17 @@ const App = () => {
   //if user is stored in redux state, then the user is logged in
   const { isLoggedIn } = useSelector((state) => state.authStatus);
   const theme = useSelector((state) => state.settings.theme);
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
   const { isVerified } = useSelector((state) => state.authStatus);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const openedSession = sessionStorage.getItem("openedSession");
 
   useEffect(() => {
-    if (user) {
-      axiosClient(`/user/`).then((response) => {
+    if (profile) {
+      axiosClient(`/profile?id=${profile._id}`).then((response) => {
         if (response.status === 200) {
-          dispatch(setUser(response.data));
+          dispatch(setProfile(response.data));
         } else {
           sessionStorage.clear();
           dispatch(setAuthStatus(null));

@@ -1,8 +1,11 @@
-import axios from "axios";
-import Alert from "components/alert";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setUser } from "state";
+
+import Alert from "components/alert";
+
+import { setToken } from "state";
+
+import axiosClient from "utils/AxiosClient";
 
 const CreateNewPassword = ({ token }) => {
   const [alert, setAlert] = useState({ type: "", message: "" });
@@ -11,20 +14,16 @@ const CreateNewPassword = ({ token }) => {
   const dispatch = useDispatch();
 
   const resetPassword = async () => {
-    const API_URL = process.env.REACT_APP_API_URL;
-
-    return await axios
-      .post(`${API_URL}/reset_password/${token}`, { password })
-      .then(
-        (response) => {
-          const { user, isVerified } = response.data;
-          dispatch(setUser({ user, isVerified }));
-        },
-        (rejected) => {
-          const { message } = rejected.response.data;
-          setAlert({ type: "error", message });
-        }
-      );
+    return await axiosClient.post(`reset_password/${token}`, { password }).then(
+      (response) => {
+        const { user, isVerified } = response.data;
+        dispatch(setToken({ user, isVerified }));
+      },
+      (rejected) => {
+        const { message } = rejected.response.data;
+        setAlert({ type: "error", message });
+      }
+    );
   };
 
   return (

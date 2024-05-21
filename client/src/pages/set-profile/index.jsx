@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { setAuthStatus, setUser } from "state";
+import { useDispatch } from "react-redux";
+import { setAuthStatus, setToken } from "state";
 
 import DropZone from "components/dropzone";
 import SubmitBtn from "components/SubmitBtn";
@@ -27,7 +27,7 @@ const SetProfile = () => {
           axiosClient.patch(`set_profile`, formData).then((resposnse) => {
             dispatch(setAuthStatus({ isLoggedIn: true }));
             setIsProfileSet(true);
-            dispatch(setUser(resposnse.data));
+            dispatch(setToken(resposnse.data));
           });
         }}
       >

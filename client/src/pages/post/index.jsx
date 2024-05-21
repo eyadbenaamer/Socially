@@ -12,7 +12,7 @@ import axiosClient from "utils/AxiosClient";
 
 const Post = () => {
   const [post, setPost] = useState(null);
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.profile);
   const { userId, postId } = useParams();
   const windowWidth = useWindowWidth();
 

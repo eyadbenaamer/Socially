@@ -13,7 +13,7 @@ import { ReactComponent as MoreIcon } from "assets/icons/more.svg";
 
 const OptionsBtn = (props) => {
   const { commentId, replyId, replyCreatorId, setIsModifying } = props;
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
   const theme = useSelector((state) => state.settings.theme);
   const [isOpen, setIsOpen] = useState(false);
   const post = useContext(PostContext);
@@ -41,7 +41,7 @@ const OptionsBtn = (props) => {
             theme === "dark" ? "bg-300" : "bg-100"
           }`}
         >
-          {user && user._id === replyCreatorId && (
+          {profile && profile._id === replyCreatorId && (
             <Delete
               userId={post.creatorId}
               postId={post._id}
@@ -49,7 +49,7 @@ const OptionsBtn = (props) => {
               replyId={replyId}
             />
           )}
-          {user && user._id === replyCreatorId && (
+          {profile && profile._id === replyCreatorId && (
             <Edit setIsModifying={setIsModifying} />
           )}
           <CopyLink

@@ -19,7 +19,7 @@ const Text = (props) => {
   const textArea = useRef(null);
   const [modifiedText, setModifiedText] = useState(null);
   const [originalText, setOriginalText] = useState(props.text);
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
   const editText = async () => {
     const API_URL = process.env.REACT_APP_API_URL;
     let requestUrl;
@@ -34,7 +34,7 @@ const Text = (props) => {
       .patch(
         requestUrl,
         { text: modifiedText },
-        { headers: { Authorization: user.token } }
+        { headers: { Authorization: profile.token } }
       )
       .then((response) => {
         setOriginalText(response.data.text);

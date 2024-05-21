@@ -143,9 +143,7 @@ export const login = async (req, res) => {
         res.cookie("token", token, { maxAge: 500000, signed: true });
 
         const profile = await Profile.findById(user.id);
-        return res
-          .status(200)
-          .json({ isVerified, user: { token, ...profile._doc } });
+        return res.status(200).json({ isVerified, token, profile });
       }
     } else {
       return res.status(404).json({ message: "The user doesn't exist." });

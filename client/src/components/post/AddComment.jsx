@@ -18,7 +18,7 @@ const AddComment = (props) => {
     creatorId,
     commentInput,
   } = useContext(PostContext);
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
   const [text, setText] = useState("");
   const [media, setMedia] = useState(null);
   const mediaBtn = useRef(null);
@@ -46,9 +46,9 @@ const AddComment = (props) => {
     <div className="w-full py-3">
       <div className={`flex gap-2 ${media ? "items-start" : "items-center"}`}>
         <UserPicture
-          id={user._id}
-          src={user.avatarPath}
-          name={`${user.firstName} ${user.lastName}`}
+          id={profile._id}
+          src={profile.avatarPath}
+          name={`${profile.firstName} ${profile.lastName}`}
         />
         <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center gap-2 bg-300 py-2 px-2 rounded-xl shadow-md">

@@ -9,7 +9,7 @@ import { ReactComponent as MessagesIcon } from "assets/icons/message-text.svg";
 import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
 
 const Bar = () => {
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
   const location = useLocation();
   return (
     <aside className="fixed bottom-0 bg-300 h-fit w-full z-10 border-t border-t-[#00000073] py-1">
@@ -22,9 +22,9 @@ const Bar = () => {
           />
         </BarItem>
 
-        <BarItem to={`/profile/${user._id}`}>
+        <BarItem to={`/profile/${profile._id}`}>
           <span className="circle w-9">
-            <img src={user.avatarPath} />
+            <img src={profile.avatarPath} />
           </span>
         </BarItem>
 

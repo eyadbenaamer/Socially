@@ -17,7 +17,7 @@ export const Post = (props) => {
   const [post, setPost] = useState(props.post);
   const [showComments, setShowComments] = useState(props.showComments);
 
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
   const theme = useSelector((state) => state.settings.theme);
 
   const commentInput = useRef();
@@ -54,12 +54,12 @@ export const Post = (props) => {
                 <button className="transition hover:text-[var(--primary-color)] hover:underline underline-offset-2">
                   show more
                 </button>
-                {user &&
+                {profile &&
                   (post.isCommentsDisabled === false ? (
                     <AddComment type="comment" />
                   ) : (
                     <div className="text-center p-4 bg-300 rounded-xl w-full">
-                      {user && user._id === creatorId
+                      {profile && profile._id === creatorId
                         ? "You"
                         : "The post creator"}{" "}
                       turned off the comments.

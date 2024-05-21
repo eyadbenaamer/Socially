@@ -1,15 +1,14 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+
+import axiosClient from "utils/AxiosClient";
 
 const useFetchUser = (id) => {
   const [user, setUser] = useState(null);
   useEffect(() => {
     if (id) {
-      axios
-        .get(`${process.env.REACT_APP_API_URL}/profile/${id}`)
-        .then((response) => {
-          setUser(response.data);
-        });
+      axiosClient(`profile?id=${id}`).then((response) => {
+        setUser(response.data);
+      });
     }
   }, [id]);
   return [user, setUser];

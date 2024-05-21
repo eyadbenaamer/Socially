@@ -11,7 +11,7 @@ const Form = (props) => {
   const { posts, setPosts } = useContext(PostsContext);
 
   const [isValidPost, setIsValidPost] = useState(false);
-  const { token } = useSelector((state) => state.user);
+  const { token } = useSelector((state) => state.profile);
   useEffect(() => {
     if (data.text != "" || media) {
       setIsValidPost(true);

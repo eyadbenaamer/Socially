@@ -10,8 +10,9 @@ import { ReactComponent as ViewsIcon } from "assets/icons/eye.svg";
 
 const Views = () => {
   const { _id: postId, creatorId } = useContext(PostContext);
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.profile);
   const [views, setViews] = useState(useContext(PostContext).views);
+
   useEffect(() => {
     //if the post viewer is a logged in user, then they will be included in the post's views
     if (user) {
@@ -24,6 +25,7 @@ const Views = () => {
       }
     }
   }, []);
+
   return (
     <div className="flex items-center gap-1 mx-3">
       <div className="w-5">

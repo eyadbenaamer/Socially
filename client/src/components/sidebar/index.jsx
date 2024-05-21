@@ -9,8 +9,9 @@ import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
 import SidebarItem from "./SidebarItem";
 
 const Sidebar = () => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.profile);
   const location = useLocation();
+
   return (
     <aside className="fixed">
       <ul className="flex flex-col gap-3 items-start px-2 w-full">

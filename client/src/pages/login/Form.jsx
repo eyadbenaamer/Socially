@@ -1,11 +1,14 @@
 import { useRef, useState } from "react";
-import submit from "./submit";
-import { useDispatch, useSelector } from "react-redux";
-import { setAuthStatus, setUser } from "state";
 import { Link, Navigate } from "react-router-dom";
-import { ReactComponent as ShowPasswordIcon } from "../../assets/icons/eye.svg";
-import { ReactComponent as HidePasswordIcon } from "../../assets/icons/hide.svg";
-import { ReactComponent as LoadingIcon } from "../../assets/icons/loading-circle.svg";
+import { useDispatch, useSelector } from "react-redux";
+
+import submit from "./submit";
+
+import { setAuthStatus, setProfile, setToken } from "state";
+
+import { ReactComponent as ShowPasswordIcon } from "assets/icons/eye.svg";
+import { ReactComponent as HidePasswordIcon } from "assets/icons/hide.svg";
+import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const Form = () => {
   const [data, setData] = useState({ email: "", password: "" });
@@ -123,7 +126,7 @@ const Form = () => {
                 setIsLoading(true);
                 setDisabled(true);
                 submit(data).then((response) => {
-                  let { message, user, isVerified } = response;
+                  let { message, token, profile, isVerified } = response;
                   setMessage(message);
                   setDisabled(false);
                   setIsLoading(false);
@@ -139,7 +142,8 @@ const Form = () => {
                         isVerified,
                       })
                     );
-                  dispatch(setUser(user));
+                  dispatch(setToken(token));
+                  dispatch(setProfile(profile));
                   setIsVerified(isVerified);
                 });
               }

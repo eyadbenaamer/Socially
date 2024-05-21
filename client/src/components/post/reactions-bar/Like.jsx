@@ -14,11 +14,11 @@ import { ReactComponent as LikeIcon } from "assets/icons/like.svg";
 
 const Like = (props) => {
   const { type, userId, postId, commentId, replyId } = props;
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
   const [likes, setLikes] = useState(props.likes);
   const [firstLoad, setFirstLoad] = useState(true);
   const [isLiked, setIsliked] = useState(
-    likes.includes(user ? user._id : false)
+    likes.includes(profile ? profile._id : false)
   );
   const [showLikes, setShowLikes] = useState(false);
   const options = {
@@ -30,17 +30,17 @@ const Like = (props) => {
 
   const likeToggle = async () => {
     setFirstLoad(false);
-    if (user) {
+    if (profile) {
       //updating likes for user before making a request
       setIsliked((prev) => !prev);
       if (!isLiked) {
         setLikes((prev) => {
-          prev.push(user._id);
+          prev.push(profile._id);
           return prev;
         });
       } else {
         setLikes((prev) => {
-          prev.filter((item) => item != user._id);
+          prev.filter((item) => item != profile._id);
           return prev;
         });
       }
@@ -63,12 +63,12 @@ const Like = (props) => {
           setIsliked((prev) => !prev);
           if (!isLiked) {
             setLikes((prev) => {
-              prev.push(user._id);
+              prev.push(profile._id);
               return prev;
             });
           } else {
             setLikes((prev) => {
-              prev.filter((item) => item != user._id);
+              prev.filter((item) => item != profile._id);
               return prev;
             });
           }
@@ -93,7 +93,7 @@ const Like = (props) => {
             ) : (
               <LikeIcon
                 color={`${
-                  likes.includes(user ? user._id : "")
+                  likes.includes(profile ? profile._id : "")
                     ? "#e53935"
                     : "transparent"
                 }`}

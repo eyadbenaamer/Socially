@@ -11,7 +11,7 @@ import { ReactComponent as PhotoIcon } from "assets/icons/photo.svg";
 import { ReactComponent as VideoIcon } from "assets/icons/video.svg";
 
 const CreatePost = () => {
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
 
   const [isOpened, setIsOpened] = useState(false);
   const [data, setData] = useState({ text: "", location: "" });
@@ -24,7 +24,7 @@ const CreatePost = () => {
   return (
     <>
       {/* the component will be rendered only on home page and the user's profile */}
-      {(!userIdParam || user._id == userIdParam) && (
+      {(!userIdParam || profile._id == userIdParam) && (
         <section
           className={`create-post bg-200 w-full px-4 pt-5 pb-1 rounded-xl flex flex-col gap-3 shadow-md ${
             theme === "light" ? "border" : ""
@@ -32,9 +32,9 @@ const CreatePost = () => {
         >
           <div className="flex gap-3 items-center">
             <UserPicture
-              id={user._id}
-              src={user.avatarPath}
-              name={`${user.firstName} ${user.lastName}`}
+              id={profile._id}
+              src={profile.avatarPath}
+              name={`${profile.firstName} ${profile.lastName}`}
             />
             <div
               onClick={() => setIsOpened(!isOpened)}

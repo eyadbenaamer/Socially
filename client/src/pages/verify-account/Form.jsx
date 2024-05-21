@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setAuthStatus, setUser } from "state";
+import { setAuthStatus, setToken } from "state";
 
 import axiosClient from "utils/AxiosClient";
 
@@ -65,7 +65,7 @@ const Form = (props) => {
             e.target.style.background = null;
             const { user, isVerified, message } = response;
             dispatch(setAuthStatus({ isVerified }));
-            dispatch(setUser(user));
+            dispatch(setToken(user));
             setMessage(message);
           });
         }}

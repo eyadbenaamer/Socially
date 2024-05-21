@@ -25,7 +25,7 @@ const Comment = (props) => {
   const { replyId } = useParams();
   const post = useContext(PostContext);
   const [user] = useFetchUser(creatorId);
-  const currentUser = useSelector((state) => state.user);
+  const currentUser = useSelector((state) => state.profile);
   const [isModifying, setIsModifying] = useState(false);
   const [showReplies, setShowReplies] = useState(Boolean(replyId));
   const time = useGetTime(createdAt);

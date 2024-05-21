@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import UserPicture from "components/UserPicture";
 
@@ -8,12 +8,11 @@ import axiosClient from "utils/AxiosClient";
 const WhoLiked = (props) => {
   const { setIsOpened, likes } = props;
   const [users, setUsers] = useState([]);
-  const { id: currentId } = useParams();
 
   useEffect(() => {
     const fetchUsers = async () => {
       likes.map((id) => {
-        axiosClient(`profile/${id}/`).then((response) =>
+        axiosClient(`profile?id=${id}`).then((response) =>
           setUsers((prev) => [...prev, response.data])
         );
       });

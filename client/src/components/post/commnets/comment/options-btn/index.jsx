@@ -9,7 +9,7 @@ import { PostContext } from "components/post";
 
 const OptionsBtn = (props) => {
   const { commentId, commentCreatorId, setIsModifying } = props;
-  const user = useSelector((state) => state.user);
+  const profile = useSelector((state) => state.profile);
   const theme = useSelector((state) => state.settings.theme);
   const [isOpen, setIsOpen] = useState(false);
   const post = useContext(PostContext);
@@ -38,15 +38,16 @@ const OptionsBtn = (props) => {
           }`}
           // onClick={() => setIsOpen(!isOpen)}
         >
-          {user &&
-            (user._id === commentCreatorId || user._id === post.creatorId) && (
+          {profile &&
+            (profile._id === commentCreatorId ||
+              profile._id === post.creatorId) && (
               <Delete
                 userId={post.creatorId}
                 postId={post._id}
                 commentId={commentId}
               />
             )}
-          {user && user._id === commentCreatorId && (
+          {profile && profile._id === commentCreatorId && (
             <Edit setIsModifying={setIsModifying} />
           )}
           <CopyLink

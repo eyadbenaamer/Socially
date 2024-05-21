@@ -10,7 +10,7 @@ import { PostsContext } from "components/posts";
 const Form = (props) => {
   const { data, setData, setIsOpened } = props;
   const [isValidPost, setIsValidPost] = useState(false);
-  const { _id: userId } = useSelector((state) => state.user);
+  const { _id: userId } = useSelector((state) => state.profile);
   const { _id: postId, creatorId } = useContext(PostContext);
   const { posts, setPosts } = useContext(PostsContext);
 
