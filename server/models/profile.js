@@ -36,7 +36,7 @@ const ProfileSchema = new Schema({
     default: [],
   },
   location: String,
-  createdAt: { type: Number, default: Date.now() },
+  joinedAt: { type: Number, default: Date.now() },
 });
 const Profile = model("Profiles", ProfileSchema);
 export default Profile;

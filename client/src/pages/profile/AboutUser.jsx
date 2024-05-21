@@ -33,12 +33,10 @@ const AboutUser = () => {
             {location}
           </div>
         )}
-        {location && (
-          <div className="text-50 flex gap-1 items-center">
-            <CalenderIcon />
-            Joined at {joinedAtMonth} {joinedAtYear}
-          </div>
-        )}
+        <div className="text-50 flex gap-1 items-center">
+          <CalenderIcon />
+          Joined at {joinedAtMonth} {joinedAtYear}
+        </div>
       </div>
       <div className="flex gap-2">
         <div>
