@@ -8,15 +8,17 @@ export const getFeedPosts = async (req, res) => {
     const finalPostsCollection = [];
     // if there the requester is a logged in user, then the feed will be customized
     if (profile) {
-      profile.following.map((account) => {
-        // including one post for each following account
-        account.posts.map((post) => {
-          // if the user haven't seen the post it will be included in the feed
-          // otherwise it will be moved to the next post to check if it's not seen
-          if (!post.views.includes(profile.id)) {
-            finalPostsCollection.push(post);
-            return;
-          }
+      profile.following.map((id) => {
+        Posts.findById(id).then((account) => {
+          // including one post for each following account
+          account.posts.map((post) => {
+            // if the user haven't seen the post it will be included in the feed
+            // otherwise it will be moved to the next post to check if it's not seen
+            if (!post.views.includes(profile.id)) {
+              finalPostsCollection.push(post);
+              return;
+            }
+          });
         });
       });
     }
@@ -40,7 +42,8 @@ export const getFeedPosts = async (req, res) => {
     });
     // }
     return res.status(200).json({ posts: finalPostsCollection });
-  } catch {
+  } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
