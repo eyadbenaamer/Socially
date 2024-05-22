@@ -31,6 +31,7 @@ const Slider = (props) => {
       });
     }
   }, [slider.current?.clientWidth, currentSlide]);
+
   return (
     <>
       <div className="flex flex-col w-full">

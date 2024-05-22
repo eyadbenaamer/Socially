@@ -12,11 +12,12 @@ import { ReactComponent as LogoutIcon } from "assets/icons/logout.svg";
 import { ReactComponent as SettingsIcon } from "assets/icons/settings.svg";
 
 const Menu = () => {
-  const theme = useSelector((state) => state.settings.theme);
   const [showMenu, setShowMenu] = useState(false);
   const dispatch = useDispatch();
   const menu = useRef(null);
+
   useCloseWidget(menu, setShowMenu);
+
   return (
     <div
       ref={menu}

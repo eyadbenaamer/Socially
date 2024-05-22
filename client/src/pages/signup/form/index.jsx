@@ -1,17 +1,23 @@
-import DateInput from "./DateInput";
-import submit from "./submit";
 import { useState } from "react";
-import Alert from "components/alert";
 import { useDispatch } from "react-redux";
 import { setAuthStatus } from "state";
+
+import DateInput from "./DateInput";
+import submit from "./submit";
+import Alert from "components/alert";
 import SubmitBtn from "components/SubmitBtn";
 import PasswordInput from "./PasswordInput";
 import Input from "./Input";
 import EmailInput from "./EmailInput";
-import { ReactComponent as LoadingIcon } from "../../../assets/icons/loading-circle.svg";
+
+import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const Form = (props) => {
   const { setIsSignup } = props;
+  const dispatch = useDispatch();
+  const [message, setMessage] = useState("");
+  const [isOpened, setIsOpened] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState({
     firstName: sessionStorage.getItem("firstName") ?? "",
     lastName: sessionStorage.getItem("lastName") ?? "",
@@ -20,9 +26,13 @@ const Form = (props) => {
     birthDate: sessionStorage.getItem("birthDate") ?? "",
     gender: sessionStorage.getItem("gender") ?? "male",
   });
-  const [message, setMessage] = useState("");
-  const [isOpened, setIsOpened] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isValidInputs, setIsValidInputs] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  });
 
   const handleChange = (e) => {
     window.sessionStorage.setItem([e.target.name], e.target.value);
@@ -31,14 +41,7 @@ const Form = (props) => {
       [e.target.name]: e.target.value,
     }));
   };
-  const dispatch = useDispatch();
-  const [isValidInputs, setIsValidInputs] = useState({
-    firstName: false,
-    lastName: false,
-    email: false,
-    password: false,
-    confirmPassword: false,
-  });
+
   const disabled = () => {
     for (const key in isValidInputs) {
       if (!isValidInputs[key]) {
@@ -47,6 +50,7 @@ const Form = (props) => {
     }
     return false;
   };
+
   return (
     <>
       {isOpened && (
@@ -95,7 +99,6 @@ const Form = (props) => {
               setData={setData}
             />
           </div>
-
           <div className="col-span-1 ">
             <PasswordInput
               setIsValid={(isValid) =>

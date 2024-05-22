@@ -6,6 +6,7 @@ const Dialog = (props) => {
   const { isOpened, setIsOpened, children } = props;
 
   const prompt = useRef(null);
+
   useEffect(() => {
     if (isOpened) {
       if (document.body.clientWidth > 768) {
@@ -18,11 +19,13 @@ const Dialog = (props) => {
       document.body.style = null;
     }
   }, [isOpened]);
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       setIsOpened(false);
     }
   });
+
   return (
     isOpened && (
       <dialog

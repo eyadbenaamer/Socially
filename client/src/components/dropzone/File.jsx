@@ -2,6 +2,7 @@ import { ReactComponent as CloseIcon } from "assets/icons/cross.svg";
 
 const File = (props) => {
   const { filePreview, file, setFiles, setFilesPreview } = props;
+
   return (
     <div className="col-span-2 sm:col-span-2 md:col-span-1 relative">
       <button

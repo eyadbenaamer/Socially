@@ -10,7 +10,6 @@ export const submit = (data, media, token) => {
       formData.append("media", media[file]);
     }
   }
-
   return axiosClient
     .post(`post/create`, formData)
     .then((response) => response.data);

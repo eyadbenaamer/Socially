@@ -5,6 +5,7 @@ import PrimaryBtn from "./PrimaryBtn";
 import SubmitBtn from "./SubmitBtn";
 
 import axiosClient from "utils/AxiosClient";
+
 const Text = (props) => {
   const [text, setText] = useState("");
   const {
@@ -16,10 +17,12 @@ const Text = (props) => {
     isModifying,
     setIsModifying,
   } = props;
+
   const textArea = useRef(null);
   const [modifiedText, setModifiedText] = useState(null);
   const [originalText, setOriginalText] = useState(props.text);
   const profile = useSelector((state) => state.profile);
+
   const editText = async () => {
     const API_URL = process.env.REACT_APP_API_URL;
     let requestUrl;
@@ -41,6 +44,7 @@ const Text = (props) => {
         setIsModifying(false);
       });
   };
+
   useEffect(() => {
     let text = originalText;
     if (text.length > 100) {
@@ -49,6 +53,7 @@ const Text = (props) => {
       setText(text);
     }
   }, [isModifying]);
+
   return (
     <>
       {isModifying ? (

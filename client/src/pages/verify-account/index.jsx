@@ -1,14 +1,16 @@
-import Alert from "components/alert/index.jsx";
-import { useSelector } from "react-redux";
-import Form from "./Form.jsx";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+import Alert from "components/alert/index.jsx";
+import Form from "./Form.jsx";
 
 const VerifyAccount = () => {
   const { email, isVerified } = useSelector((state) => state.authStatus);
   const [message, setMessage] = useState("");
   const theme = useSelector((state) => state.settings.theme);
   sessionStorage.clear();
+
   return (
     <>
       {!email && <Navigate to={"/"} />}

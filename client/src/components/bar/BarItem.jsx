@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 const BarItem = (props) => {
   const { to, children } = props;
+
   return (
     <li className="w-full">
       <Link

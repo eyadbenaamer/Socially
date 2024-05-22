@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import Lottie from "react-lottie";
-import tickAnimationData from "../../../assets/icons/tick.json";
-import crossAnimationData from "../../../assets/icons/cross.json";
-import { ReactComponent as LoadingIcon } from "../../../assets/icons/loading-circle.svg";
+
+import tickAnimationData from "assets/icons/tick.json";
+import crossAnimationData from "assets/icons/cross.json";
 
 const Input = (props) => {
   const {
@@ -25,10 +25,12 @@ const Input = (props) => {
       verifyValue(input.current);
     }
   }, []);
+
   useEffect(
     () => setIsValid(check.state === "success" ? true : false),
     [check]
   );
+
   const [focused, setFocused] = useState(autoFocus);
   const verifyValue = () => {
     if (!fieldValue) {
@@ -55,6 +57,7 @@ const Input = (props) => {
       }
     }
   };
+
   return (
     <>
       <label htmlFor={name}>{label}</label>
@@ -73,7 +76,6 @@ const Input = (props) => {
           autoFocus={autoFocus}
           onFocus={(e) => {
             e.target.style.border = "solid 2px transparent";
-
             setFocused(true);
           }}
           onChange={(e) => {

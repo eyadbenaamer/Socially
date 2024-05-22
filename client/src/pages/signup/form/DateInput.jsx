@@ -11,12 +11,15 @@ const DateInput = (props) => {
     year: `${currentYear - 5}`,
   });
   const birthDate = `${date.year}-${date.month}-${date.day}`;
+
   useEffect(() => {
     setData((prev) => ({ ...prev, birthDate }));
   }, [birthDate, setData]);
+
   let dayArray = [],
     monthArray = [],
     yearArray = [];
+
   for (let i = 1; i <= 31; i++) {
     dayArray.push(`${i < 10 ? 0 : ""}${i}`);
   }
@@ -29,6 +32,7 @@ const DateInput = (props) => {
   const handleChange = (e) => {
     setDate({ ...date, [e.target.name]: e.target.value });
   };
+
   return (
     <div className="flex gap-1">
       <select tabIndex={1} name="day" value={date.day} onChange={handleChange}>

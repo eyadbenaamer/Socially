@@ -1,12 +1,15 @@
 import { useState, useRef } from "react";
-import { ReactComponent as AddIcon } from "assets/icons/add.svg";
+
 import File from "./File";
+
+import { ReactComponent as AddIcon } from "assets/icons/add.svg";
 
 const DropZone = (props) => {
   const { files, setFiles } = props;
   const [isDragging, setIsDragging] = useState(false);
   const [filesPreview, setFilesPreview] = useState([]);
   const input = useRef(null);
+
   return (
     <>
       <input

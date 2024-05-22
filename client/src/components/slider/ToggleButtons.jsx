@@ -1,7 +1,9 @@
 import { ReactComponent as NextIcon } from "assets/icons/arrow-right.svg";
 import { ReactComponent as PrevIcon } from "assets/icons/arrow-left.svg";
+
 const ToggleButtons = (props) => {
   const { currentSlide, setCurrentSlide, slidesCount } = props;
+
   return (
     <>
       {slidesCount > 1 && (

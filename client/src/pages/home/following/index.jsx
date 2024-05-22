@@ -1,7 +1,9 @@
-import UserPicture from "components/UserPicture";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+
+import UserPicture from "components/UserPicture";
+
 import axiosClient from "utils/AxiosClient";
 
 const Following = () => {
@@ -17,7 +19,6 @@ const Following = () => {
         );
         result.push(user);
       }
-
       setUsers(result);
     };
     fetchUsers();

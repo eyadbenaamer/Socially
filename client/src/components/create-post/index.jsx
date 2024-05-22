@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 
 import Dialog from "components/dialog";
 import UserPicture from "components/UserPicture";
-
 import Form from "./form";
 
 import { ReactComponent as PhotoIcon } from "assets/icons/photo.svg";

@@ -11,6 +11,7 @@ import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
 const Bar = () => {
   const profile = useSelector((state) => state.profile);
   const location = useLocation();
+
   return (
     <aside className="fixed bottom-0 bg-300 h-fit w-full z-10 border-t border-t-[#00000073] py-1">
       <ul className="flex gap-3 items-center px-2 w-full">

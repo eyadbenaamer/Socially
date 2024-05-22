@@ -1,9 +1,10 @@
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+
+import Menu from "./Menu";
 
 import darkLogo from "assets/icons/logo-dark.svg";
 import lightLogo from "assets/icons/logo-light.svg";
-import { Link } from "react-router-dom";
-import Menu from "./Menu";
 
 const LoggedIn = () => {
   const theme = useSelector((state) => state.settings).theme;

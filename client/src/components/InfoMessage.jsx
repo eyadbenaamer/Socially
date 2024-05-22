@@ -1,11 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { setShowMessage } from "state";
+
 import { ReactComponent as CLoseIcon } from "assets/icons/cross.svg";
+
 const InfoMessage = () => {
   const infoMessage = useSelector((state) => state.infoMessage);
   const dispatch = useDispatch();
   const resetMessage = () => dispatch(setShowMessage(""));
+
   setTimeout(resetMessage, 10000);
+
   return (
     <>
       {infoMessage && (

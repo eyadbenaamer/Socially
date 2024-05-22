@@ -1,12 +1,13 @@
-import axios from "axios";
+import { useRef, useState } from "react";
+
 import Alert from "components/alert";
-import React, { useRef, useState } from "react";
+
+import axiosClient from "utils/AxiosClient";
 
 const SendCode = (props) => {
   const { setEmail, setIsCodeSent, email } = props;
   const [alert, setAlert] = useState({ type: "", message: "" });
   const sendBtn = useRef(null);
-  const API_URL = process.env.REACT_APP_API_URL;
 
   return (
     <>
@@ -28,24 +29,22 @@ const SendCode = (props) => {
         className="py-2 px-4 border-solid bg-primary rounded-xl text-inverse"
         onClick={(e) => {
           e.target.style.background = "#899dfc";
-          axios
-            .post(`${API_URL}/send_verification_code`, {
+          axiosClient
+            .post(`send_verification_code`, {
               type: "reset_password",
               email,
             })
-            .then(
-              (response) => {
-                e.target.style.background = null;
-                const { message } = response.data;
-                setAlert({ type: "info", message });
-                setIsCodeSent(true);
-              },
-              (rejected) => {
-                e.target.style.background = null;
-                const { message } = rejected.response.data;
-                setAlert({ type: "error", message });
-              }
-            );
+            .then((response) => {
+              e.target.style.background = null;
+              const { message } = response.data;
+              setAlert({ type: "info", message });
+              setIsCodeSent(true);
+            })
+            .catch((error) => {
+              e.target.style.background = null;
+              const { message } = error.response.data;
+              setAlert({ type: "error", message });
+            });
         }}
       >
         Send

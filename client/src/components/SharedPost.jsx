@@ -1,19 +1,19 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 import Slider from "./slider";
-
 import CreatorInfo from "./post/post-content/CreatorInfo";
+
+import axiosClient from "utils/AxiosClient";
 
 const SharedPost = (props) => {
   const { _id: id, creatorId } = props.post;
   const theme = useSelector((state) => state.settings.theme);
   const [post, setPost] = useState(null);
+
   useEffect(() => {
-    const API_URL = process.env.REACT_APP_API_URL;
-    axios
-      .get(`${API_URL}/post?userId=${creatorId}&postId=${id}`)
+    axiosClient
+      .get(`post?userId=${creatorId}&postId=${id}`)
       .then((response) => {
         setPost(response.data);
       })
@@ -23,6 +23,7 @@ const SharedPost = (props) => {
         }
       });
   }, []);
+
   return (
     <div
       className={`shared-post flex flex-col gap-4 bg-200 w-full py-3 ${

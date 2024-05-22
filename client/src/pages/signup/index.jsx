@@ -1,10 +1,13 @@
-import Form from "./form";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
+
+import Form from "./form";
+
 const Signup = () => {
   const [isSignedup, setIsSignedup] = useState(false);
   const theme = useSelector((state) => state.settings.theme);
+
   return (
     <>
       {isSignedup && <Navigate to={"/verify-account"} />}

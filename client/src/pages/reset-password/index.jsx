@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from "react-redux";
-import VerifyCode from "./VerifyCode.jsx";
 import { useState } from "react";
+
+import VerifyCode from "./VerifyCode.jsx";
 import SendCode from "./SendCode.jsx";
 import CreateNewPassword from "./CreateNewPassword.jsx";
 

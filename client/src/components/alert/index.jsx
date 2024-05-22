@@ -3,6 +3,7 @@ import "./index.css";
 
 const Alert = (props) => {
   const { message, type, isOpened, setIsOpened } = props;
+
   return (
     <>
       {isOpened && (

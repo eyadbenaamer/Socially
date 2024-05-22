@@ -1,5 +1,6 @@
 const PrimaryBtn = (props) => {
   const { onClick, disabled, children } = props;
+
   return (
     <button
       disabled={disabled}

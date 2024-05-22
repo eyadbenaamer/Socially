@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ReactComponent as ShowPasswordIcon } from "../../../assets/icons/eye.svg";
-import { ReactComponent as HidePasswordIcon } from "../../../assets/icons/hide.svg";
-import tickAnimationData from "../../../assets/icons/tick.json";
-import crossAnimationData from "../../../assets/icons/cross.json";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import Lottie from "react-lottie";
+
+import { ReactComponent as ShowPasswordIcon } from "assets/icons/eye.svg";
+import { ReactComponent as HidePasswordIcon } from "assets/icons/hide.svg";
+import tickAnimationData from "assets/icons/tick.json";
+import crossAnimationData from "assets/icons/cross.json";
 
 const PasswordInput = (props) => {
   const { setData, fieldValue, setIsValid, data, name, placeholder } = props;
@@ -14,19 +15,11 @@ const PasswordInput = (props) => {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [focused, setFocused] = useState(false);
   const [check, setCheck] = useState({ state: "", message: "" });
+  const input = useRef(null);
 
   const regex =
     /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}/g;
-  const input = useRef(null);
-  useEffect(
-    () => setIsValid(check.state === "success" ? true : false),
-    [check]
-  );
-  useEffect(() => {
-    if (!focused && fieldValue && input.current) {
-      verifyValue(input.current);
-    }
-  }, []);
+
   const verifyValue = () => {
     if (name === "password") {
       if (!fieldValue) {
@@ -46,7 +39,6 @@ const PasswordInput = (props) => {
       } else {
         input.current.style.border = "solid 2px red";
         setData((prev) => ({ ...prev, [name]: fieldValue }));
-
         setCheck({
           state: "fail",
           message: "Invalid password",
@@ -69,6 +61,18 @@ const PasswordInput = (props) => {
       }
     }
   };
+
+  useEffect(
+    () => setIsValid(check.state === "success" ? true : false),
+    [check]
+  );
+
+  useEffect(() => {
+    if (!focused && fieldValue && input.current) {
+      verifyValue(input.current);
+    }
+  }, []);
+
   return (
     <>
       <label htmlFor={name}>{placeholder}</label>

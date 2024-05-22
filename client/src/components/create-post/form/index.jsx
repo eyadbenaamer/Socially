@@ -12,6 +12,7 @@ const Form = (props) => {
 
   const [isValidPost, setIsValidPost] = useState(false);
   const { token } = useSelector((state) => state.profile);
+
   useEffect(() => {
     if (data.text != "" || media) {
       setIsValidPost(true);
@@ -19,6 +20,7 @@ const Form = (props) => {
       setIsValidPost(false);
     }
   }, [data, media]);
+
   return (
     <div className="flex flex-col gap-3 w-[280px] sm:w-[500px] p-2">
       <textarea

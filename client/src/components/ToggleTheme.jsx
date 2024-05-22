@@ -5,8 +5,10 @@ import { toggleTheme } from "state";
 import { ReactComponent as MoonIcon } from "assets/icons/moon.svg";
 
 const ToggleTheme = () => {
-  const theme = useSelector((state) => state.settings).theme;
+  const theme = useSelector((state) => state.settings.theme);
+
   const dispatch = useDispatch();
+
   return (
     <MoonIcon
       onClick={() => dispatch(toggleTheme())}
