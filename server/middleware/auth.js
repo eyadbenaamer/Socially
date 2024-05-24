@@ -7,17 +7,13 @@ export const verifyToken = async (req, res, next) => {
       return res.status(403).json("login first");
     }
     if (token.startsWith("Bearer ")) {
-      token = token.slice(7).trimStart();
+      token = token.trimStart().slice(7);
     }
     const userInfo = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(userInfo.id);
     if (user) {
-      if (user.verificationStatus.isVerified) {
-        req.user = user;
-        next();
-      } else {
-        return res.status(401).json("verify your account first");
-      }
+      req.user = user;
+      next();
     } else {
       return res.status(403).json("invalid token or user doesn't exist");
     }

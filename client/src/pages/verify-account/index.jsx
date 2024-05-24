@@ -1,33 +1,42 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import Alert from "components/alert/index.jsx";
 import Form from "./Form.jsx";
+import { clearSignupFields } from "state/index.js";
 
 const VerifyAccount = () => {
   const { email, isVerified } = useSelector((state) => state.authStatus);
   const [message, setMessage] = useState("");
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
   const theme = useSelector((state) => state.settings.theme);
-  sessionStorage.clear();
+  const dispatch = useDispatch();
+  dispatch(clearSignupFields());
 
   return (
     <>
-      {!email && <Navigate to={"/"} />}
+      {/* once the account is verified, the router will redirect to the set profile page*/}
       {isVerified && <Navigate to={"/set-profile"} />}
-      <div className="container center ">
-        <div className=" md:mx-auto my-3">
-          {message && <Alert type={"error"} message={message} />}
+      <div className="container flex flex-col p-3">
+        <div className="">
+          {isAlertOpen && (
+            <Alert
+              isOpened={isAlertOpen}
+              setIsOpened={setIsAlertOpen}
+              type={"error"}
+              message={message}
+            />
+          )}
         </div>
         <div
           className={`${
             theme === "light" ? "text-slate-800" : ""
-          } my-8 bg-300 rounded-xl p-4 shadow-md`}
+          } my-8 bg-300 rounded-xl p-4 shadow-md self-center`}
         >
-          We sent a code to : {email} to verify your account.
-          <div>
-            <Form setMessage={setMessage} />
-          </div>
+          We sent a code to : <span className="primary-text">{email}</span> to
+          verify your account.
+          <Form setIsAlertOpen={setIsAlertOpen} setMessage={setMessage} />
         </div>
       </div>
     </>

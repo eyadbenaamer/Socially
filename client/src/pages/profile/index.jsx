@@ -7,12 +7,12 @@ import CoverPicture from "./CoverPicture";
 import FollowingStatus from "./FollowingStatus";
 import AboutUser from "./AboutUser";
 import Bar from "components/bar";
+import FollowToggleBtn from "components/FollowingBtn";
 import NotFound from "pages/NotFound";
 
 import { useWindowWidth } from "hooks/useWindowWidth";
 
 import axiosClient from "utils/AxiosClient";
-import FollowToggleBtn from "components/FollowingBtn";
 
 export const ProfileContext = createContext();
 
@@ -24,22 +24,19 @@ const Profile = () => {
 
   useEffect(() => {
     const getUser = () => {
-      axiosClient(`profile?id=${id}`).then((response) => {
-        if (response.status === 200) {
+      axiosClient(`profile?id=${id}`)
+        .then((response) => {
           setProfile(response.data);
-        } else {
-          setProfile("not found");
-        }
-      });
+        })
+        .catch(() => setProfile("not found"));
     };
     getUser();
   }, [id]);
 
   return (
     <ProfileContext.Provider value={{ ...profile, setProfile }}>
-      {profile === "not found" ? (
-        <NotFound />
-      ) : (
+      {profile === "not found" && <NotFound />}
+      {profile && (
         <>
           <div className="container relative center px-2">
             <div className="mb-20">
@@ -57,7 +54,6 @@ const Profile = () => {
           {profile && <Content profile={profile} />}
         </>
       )}
-
       {windowWidth <= 768 && myProfile && <Bar />}
     </ProfileContext.Provider>
   );

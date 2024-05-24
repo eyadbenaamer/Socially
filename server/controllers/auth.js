@@ -7,6 +7,8 @@ import Profile from "../models/profile.js";
 import { generateCode } from "../utils/generateCode.js";
 import Posts from "../models/posts.js";
 
+import { sendCodeEmail } from "../utils/sendEmail.js";
+
 /*REGISTER USER*/
 
 export const signup = async (req, res) => {
@@ -101,52 +103,58 @@ export const login = async (req, res) => {
     } else {
       user = await User.findOne({ email });
     }
-    if (user) {
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: "Incorrect password." });
-      }
-      const isVerified = user.verificationStatus.isVerified;
-      if (!isVerified) {
-        const verificationCode = generateCode(6);
-        const transporter = createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASSWORD,
-          },
-        });
-        transporter.sendMail({
-          subject: "Code verification",
-          to: email,
-          html: `${verificationCode}`,
-        });
-
-        console.log(verificationCode);
-        const verificationToken = jwt.sign(
-          { id: user.id, verificationCode },
-          process.env.JWT_SECRET,
-          {
-            expiresIn: "10m",
-          }
-        );
-        user.verificationStatus.verificationToken = verificationToken;
-        await user.save();
-        return res.status(401).json({
-          isVerified,
-          message: "Verify your account first.",
-        });
-      } else {
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-          expiresIn: process.env.TOKEN_EXPIRATION,
-        });
-        res.cookie("token", token, { maxAge: 500000, signed: true });
-
-        const profile = await Profile.findById(user.id);
-        return res.status(200).json({ isVerified, token, profile });
-      }
-    } else {
+    if (!user) {
       return res.status(404).json({ message: "The user doesn't exist." });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Incorrect password." });
+    }
+    const isVerified = user.verificationStatus.isVerified;
+    if (!isVerified) {
+      const verificationCode = generateCode(6);
+      // send email with verification code
+      const verificationToken = jwt.sign(
+        { id: user.id, verificationCode },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "10m",
+        }
+      );
+      sendCodeEmail(email, verificationCode, verificationToken);
+      console.log(verificationCode);
+      user.verificationStatus.verificationToken = verificationToken;
+      await user.save();
+      return res.status(401).json({
+        isVerified,
+        message: "Verify your account first.",
+      });
+    }
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.TOKEN_EXPIRATION,
+    });
+    res.cookie("token", token, { maxAge: 500000, signed: true });
+
+    const profile = await Profile.findById(user.id);
+    return res.status(200).json({ isVerified, token, profile });
+  } catch {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. try again later." });
+  }
+};
+export const loginWithToken = async (req, res) => {
+  try {
+    if (req.header("Authorization")) {
+      let token = req.header("Authorization");
+      if (token.startsWith("Bearer ")) {
+        token = token.trimStart().slice(7);
+      }
+      const userInfo = jwt.verify(token, process.env.JWT_SECRET);
+      const profile = await Profile.findById(userInfo.id);
+      if (profile) {
+        return res.status(200).json(profile);
+      }
     }
   } catch {
     return res
@@ -154,11 +162,10 @@ export const login = async (req, res) => {
       .json({ message: "An error occurred. try again later." });
   }
 };
-
 export const verifyAccount = async (req, res) => {
   try {
     const { email, code } = req.body;
-    const { verificationToken } = req.params;
+    const { token: verificationToken } = req.query;
 
     if (code && email) {
       const user = await User.findOne({ email: email.trim().toLowerCase() });
@@ -168,23 +175,25 @@ export const verifyAccount = async (req, res) => {
       if (user.verificationStatus.isVerified) {
         return res.status(400).send("already verified");
       }
-      const userInfo = jwt.verify(
-        user.verificationStatus.verificationToken,
-        process.env.JWT_SECRET
-      );
-      if (userInfo.verificationCode == code) {
-        user.verificationStatus.isVerified = true;
-        user.verificationStatus.verificationToken = null;
-        await user.save();
-        const profile = await Profile.findById(user.id);
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-          expiresIn: process.env.TOKEN_EXPIRATION,
-        });
-        return res
-          .status(200)
-          .json({ isVerified: true, user: { token, ...profile._doc } });
-      } else {
-        return res.status(401).json({ message: "Invalid code." });
+      try {
+        const userInfo = jwt.verify(
+          user.verificationStatus.verificationToken,
+          process.env.JWT_SECRET
+        );
+        if (userInfo.verificationCode == code) {
+          user.verificationStatus.isVerified = true;
+          user.verificationStatus.verificationToken = null;
+          await user.save();
+          const profile = await Profile.findById(user.id);
+          const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+            expiresIn: process.env.TOKEN_EXPIRATION,
+          });
+          return res.status(200).json({ profile, isVerified: true, token });
+        } else {
+          return res.status(401).json({ message: "Invalid code." });
+        }
+      } catch {
+        return res.status(500).json({ message: "jwt expired" });
       }
     } else if (verificationToken) {
       const userInfo = jwt.verify(verificationToken, process.env.JWT_SECRET);
@@ -198,8 +207,12 @@ export const verifyAccount = async (req, res) => {
       if (userInfo.id === user.id) {
         user.verificationStatus.isVerified = true;
         user.verificationStatus.verificationToken = null;
+        const profile = await Profile.findById(user.id);
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+          expiresIn: process.env.TOKEN_EXPIRATION,
+        });
         await user.save();
-        return res.status(200).send("Verified");
+        return res.status(200).json({ profile, token, isVerified: true });
       } else {
         return res.status(400).send("Bad Request");
       }
@@ -211,7 +224,9 @@ export const verifyAccount = async (req, res) => {
       }
     }
   } catch {
-    return res.status(500).json({ message: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. try again later." });
   }
 };
 export const resetPassword = async (req, res) => {
@@ -255,7 +270,9 @@ export const resetPassword = async (req, res) => {
       return res.status(401).json({ message: "Link expired." });
     }
   } catch {
-    return res.status(500).json({ message: error.message });
+    return res
+      .status(500)
+      .json({ message: "An error occurred. try again later." });
   }
 };
 
@@ -316,11 +333,10 @@ export const verifyResetPasswordCode = async (req, res) => {
       user.resetPasswordToken,
       process.env.JWT_SECRET
     );
-    if (tokenInfo.verificationCode === code) {
-      res.status(200).json({ token: user.resetPasswordToken });
-    } else {
+    if (tokenInfo.verificationCode !== code) {
       return res.status(401).json({ message: "Invalid code." });
     }
+    return res.status(200).json({ token: user.resetPasswordToken });
   } catch {
     return res
       .status(500)

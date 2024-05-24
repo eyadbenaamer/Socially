@@ -1,14 +1,15 @@
 import { useRef, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import submit from "./submit";
+import { setAuthStatus, setProfile } from "state";
 
-import { setAuthStatus, setProfile, setToken } from "state";
+import axiosClient from "utils/AxiosClient";
 
 import { ReactComponent as ShowPasswordIcon } from "assets/icons/eye.svg";
 import { ReactComponent as HidePasswordIcon } from "assets/icons/hide.svg";
 import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
+import SubmitBtn from "components/SubmitBtn";
 
 const Form = () => {
   const [data, setData] = useState({ email: "", password: "" });
@@ -21,15 +22,57 @@ const Form = () => {
       submitButton.current.click();
     }
   };
-  const [disabled, setDisabled] = useState(false);
   const theme = useSelector((state) => state.settings.theme);
 
   const [passwordInputType, setPasswordInputType] = useState("password");
   const [inputError, setInputError] = useState({ email: "", password: "" });
-  const [isLoading, setIsLoading] = useState(false);
+
+  const submit = async () => {
+    await axiosClient
+      .post(`/login`, data)
+      .then((response) => {
+        const { token, profile, isVerified } = response.data;
+        localStorage.setItem("token", token);
+        dispatch(setProfile(profile));
+        setIsVerified(isVerified);
+        dispatch(
+          setAuthStatus({
+            email: "",
+            message: "",
+            isLoggedin: true,
+            isVerified,
+          })
+        );
+      })
+      .catch((error) => {
+        const { message, isVerified } = error.response.data;
+        setMessage(message);
+        if (isVerified === false) {
+          sessionStorage.setItem("isNotVerified", true);
+          dispatch(
+            setAuthStatus({
+              email: data.email,
+              isLoggedin: true,
+              message: message,
+              isVerified,
+            })
+          );
+        } else {
+          dispatch(
+            setAuthStatus({
+              email: "",
+              isLoggedin: false,
+              message: message,
+              isVerified: false,
+            })
+          );
+        }
+      });
+  };
+
   return (
     <>
-      {isVerified === false && <Navigate to={"/verify-account"} />}
+      {/* {isVerified === false && <Navigate to={"/verify-account"} />} */}
 
       <section className="flex flex-col gap-4 w-fit center">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -117,40 +160,14 @@ const Form = () => {
           Forgot password?
         </Link>
         <div className="self-center sm:self-start">
-          <button
+          <SubmitBtn
             ref={submitButton}
-            className="py-2 px-4 border-solid bg-primary rounded-xl text-white disabled:opacity-70"
-            disabled={disabled || inputError.email || inputError.password}
-            onClick={() => {
-              if (!(disabled || inputError.email || inputError.password)) {
-                setIsLoading(true);
-                setDisabled(true);
-                submit(data).then((response) => {
-                  let { message, token, profile, isVerified } = response;
-                  setMessage(message);
-                  setDisabled(false);
-                  setIsLoading(false);
-                  !isVerified &&
-                    dispatch(
-                      setAuthStatus({ email: data.email, message, isVerified })
-                    );
-                  isVerified &&
-                    dispatch(
-                      setAuthStatus({
-                        email: data.email,
-                        isLoggedIn: true,
-                        isVerified,
-                      })
-                    );
-                  dispatch(setToken(token));
-                  dispatch(setProfile(profile));
-                  setIsVerified(isVerified);
-                });
-              }
+            onClick={async () => {
+              await submit();
             }}
           >
-            {isLoading ? <LoadingIcon height={24} stroke="white" /> : "Log in"}
-          </button>
+            Login
+          </SubmitBtn>
         </div>
       </section>
     </>

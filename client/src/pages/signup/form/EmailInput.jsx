@@ -32,19 +32,19 @@ const EmailInput = (props) => {
           ...prev,
           email: fieldValue.trim().toLowerCase(),
         }));
-        axiosClient(`check_email/${fieldValue}`).then((response) => {
-          setIsEmailChecked(true);
-          if (response.status === 200) {
+        axiosClient(`check_email/${fieldValue}`)
+          .then(() => {
             input.current.style.border = "solid 2px green";
             setCheck({
               state: "success",
               message: "This email is available",
             });
-          } else {
-            setCheck({ state: "fail", message: response.data.message });
+          })
+          .catch((error) => {
+            setCheck({ state: "fail", message: error.response.data.message });
             input.current.style.border = "solid 2px red";
-          }
-        });
+          });
+        setIsEmailChecked(true);
         setCheck({ state: "success" });
       } else {
         input.current.style.border = "solid 2px red";
@@ -57,6 +57,7 @@ const EmailInput = (props) => {
       }
     }
   };
+
   return (
     <>
       <label htmlFor="eamil">Email</label>

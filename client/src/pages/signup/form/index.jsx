@@ -3,21 +3,19 @@ import { useDispatch } from "react-redux";
 import { setAuthStatus } from "state";
 
 import DateInput from "./DateInput";
-import submit from "./submit";
 import Alert from "components/alert";
 import SubmitBtn from "components/SubmitBtn";
 import PasswordInput from "./PasswordInput";
 import Input from "./Input";
 import EmailInput from "./EmailInput";
 
-import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
+import axiosClient from "utils/AxiosClient";
 
 const Form = (props) => {
   const { setIsSignup } = props;
   const dispatch = useDispatch();
   const [message, setMessage] = useState("");
-  const [isOpened, setIsOpened] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAlertOpened, setIsAlertOpened] = useState(false);
   const [data, setData] = useState({
     firstName: sessionStorage.getItem("firstName") ?? "",
     lastName: sessionStorage.getItem("lastName") ?? "",
@@ -42,7 +40,7 @@ const Form = (props) => {
     }));
   };
 
-  const disabled = () => {
+  const isDisabled = () => {
     for (const key in isValidInputs) {
       if (!isValidInputs[key]) {
         return true;
@@ -51,15 +49,29 @@ const Form = (props) => {
     return false;
   };
 
+  const submit = async () => {
+    await axiosClient
+      .post(`signup`, data)
+      .then(() => {
+        dispatch(setAuthStatus({ email: data.email, isLoggedin: true }));
+        setIsSignup(true);
+      })
+      .catch((error) => {
+        setMessage(error.response.data.message);
+        setIsSignup(false);
+      });
+    setIsAlertOpened(true);
+  };
+
   return (
     <>
-      {isOpened && (
+      {isAlertOpened && (
         <div>
           <Alert
             type={"error"}
             message={message}
-            isOpened={isOpened}
-            setIsOpened={setIsOpened}
+            isOpened={isAlertOpened}
+            setIsOpened={setIsAlertOpened}
           />
         </div>
       )}
@@ -139,20 +151,10 @@ const Form = (props) => {
         <div className=" self-center">
           <SubmitBtn
             tabIndex={1}
-            disabled={disabled()}
-            onClick={() => {
-              setIsLoading(true);
-              submit(data).then((response) => {
-                setIsLoading(false);
-                const { message, isSignup } = response;
-                dispatch(setAuthStatus({ email: data.email }));
-                setIsSignup(isSignup);
-                setIsOpened(true);
-                setMessage(message);
-              });
-            }}
+            disabled={isDisabled()}
+            onClick={async () => await submit()}
           >
-            {isLoading ? <LoadingIcon height={24} stroke="white" /> : "Sign up"}
+            Sign up
           </SubmitBtn>
         </div>
       </section>

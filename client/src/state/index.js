@@ -2,11 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   settings: { theme: "light" },
-  token: null,
   profile: null,
   authStatus: {
     email: null,
-    isLoggedIn: false,
+    isLoggedin: false,
     isVerified: false,
   },
   infoMessage: "",
@@ -21,9 +20,6 @@ export const slice = createSlice({
         ...state.settings,
         [action.payload.property]: action.payload.value,
       };
-    },
-    setToken: (state, action) => {
-      state.token = action.payload;
     },
     setProfile: (state, action) => {
       state.profile = action.payload;
@@ -42,12 +38,18 @@ export const slice = createSlice({
     setShowMessage: (state, action) => {
       state.infoMessage = action.payload;
     },
-    logout: (state) => {
+    clearSignupFields: () => {
       sessionStorage.clear();
+      // set the isLoaded again after clearing sessionStorage
+      sessionStorage.setItem("isLoaded", true);
+    },
+    logout: (state) => {
+      localStorage.clear();
+      slice.actions.clearSignupFields();
       state.token = null;
       state.profile = null;
       state.authStatus.email = null;
-      state.authStatus.isLoggedIn = false;
+      state.authStatus.isLoggedin = false;
       state.authStatus.isVerified = false;
       state.settings.mode = "light";
       state.infoMessage = "";
@@ -55,13 +57,13 @@ export const slice = createSlice({
   },
 });
 export const {
-  setToken,
   setProfile,
   setSettings,
   setIsVerified,
   setAuthStatus,
   toggleTheme,
   setShowMessage,
+  clearSignupFields,
   logout,
 } = slice.actions;
 export default slice.reducer;
