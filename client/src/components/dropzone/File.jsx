@@ -18,7 +18,9 @@ const File = (props) => {
           });
         }}
       >
-        <CloseIcon stroke="var(--primary-color)" />
+        <div className="text-black w-full hover:text-[var(--primary-color)] transition">
+          <CloseIcon />
+        </div>
       </button>
       <div className="rounded-xl overflow-hidden border-2 border-[var(--primary-color)] aspect-square">
         {file.type.startsWith("image") ? (

@@ -1,25 +1,34 @@
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { submit } from "./submit";
-
 import DropZone from "components/dropzone";
 import { PostsContext } from "components/posts";
+import axiosClient from "utils/AxiosClient";
+import SubmitBtn from "components/SubmitBtn";
 
 const Form = (props) => {
-  const { data, setData, media, setMedia, setIsOpened } = props;
+  const { data, setData, setIsOpened } = props;
   const { posts, setPosts } = useContext(PostsContext);
+  const [media, setMedia] = useState([]);
 
-  const [isValidPost, setIsValidPost] = useState(false);
-  const { token } = useSelector((state) => state.profile);
-
-  useEffect(() => {
-    if (data.text != "" || media) {
-      setIsValidPost(true);
-    } else {
-      setIsValidPost(false);
+  const submit = async () => {
+    const formData = new FormData();
+    for (const property in data) {
+      formData.append(property, data[property]);
     }
-  }, [data, media]);
+    if (media) {
+      for (const file in media) {
+        formData.append("media", media[file]);
+      }
+    }
+    await axiosClient.post(`post/create`, formData).then((response) => {
+      if (posts) {
+        setPosts([response.data, ...posts]);
+      } else {
+        setPosts(response.data);
+      }
+    });
+  };
 
   return (
     <div className="flex flex-col gap-3 w-[280px] sm:w-[500px] p-2">
@@ -35,26 +44,17 @@ const Form = (props) => {
         }}
       />
       <DropZone files={media} setFiles={setMedia} />
-      <button
-        disabled={!isValidPost}
-        className={`${
-          isValidPost ? "bg-primary" : "bg-secondary"
-        } self-end py-2 px-4 rounded-xl text-white`}
+      <SubmitBtn
+        disabled={!(data.text || media.length > 0)}
         onClick={async () => {
-          setIsOpened(false);
+          await submit();
           setData({ text: "", location: "" });
-          setMedia(null);
-          submit(data, media, token).then((response) => {
-            if (posts) {
-              setPosts([response, ...posts]);
-            } else {
-              setPosts(response);
-            }
-          });
+          setMedia([]);
+          setIsOpened(false);
         }}
       >
         Post
-      </button>
+      </SubmitBtn>
     </div>
   );
 };

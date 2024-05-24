@@ -14,7 +14,6 @@ const CreatePost = () => {
 
   const [isOpened, setIsOpened] = useState(false);
   const [data, setData] = useState({ text: "", location: "" });
-  const [media, setMedia] = useState([]);
 
   const { id: userIdParam } = useParams();
 
@@ -58,13 +57,7 @@ const CreatePost = () => {
               <VideoIcon className="w-7" /> Video
             </div>
             <Dialog isOpened={isOpened} setIsOpened={setIsOpened}>
-              <Form
-                setIsOpened={setIsOpened}
-                data={data}
-                setData={setData}
-                media={media}
-                setMedia={setMedia}
-              />
+              <Form setIsOpened={setIsOpened} data={data} setData={setData} />
             </Dialog>
           </div>
         </section>
