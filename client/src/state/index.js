@@ -8,6 +8,13 @@ const initialState = {
     isLoggedin: false,
     isVerified: false,
   },
+  resetPasswordInfo: {
+    email: null,
+    token: null,
+    message: "",
+    isCodeSent: false,
+    isPasswordReset: false,
+  },
   infoMessage: "",
 };
 
@@ -27,6 +34,13 @@ export const slice = createSlice({
     setAuthStatus: (state, action) => {
       if (action.payload === null) state.authStatus = null;
       state.authStatus = { ...state.authStatus, ...action.payload };
+    },
+    setResetPasswordInfo: (state, action) => {
+      if (action.payload === null) state.resetPasswordInfo = null;
+      state.resetPasswordInfo = {
+        ...state.resetPasswordInfo,
+        ...action.payload,
+      };
     },
     toggleTheme: (state) => {
       if (state.settings.theme === "dark") {
@@ -61,6 +75,7 @@ export const {
   setSettings,
   setIsVerified,
   setAuthStatus,
+  setResetPasswordInfo,
   toggleTheme,
   setShowMessage,
   clearSignupFields,

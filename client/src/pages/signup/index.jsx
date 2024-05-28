@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
 
 import Form from "./form";
+import { setResetPasswordInfo } from "state";
 
 const Signup = () => {
   const [isSignedup, setIsSignedup] = useState(false);
   const theme = useSelector((state) => state.settings.theme);
+  const dispatch = useDispatch();
+
+  // clear stored fields in reset page
+  dispatch(setResetPasswordInfo(null));
 
   return (
     <>

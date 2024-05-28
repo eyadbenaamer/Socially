@@ -1,66 +1,114 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import Alert from "components/alert";
+import { setAuthStatus, setProfile, setResetPasswordInfo } from "state";
 
-import { setToken } from "state";
+import PasswordInput from "components/PasswordInput";
+import SubmitBtn from "components/SubmitBtn";
 
 import axiosClient from "utils/AxiosClient";
+import { Link } from "react-router-dom";
 
-const CreateNewPassword = ({ token }) => {
-  const [alert, setAlert] = useState({ type: "", message: "" });
-  const [isValid, setIsValid] = useState(false);
-  const [password, setPassword] = useState(null);
+const CreateNewPassword = () => {
+  const { token, isPasswordReset } = useSelector(
+    (state) => state.resetPasswordInfo
+  );
+  const [isValidInputs, setIsValidInputs] = useState({
+    password: false,
+    confirmPassword: false,
+  });
+  const [data, setData] = useState({ password: "" });
   const dispatch = useDispatch();
+  const [authInfo, setAuthInfo] = useState({});
 
-  const resetPassword = async () => {
-    return await axiosClient.post(`reset_password/${token}`, { password }).then(
-      (response) => {
-        const { user, isVerified } = response.data;
-        dispatch(setToken({ user, isVerified }));
-      },
-      (rejected) => {
-        const { message } = rejected.response.data;
-        setAlert({ type: "error", message });
+  const isDisabled = () => {
+    for (const key in isValidInputs) {
+      if (!isValidInputs[key]) {
+        return true;
       }
-    );
+    }
+    return false;
   };
 
+  const resetPassword = async () => {
+    return await axiosClient
+      .post(`reset_password/${token}`, { password: data.password })
+      .then((response) => {
+        setAuthInfo(response.data);
+        dispatch(setResetPasswordInfo({ isPasswordReset: true }));
+      })
+      .catch((error) => {
+        const { message, isExpired } = error.response.data;
+        if (isExpired) {
+          /*
+          if token is expired then all reset password information will be reset
+          which will redirect back to searh account wizard
+          */
+          dispatch(
+            setResetPasswordInfo({ isCodeSent: false, token: null, message })
+          );
+        }
+        dispatch(setResetPasswordInfo({ message }));
+      });
+  };
+
+  const authenticateAfterReset = () => {
+    const { profile, isVerified, token } = authInfo;
+    localStorage.setItem("token", token);
+    dispatch(setAuthStatus({ isVerified, email: "", isLoggedin: true }));
+    dispatch(setProfile(profile));
+    dispatch(setResetPasswordInfo(null));
+  };
   return (
     <>
-      <div className=" md:mx-auto my-3">
-        {alert.message && <Alert type={alert.type} message={alert.message} />}
-      </div>
-      <div>Enter new password</div>
-      <div>
-        New password:
-        <input type="text" onChange={(e) => setPassword(e.target.value)} />
-      </div>
-      <div>
-        Confirm new password:
-        <input
-          type="text"
-          onChange={(e) => {
-            if (e.target.value == password) {
-              setIsValid(true);
-            } else {
-              setIsValid(false);
+      {!isPasswordReset && (
+        <>
+          <h1 className="font-bold text-2xl primary-text">
+            Enter new password
+          </h1>
+          <PasswordInput
+            setIsValid={(isValid) =>
+              setIsValidInputs({ ...isValidInputs, password: isValid })
             }
-          }}
-        />
-      </div>
-      <button
-        disabled={!isValid}
-        className="py-2 px-4 border-solid bg-primary rounded-xl text-inverse"
-        onClick={(e) => {
-          e.target.style.background = "#899dfc";
-          resetPassword().then((response) => {
-            e.target.style.background = null;
-          });
-        }}
-      >
-        Send
-      </button>
+            data={data}
+            setData={setData}
+            name={"password"}
+            fieldValue={data.password}
+            placeholder={"New password"}
+          />
+          <PasswordInput
+            setIsValid={(isValid) =>
+              setIsValidInputs({ ...isValidInputs, confirmPassword: isValid })
+            }
+            data={data}
+            setData={setData}
+            name={"confirmPassword"}
+            fieldValue={data.confirmPassword}
+            placeholder={"Confirm new password"}
+          />
+          <SubmitBtn
+            disabled={isDisabled()}
+            tabIndex={1}
+            onClick={async () => await resetPassword()}
+          >
+            Send
+          </SubmitBtn>
+        </>
+      )}
+      {isPasswordReset && (
+        <div className="flex flex-col gap-6">
+          <h1 className="text-lg">
+            Your password has been reset successfully!
+          </h1>
+          <Link
+            className="w-full rounded-xl bg-primary p-2 text-center"
+            to="/"
+            onClick={authenticateAfterReset}
+          >
+            Go to home page
+          </Link>
+        </div>
+      )}
     </>
   );
 };

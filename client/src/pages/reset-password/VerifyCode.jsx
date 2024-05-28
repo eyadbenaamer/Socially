@@ -1,52 +1,45 @@
 import { useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import Alert from "components/alert";
+import SubmitBtn from "components/SubmitBtn";
 
+import { setResetPasswordInfo } from "state";
 import axiosClient from "utils/AxiosClient";
 
-const VerifyCode = (props) => {
-  const { email, setToken } = props;
+const VerifyCode = () => {
+  const { email } = useSelector((state) => state.resetPasswordInfo);
   const [code, setCode] = useState("");
-  const theme = useSelector((state) => state.settings.theme);
-  const [alert, setAlert] = useState({ type: "", message: "" });
+  const dispatch = useDispatch();
 
   const sendCode = async () => {
-    const response = await axiosClient
-      .post(`reset_password/verify_code`, { code, email })
+    await axiosClient
+      .post(`verify_reset_password`, { code, email })
       .then((response) => {
         const { token } = response.data;
-        return { token };
+        dispatch(setResetPasswordInfo({ token, message: "" }));
       })
       .catch(async (error) => {
         let { message } = error.response.data;
         if (message === "jwt expired") {
           axiosClient.post(`send_verification_code`, {
-            type: "verify_account",
+            type: "reset_password",
             email,
           });
           message = "Code has expired. we sent another code to your email";
         }
-        return { alert: { type: "error", message } };
+        dispatch(setResetPasswordInfo({ message }));
       });
-    return response;
   };
   const sendBtn = useRef(null);
 
   return (
     <>
-      <div className=" md:mx-auto my-3">
-        {alert.message && <Alert type={alert.type} message={alert.message} />}
-      </div>
-      <div
-        className={`${
-          theme === "light" ? "text-slate-800" : ""
-        } my-8 bg-300 rounded-xl p-4 shadow-md`}
-      >
-        Enter the code that has been sent to your email address
-        <div className=" my-3">
+      <h1>Enter the code that has been sent to your email address</h1>
+      <div className="flex flex-col items-center sm:items-start">
+        <div className="border-2 my-3 rounded-lg p-2">
           <input
-            className="rounded-xl border-2 text-center text-3xl h-[60px] w-[120px]"
+            className="w-20 text-xl font-bold"
+            style={{ letterSpacing: 1 }}
             type="text"
             value={code}
             onKeyDown={(e) => {
@@ -65,21 +58,13 @@ const VerifyCode = (props) => {
             }}
           />
         </div>
-        <button
+        <SubmitBtn
+          disabled={code?.length < 6}
           ref={sendBtn}
-          className="py-2 px-4 border-solid bg-primary rounded-xl text-inverse"
-          onClick={(e) => {
-            e.target.style.background = "#899dfc";
-            sendCode().then((response) => {
-              e.target.style.background = null;
-              const { alert, token } = response;
-              setAlert(alert);
-              setToken(token);
-            });
-          }}
+          onClick={async () => await sendCode()}
         >
           Send
-        </button>
+        </SubmitBtn>
       </div>
     </>
   );

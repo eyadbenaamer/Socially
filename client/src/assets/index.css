@@ -79,6 +79,10 @@ svg.icon-hover:hover {
   color: var(--primary-color);
 }
 
+.icon.primary-text {
+  color: #4361ee !important;
+}
+
 /*Scrollbar*/
 
 ::-webkit-scrollbar {

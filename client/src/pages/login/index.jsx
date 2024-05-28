@@ -1,8 +1,18 @@
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+import { clearSignupFields, setResetPasswordInfo } from "state";
+
 import Form from "./Form";
-import { useSelector } from "react-redux";
+
 const Login = () => {
   const theme = useSelector((state) => state.settings.theme);
+  const dispatch = useDispatch();
+
+  // clear stored fields in signup and reset password pages
+  dispatch(clearSignupFields());
+  dispatch(setResetPasswordInfo(null));
+
   return (
     <div className="container m-auto">
       <div

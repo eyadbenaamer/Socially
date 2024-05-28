@@ -8,7 +8,7 @@ import crossAnimationData from "assets/icons/cross.json";
 import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const EmailInput = (props) => {
-  const { fieldValue, setData, setIsValid } = props;
+  const { fieldValue, setData, setIsValid, type, placeholder } = props;
   const [check, setCheck] = useState({ state: "", message: "" });
 
   const regex = /((\w)+.?)+@\w{1,}\.\w{2,}/gi;
@@ -19,42 +19,44 @@ const EmailInput = (props) => {
   );
   const [focused, setFocused] = useState(false);
   const [isEmailChecked, setIsEmailChecked] = useState(true);
+
   const verifyValue = () => {
     if (!fieldValue) {
       input.current.style.border = "solid 2px red";
       setData((prev) => ({ ...prev, email: fieldValue }));
       setIsEmailChecked(true);
       setCheck({ state: "fail", message: "Required" });
-    } else {
-      const isValid = regex.test(fieldValue);
-      if (isValid) {
-        setData((prev) => ({
-          ...prev,
-          email: fieldValue.trim().toLowerCase(),
-        }));
-        axiosClient(`check_email/${fieldValue}`)
-          .then(() => {
-            input.current.style.border = "solid 2px green";
-            setCheck({
-              state: "success",
-              message: "This email is available",
-            });
-          })
-          .catch((error) => {
-            setCheck({ state: "fail", message: error.response.data.message });
-            input.current.style.border = "solid 2px red";
+      return;
+    }
+    const isValid = regex.test(fieldValue);
+    if (isValid) {
+      setData((prev) => ({
+        ...prev,
+        email: fieldValue.trim().toLowerCase(),
+      }));
+      axiosClient(`check_email_availability/${type}/${fieldValue}`)
+        .then((response) => {
+          const { message } = response.data;
+          input.current.style.border = "solid 2px green";
+          setCheck({
+            state: "success",
+            message,
           });
-        setIsEmailChecked(true);
-        setCheck({ state: "success" });
-      } else {
-        input.current.style.border = "solid 2px red";
-        setData((prev) => ({ ...prev, email: fieldValue }));
-        setIsEmailChecked(true);
-        setCheck({
-          state: "fail",
-          message: "Invalid email",
+        })
+        .catch((error) => {
+          setCheck({ state: "fail", message: error.response.data.message });
+          input.current.style.border = "solid 2px red";
         });
-      }
+      setIsEmailChecked(true);
+      setCheck({ state: "success" });
+    } else {
+      input.current.style.border = "solid 2px red";
+      setData((prev) => ({ ...prev, email: fieldValue }));
+      setIsEmailChecked(true);
+      setCheck({
+        state: "fail",
+        message: "Invalid email",
+      });
     }
   };
 
@@ -66,7 +68,7 @@ const EmailInput = (props) => {
           tabIndex={1}
           ref={input}
           defaultValue={fieldValue}
-          placeholder="email.example.com"
+          placeholder={placeholder === null ? "email.example.com" : ""}
           style={{
             borderRadius: 8,
             boxShadow: "0px 1px 3px 0px #00000026",
@@ -129,7 +131,6 @@ const EmailInput = (props) => {
             ))}
         </div>
       </div>
-
       <div
         className={`${
           check.state === "fail" ? "text-[red]" : "text-[green]"
