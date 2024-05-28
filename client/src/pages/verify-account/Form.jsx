@@ -1,24 +1,25 @@
+import SubmitBtn from "components/SubmitBtn";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setAuthStatus, setToken } from "state";
+import { setAuthStatus, setProfile } from "state";
 
 import axiosClient from "utils/AxiosClient";
 
 const Form = (props) => {
-  const { setMessage } = props;
+  const { setMessage, setIsAlertOpen } = props;
   const [code, setCode] = useState("");
   const dispatch = useDispatch();
   const { email } = useSelector((state) => state.authStatus);
+
   const sendCode = async () => {
-    const response = await axiosClient
+    await axiosClient
       .post(`verify_account`, { code, email })
       .then((response) => {
-        const { user, isVerified } = response.data;
-        return {
-          user,
-          isVerified,
-        };
+        const { profile, token, isVerified } = response.data;
+        localStorage.setItem("token", token);
+        dispatch(setAuthStatus({ isVerified }));
+        dispatch(setProfile(profile));
       })
       .catch(async (error) => {
         let { message } = error.response.data;
@@ -29,15 +30,18 @@ const Form = (props) => {
           });
           message = "Code has expired. we sent another code to your email";
         }
-        return { message, isVerified: false };
+        setMessage(message);
+        setIsAlertOpen(true);
+        dispatch(setAuthStatus({ isVerified: false }));
       });
-    return response;
   };
   const sendBtn = useRef(null);
   return (
-    <div>
-      <div className="code my-3">
+    <div className="flex flex-col items-center sm:items-start">
+      <div className="border-2 my-3 rounded-lg p-2">
         <input
+          className="w-20 text-xl font-bold"
+          style={{ letterSpacing: 1 }}
           type="text"
           value={code}
           onKeyDown={(e) => {
@@ -56,22 +60,13 @@ const Form = (props) => {
           }}
         />
       </div>
-      <button
+      <SubmitBtn
+        disabled={code?.length < 6}
         ref={sendBtn}
-        className="py-2 px-4 border-solid bg-primary rounded-xl text-inverse"
-        onClick={(e) => {
-          e.target.style.background = "#899dfc";
-          sendCode().then((response) => {
-            e.target.style.background = null;
-            const { user, isVerified, message } = response;
-            dispatch(setAuthStatus({ isVerified }));
-            dispatch(setToken(user));
-            setMessage(message);
-          });
-        }}
+        onClick={async () => await sendCode()}
       >
         Send
-      </button>
+      </SubmitBtn>
     </div>
   );
 };

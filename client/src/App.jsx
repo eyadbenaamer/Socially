@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import axios from "axios";
 import { logout, setAuthStatus, setProfile } from "state";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
@@ -15,13 +16,11 @@ import Messages from "pages/messages";
 import ResetPassword from "pages/reset-password";
 import SetProfile from "pages/set-profile";
 import Post from "pages/post";
+import NotFound from "pages/NotFound";
+import VerifyAccountByLink from "pages/VerifyAccountByLink";
 
 import Header from "components/header";
 import InfoMessage from "components/InfoMessage";
-
-import axios from "axios";
-import VerifyAccountByLink from "pages/VerifyAccountByLink";
-import NotFound from "pages/NotFound";
 
 const App = () => {
   //if user is stored in redux state, then the user is logged in
@@ -65,6 +64,7 @@ const App = () => {
       <div className={`App ${theme} bg-100 min-h-screen`}>
         <Header />
         <motion.main
+          className=" min-h-screens"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "linear" }}
@@ -99,16 +99,6 @@ const App = () => {
               }
             />
             <Route
-              path="/reset-password"
-              element={
-                !isLoggedin ? (
-                  <ResetPassword />
-                ) : (
-                  <Navigate to={"/"} replace={true} />
-                )
-              }
-            />
-            <Route
               path="/verify-account"
               element={
                 isLoggedin && !isVerified ? (
@@ -129,6 +119,26 @@ const App = () => {
                   <Navigate to="/set-profile" replace={true} />
                 ) : (
                   <Navigate to="/" />
+                )
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                !isLoggedin ? (
+                  <ResetPassword />
+                ) : (
+                  <Navigate to={"/"} replace={true} />
+                )
+              }
+            />
+            <Route
+              path="/reset-password/:token"
+              element={
+                !isLoggedin ? (
+                  <ResetPassword />
+                ) : (
+                  <Navigate to={"/"} replace={true} />
                 )
               }
             />
