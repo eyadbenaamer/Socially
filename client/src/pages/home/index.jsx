@@ -19,7 +19,7 @@ const Home = () => {
           </div>
         )}
         <div className="content sm:col-span-8 md:mx-0 md:col-span-6 lg:col-span-4 col-span-8">
-          <h1 className="text-2xl p-4 sticky top-[78px] bg-100 z-30">Home</h1>
+          <h1 className="text-2xl p-4 sticky top-[62px] bg-100 z-30">Home</h1>
           <div className="my-0 mx-auto">
             <Content />
           </div>

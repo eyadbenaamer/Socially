@@ -31,6 +31,7 @@ const Comment = (props) => {
   const [isModifying, setIsModifying] = useState(false);
   const [showReplies, setShowReplies] = useState(Boolean(replyId));
   const time = useGetTime(createdAt);
+
   return (
     <>
       {props.comment && user && (
@@ -90,7 +91,7 @@ const Comment = (props) => {
                   <Like
                     likes={likes}
                     type="comment"
-                    userId={creatorId}
+                    userId={post.creatorId}
                     postId={post._id}
                     commentId={id}
                   />

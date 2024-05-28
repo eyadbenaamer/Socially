@@ -5,9 +5,9 @@ import { setAuthStatus } from "state";
 import DateInput from "./DateInput";
 import Alert from "components/alert";
 import SubmitBtn from "components/SubmitBtn";
-import PasswordInput from "./PasswordInput";
+import PasswordInput from "components/PasswordInput";
 import Input from "./Input";
-import EmailInput from "./EmailInput";
+import EmailInput from "components/EmailInput";
 
 import axiosClient from "utils/AxiosClient";
 
@@ -104,6 +104,7 @@ const Form = (props) => {
           </div>
           <div className="col-span-1">
             <EmailInput
+              type="register"
               setIsValid={(isValid) =>
                 setIsValidInputs({ ...isValidInputs, email: isValid })
               }

@@ -1,20 +1,31 @@
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
-import UnloggedIn from "./UnloggedIn";
-import LoggedIn from "./logged-in";
+import Menu from "./Menu";
+import ToggleTheme from "components/ToggleTheme";
 
+import darkLogo from "assets/icons/logo-dark.svg";
+import lightLogo from "assets/icons/logo-light.svg";
 import "./index.css";
 
 const Header = () => {
   const isLoggedin = Boolean(
     useSelector((state) => state.authStatus.isLoggedin)
   );
+  const theme = useSelector((state) => state.settings.theme);
 
   return (
     <header className="sticky top-0 z-40 w-full bg-300 shadow-lg py-2 transition">
-      <div className="container px-4">
-        {isLoggedin && <LoggedIn />}
-        {!isLoggedin && <UnloggedIn />}
+      <div className="container px-4 py-2 m-auto flex gap-3 items-center justify-between">
+        <Link to="/">
+          {theme === "light" ? (
+            <img src={lightLogo} alt="Socially" />
+          ) : (
+            <img src={darkLogo} alt="Socially" />
+          )}
+        </Link>
+        {isLoggedin && <Menu />}
+        {!isLoggedin && <ToggleTheme />}
       </div>
     </header>
   );
