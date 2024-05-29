@@ -52,7 +52,7 @@ export const signup = async (req, res) => {
       _id: newUser.id,
       firstName,
       lastName,
-      userName: `user${profilesCount + 1}`,
+      username: `user${profilesCount + 1}`,
       birthDate,
       gender,
     });
@@ -106,15 +106,15 @@ export const checkEmailForResetPassword = async (req, res) => {
 /*LOGIN USER*/
 export const login = async (req, res) => {
   try {
-    let { email, userName, password } = req.body;
+    let { email, username, password } = req.body;
     email = email.trim().toLowerCase();
-    if (!password && (userName || email)) {
+    if (!password && (username || email)) {
       return res.status(400).json({ message: "Invalid credentials." });
     }
     let user;
-    if (userName && !email) {
-      user = await User.findOne({ userName });
-    } else if (!userName && email) {
+    if (username && !email) {
+      user = await User.findOne({ username });
+    } else if (!username && email) {
       user = await User.findOne({ email });
     } else {
       return res.status(400).json({ message: "bad request." });
@@ -129,8 +129,6 @@ export const login = async (req, res) => {
     const isVerified = user.verificationStatus.isVerified;
     if (!isVerified) {
       const verificationCode = generateCode(6);
-      // send email with verification code if the email isn't verified
-      await sendResetPasswordCode(email, verificationCode, verificationToken);
       const verificationToken = jwt.sign(
         { id: user.id, verificationCode },
         process.env.JWT_SECRET,
@@ -139,6 +137,8 @@ export const login = async (req, res) => {
         }
       );
       user.verificationStatus.verificationToken = verificationToken;
+      // send email with verification code if the email isn't verified
+      await sendResetPasswordCode(email, verificationCode, verificationToken);
       await user.save();
       return res.status(401).json({
         isVerified,
@@ -171,9 +171,10 @@ export const loginWithToken = async (req, res) => {
       }
       const userInfo = jwt.verify(token, process.env.JWT_SECRET);
       const profile = await Profile.findById(userInfo.id);
-      if (profile) {
-        return res.status(200).json(profile);
+      if (!profile) {
+        return res.status(404).json({ message: "User not found." });
       }
+      return res.status(200).json(profile);
     }
   } catch {
     return res
