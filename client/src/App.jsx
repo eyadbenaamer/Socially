@@ -113,7 +113,7 @@ const App = () => {
             <Route
               path="/verify-account/:token"
               element={
-                isLoggedin && !isVerified ? (
+                !isLoggedin || (isLoggedin && !isVerified) ? (
                   <VerifyAccountByLink />
                 ) : isLoggedin && email && isVerified ? (
                   <Navigate to="/set-profile" replace={true} />
