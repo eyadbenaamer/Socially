@@ -9,7 +9,7 @@ import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
 import SidebarItem from "./SidebarItem";
 
 const Sidebar = () => {
-  const user = useSelector((state) => state.profile);
+  const profile = useSelector((state) => state.profile);
   const location = useLocation();
 
   return (
@@ -21,11 +21,11 @@ const Sidebar = () => {
           />
         </SidebarItem>
         <SidebarItem
-          to={`/profile/${user._id}`}
-          name={`${user.firstName} ${user.lastName}`}
+          to={`/profile/${profile._id}`}
+          name={`${profile.firstName} ${profile.lastName}`}
         >
           <span className="circle w-9 border-2">
-            <img src={user.avatarPath} />
+            <img src={profile.profilePicPath} />
           </span>
         </SidebarItem>
 

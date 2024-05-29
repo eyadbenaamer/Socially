@@ -7,13 +7,13 @@ import axiosClient from "utils/AxiosClient";
 
 const WhoLiked = (props) => {
   const { setIsOpened, likes } = props;
-  const [users, setUsers] = useState([]);
+  const [profiles, setProfiles] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       likes.map((id) => {
         axiosClient(`profile?id=${id}`).then((response) =>
-          setUsers((prev) => [...prev, response.data])
+          setProfiles((prev) => [...prev, response.data])
         );
       });
     };
@@ -24,25 +24,25 @@ const WhoLiked = (props) => {
     <div className="w-[250px] sm:w-[500px] p-2">
       <h1 className="py-2 text-lg">People Who Liked</h1>
       <ul className="flex flex-col gap-3">
-        {users &&
-          users.map((user) => {
+        {profiles &&
+          profiles.map((profile) => {
             return (
               <li
                 onClick={() => setIsOpened(false)}
-                key={user._id}
+                key={profile._id}
                 className="flex gap-2 items-center"
               >
                 <UserPicture
-                  id={user._id}
-                  src={user.avatarPath}
-                  name={`${user.firstName} ${user.lastName}`}
+                  id={profile._id}
+                  src={profile.profilePicPath}
+                  name={`${profile.firstName} ${profile.lastName}`}
                 />
                 <Link
                   reloadDocument={true}
-                  to={`/profile/${user._id}`}
+                  to={`/profile/${profile._id}`}
                   className="hover:underline"
                 >
-                  {user.firstName} {user.lastName}
+                  {profile.firstName} {profile.lastName}
                 </Link>
               </li>
             );

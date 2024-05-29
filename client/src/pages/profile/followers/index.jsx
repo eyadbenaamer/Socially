@@ -45,13 +45,13 @@ const Followers = () => {
           <div className="text-xl">Followers</div>
           <ul className="flex flex-col gap-3">
             {users?.map((user) => {
-              const { _id: id, avatarPath, firstName, lastName } = user;
+              const { _id: id, profilePicPath, firstName, lastName } = user;
               return (
                 <li className="flex items-center justify-between">
                   <div className="account flex gap-2 items-center">
                     <UserPicture
                       id={id}
-                      src={avatarPath}
+                      src={profilePicPath}
                       name={`${firstName} ${lastName}`}
                     />
                     <Link to={`/profile/${id}`} reloadDocument className="link">

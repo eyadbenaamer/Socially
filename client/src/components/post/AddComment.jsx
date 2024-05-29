@@ -47,7 +47,7 @@ const AddComment = (props) => {
       <div className={`flex gap-2 ${media ? "items-start" : "items-center"}`}>
         <UserPicture
           id={profile._id}
-          src={profile.avatarPath}
+          src={profile.profilePicPath}
           name={`${profile.firstName} ${profile.lastName}`}
         />
         <div className="flex flex-col gap-2 w-full">

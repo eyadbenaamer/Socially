@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 
-import useFetchUser from "hooks/useFetchUser";
+import useFetchProfile from "hooks/useFetchUser";
 
 import Replies from "./replies";
 import OptionsBtn from "./options-btn";
@@ -26,7 +26,7 @@ const Comment = (props) => {
   } = props;
   const { replyId } = useParams();
   const post = useContext(PostContext);
-  const [user] = useFetchUser(creatorId);
+  const [user] = useFetchProfile(creatorId);
   const currentUser = useSelector((state) => state.profile);
   const [isModifying, setIsModifying] = useState(false);
   const [showReplies, setShowReplies] = useState(Boolean(replyId));
@@ -41,7 +41,7 @@ const Comment = (props) => {
               <div className="flex">
                 <UserPicture
                   id={user._id}
-                  src={user.avatarPath}
+                  src={user.profilePicPath}
                   name={`${user.firstName} ${user.lastName}`}
                 />
               </div>

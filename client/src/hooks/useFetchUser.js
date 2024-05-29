@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 
 import axiosClient from "utils/AxiosClient";
 
-const useFetchUser = (id) => {
-  const [user, setUser] = useState(null);
+const useFetchProfile = (id) => {
+  const [profile, setProfile] = useState(null);
   useEffect(() => {
     if (id) {
       axiosClient(`profile?id=${id}`).then((response) => {
-        setUser(response.data);
+        setProfile(response.data);
       });
     }
   }, [id]);
-  return [user, setUser];
+  return [profile, setProfile];
 };
 
-export default useFetchUser;
+export default useFetchProfile;

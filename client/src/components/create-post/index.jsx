@@ -31,7 +31,7 @@ const CreatePost = () => {
           <div className="flex gap-3 items-center">
             <UserPicture
               id={profile._id}
-              src={profile.avatarPath}
+              src={profile.profilePicPath}
               name={`${profile.firstName} ${profile.lastName}`}
             />
             <div

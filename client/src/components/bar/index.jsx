@@ -25,7 +25,7 @@ const Bar = () => {
 
         <BarItem to={`/profile/${profile._id}`}>
           <span className="circle w-9">
-            <img src={profile.avatarPath} />
+            <img src={profile.profilePicPath} />
           </span>
         </BarItem>
 

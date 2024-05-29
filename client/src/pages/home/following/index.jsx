@@ -31,13 +31,13 @@ const Following = () => {
         {/* show only 20 following if following more than 20, otherwise show them all  */}
         {users &&
           users.slice(0, users.length < 20 ? users.length : 20).map((user) => {
-            const { _id: id, avatarPath, firstName, lastName } = user;
+            const { _id: id, profilePicPath, firstName, lastName } = user;
             return (
               <li className="flex items-center">
                 <div className="account flex gap-2 items-center">
                   <UserPicture
                     id={id}
-                    src={avatarPath}
+                    src={profilePicPath}
                     name={`${firstName} ${lastName}`}
                   />
                   <Link to={`/profile/${id}`} className="link">

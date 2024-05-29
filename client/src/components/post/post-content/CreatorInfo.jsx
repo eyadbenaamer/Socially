@@ -3,30 +3,30 @@ import { Link } from "react-router-dom";
 import UserPicture from "components/UserPicture";
 
 import useGetTime from "hooks/useGetTime";
-import useFetchUser from "hooks/useFetchUser";
+import useFetchProfile from "hooks/useFetchUser";
 
 const CreatorInfo = (props) => {
   const { creatorId, createdAt, location, postId } = props;
   const time = useGetTime(createdAt);
-  const [user] = useFetchUser(creatorId);
+  const [profile] = useFetchProfile(creatorId);
 
   return (
     <>
-      {user && (
+      {profile && (
         <div className="flex gap-3">
           <UserPicture
-            id={user._id}
-            src={user.avatarPath}
-            name={`${user.firstName} ${user.lastName}`}
+            id={profile._id}
+            src={profile.profilePicPath}
+            name={`${profile.firstName} ${profile.lastName}`}
           />
           <div className="flex flex-col">
-            <Link to={`/profile/${user._id}`}>
+            <Link to={`/profile/${profile._id}`}>
               <span className=" hover:underline cursor-pointer">
-                {user.firstName} {user.lastName}
+                {profile.firstName} {profile.lastName}
               </span>
             </Link>
             <Link
-              to={`/post/${user._id}/${postId}`}
+              to={`/post/${profile._id}/${postId}`}
               className="flex gap-1 text-slate-400 text-xs hover:underline"
             >
               <span>{time}</span>

@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { ProfileContext } from ".";
 
 const CoverPicture = () => {
-  const { coverPath, avatarPath } = useContext(ProfileContext);
+  const { coverPicPath, profilePicPath } = useContext(ProfileContext);
 
   return (
     <>
@@ -14,11 +14,11 @@ const CoverPicture = () => {
           borderBottomRightRadius: 16,
         }}
       >
-        {coverPath && <div className="loading w-full h-full absolute"></div>}
+        {coverPicPath && <div className="loading w-full h-full absolute"></div>}
         <img
           loading="lazy"
           className="max-h-full w-full"
-          src={coverPath}
+          src={coverPicPath}
           // when the image is loaded remove the loading effect
           onLoad={() =>
             document.querySelector(".cover-image-container .loading").remove()
@@ -30,7 +30,7 @@ const CoverPicture = () => {
           <img
             loading="lazy"
             className=" max-h-full w-full rounded-xl "
-            src={avatarPath}
+            src={profilePicPath}
           />
         </div>
       </div>

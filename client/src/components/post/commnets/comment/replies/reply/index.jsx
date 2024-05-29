@@ -7,7 +7,7 @@ import UserPicture from "components/UserPicture";
 import Media from "../../Media";
 import OptionsBtn from "./options-btn";
 
-import useFetchUser from "hooks/useFetchUser";
+import useFetchProfile from "hooks/useFetchUser";
 import useGetTime from "hooks/useGetTime";
 
 import { PostContext } from "components/post";
@@ -17,25 +17,28 @@ const Reply = (props) => {
     reply: { _id: id, createdAt, creatorId, text, likes, file, rootCommentId },
   } = props;
   const post = useContext(PostContext);
-  const [user] = useFetchUser(creatorId);
+  const [profile] = useFetchProfile(creatorId);
   const [isModifying, setIsModifying] = useState(false);
   const time = useGetTime(createdAt);
   return (
     <>
-      {props.reply && user && (
+      {props.reply && profile && (
         <div className="flex items-start">
           <div className="flex scale-75">
             <UserPicture
-              id={user._id}
-              src={user.avatarPath}
-              name={`${user.firstName} ${user.lastName}`}
+              id={profile._id}
+              src={profile.profilePicPath}
+              name={`${profile.firstName} ${profile.lastName}`}
             />
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center">
               <div className="bg-300 rounded-xl shadow-md px-3 py-2 w-fit">
-                <Link to={`/profile/${user._id}`} className="hover:underline">
-                  {user.firstName} {user.lastName}
+                <Link
+                  to={`/profile/${profile._id}`}
+                  className="hover:underline"
+                >
+                  {profile.firstName} {profile.lastName}
                 </Link>
                 <Text
                   postCreatorId={post.creatorId}
