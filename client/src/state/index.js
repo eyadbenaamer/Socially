@@ -65,7 +65,7 @@ export const slice = createSlice({
       state.authStatus.email = null;
       state.authStatus.isLoggedin = false;
       state.authStatus.isVerified = false;
-      state.settings.mode = "light";
+      state.settings.theme = "light";
       state.infoMessage = "";
     },
   },
