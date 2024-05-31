@@ -63,7 +63,7 @@ const CreateNewPassword = () => {
     <>
       {!isPasswordReset && (
         <>
-          <h1 className="font-bold text-2xl primary-text">
+          <h1 className="font-bold text-2xl text-primary">
             Enter new password
           </h1>
           <PasswordInput

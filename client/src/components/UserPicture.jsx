@@ -6,7 +6,7 @@ const UserPicture = (props) => {
 
   return (
     <Link to={`/profile/${id}`} className="circle w-12 shadow-md border-2">
-      <img className="h-full" loading="lazy" src={src} alt={name} />
+      <img className="h-full w-full" loading="lazy" src={src} alt={name} />
     </Link>
   );
 };

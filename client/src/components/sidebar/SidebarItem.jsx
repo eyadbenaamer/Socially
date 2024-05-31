@@ -8,7 +8,7 @@ const SidebarItem = (props) => {
       <Link onClick={() => window.scrollTo({ top: 0 })} to={to}>
         <div className="bg-hovered flex gap-3 items-center px-3 py-2 rounded-xl">
           <span className="w-9">{children}</span>
-          <span className={`${location.pathname === to ? "primary-text" : ""}`}>
+          <span className={`${location.pathname === to ? "text-primary" : ""}`}>
             {name}
           </span>
         </div>

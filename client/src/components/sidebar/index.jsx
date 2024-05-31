@@ -17,7 +17,7 @@ const Sidebar = () => {
       <ul className="flex flex-col gap-3 items-start px-2 w-full">
         <SidebarItem to={"/"} name={"Home"}>
           <HomeIcon
-            className={`${location.pathname === "/" ? "primary-text" : ""}`}
+            className={`${location.pathname === "/" ? "text-primary" : ""}`}
           />
         </SidebarItem>
         <SidebarItem
@@ -25,14 +25,14 @@ const Sidebar = () => {
           name={`${profile.firstName} ${profile.lastName}`}
         >
           <span className="circle w-9 border-2">
-            <img src={profile.profilePicPath} />
+            <img className="h-full w-full" src={profile.profilePicPath} />
           </span>
         </SidebarItem>
 
         <SidebarItem to={"/notifications"} name={"Notifications"}>
           <NotificationsIcon
             className={`${
-              location.pathname === "/notifications" ? "primary-text" : ""
+              location.pathname === "/notifications" ? "text-primary" : ""
             }`}
           />
         </SidebarItem>
@@ -40,7 +40,7 @@ const Sidebar = () => {
         <SidebarItem to={"/messages"} name={"Messages"}>
           <MessagesIcon
             className={`${
-              location.pathname === "/messages" ? "primary-text" : ""
+              location.pathname === "/messages" ? "text-primary" : ""
             }`}
           />
         </SidebarItem>
@@ -48,7 +48,7 @@ const Sidebar = () => {
         <SidebarItem to={"/saved-posts"} name={"Saved Posts"}>
           <SavedPostsIcon
             className={`${
-              location.pathname === "/saved-posts" ? "primary-text" : ""
+              location.pathname === "/saved-posts" ? "text-primary" : ""
             }`}
           />
         </SidebarItem>

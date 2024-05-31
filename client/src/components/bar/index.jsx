@@ -18,21 +18,21 @@ const Bar = () => {
         <BarItem to={"/"}>
           <HomeIcon
             className={`icon ${
-              location.pathname === "/" ? "primary-text" : ""
+              location.pathname === "/" ? "text-primary" : ""
             }`}
           />
         </BarItem>
 
         <BarItem to={`/profile/${profile._id}`}>
-          <span className="circle w-9">
-            <img src={profile.profilePicPath} />
+          <span className="circle w-9 border-[1px]">
+            <img className="h-full w-full" src={profile.profilePicPath} />
           </span>
         </BarItem>
 
         <BarItem to={"/notifications"}>
           <NotificationsIcon
             className={`icon ${
-              location.pathname === "/notifications" ? "primary-text" : ""
+              location.pathname === "/notifications" ? "text-primary" : ""
             }`}
           />
         </BarItem>
@@ -40,7 +40,7 @@ const Bar = () => {
         <BarItem to={"/messages"}>
           <MessagesIcon
             className={`icon ${
-              location.pathname === "/messages" ? "primary-text" : ""
+              location.pathname === "/messages" ? "text-primary" : ""
             }`}
           />
         </BarItem>
@@ -48,7 +48,7 @@ const Bar = () => {
         <BarItem to={"/saved-posts"}>
           <SavedPostsIcon
             className={`icon ${
-              location.pathname === "/saved-posts" ? "primary-text" : ""
+              location.pathname === "/saved-posts" ? "text-primary" : ""
             }`}
           />
         </BarItem>

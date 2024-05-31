@@ -17,7 +17,7 @@ const CoverPicture = () => {
         {coverPicPath && <div className="loading w-full h-full absolute"></div>}
         <img
           loading="lazy"
-          className="max-h-full w-full"
+          className="h-full w-full"
           src={coverPicPath}
           // when the image is loaded remove the loading effect
           onLoad={() =>
@@ -25,11 +25,17 @@ const CoverPicture = () => {
           }
         />
       </div>
-      <div className="avatar-image-container absolute -translate-y-[50%] translate-x-5 circle w-32 sm:w-36 border-2 bg-300">
+      <div className="profile-image-container absolute -translate-y-[50%] translate-x-5 circle w-32 sm:w-36 border-2 bg-300">
         <div className="loading w-full h-full">
           <img
             loading="lazy"
-            className=" max-h-full w-full rounded-xl "
+            onLoad={() => {
+              // when the image is loaded remove the loading effect
+              document
+                .querySelector(".profile-image-container .loading")
+                .classList.remove("loading");
+            }}
+            className="h-full max-w-fit min-w-full"
             src={profilePicPath}
           />
         </div>

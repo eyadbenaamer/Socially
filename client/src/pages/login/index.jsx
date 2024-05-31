@@ -14,9 +14,9 @@ const Login = () => {
   dispatch(setResetPasswordInfo(null));
 
   return (
-    <div className="container m-auto">
+    <div className="container m-auto p-3">
       <div
-        className={`auth flex flex-col gap-3 w-fit my-5 mx-auto shadow-md rounded-xl p-4 bg-300 ${
+        className={`auth flex flex-col gap-3 w-fit my-8 mx-auto shadow-md rounded-xl p-4 bg-300 ${
           theme === "light" ? "border" : ""
         }`}
       >

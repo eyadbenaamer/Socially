@@ -35,7 +35,7 @@ const SendCode = () => {
 
   return (
     <>
-      <h1 className="font-bold text-2xl primary-text">Find your account</h1>
+      <h1 className="font-bold text-2xl text-primary">Find your account</h1>
       <h2 className="mb-6">
         Enter your email address to recieve a verification code
       </h2>
