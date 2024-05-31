@@ -26,8 +26,9 @@ import { add as addReply } from "./controllers/reply.js";
 
 import { verifyToken } from "./middleware/auth.js";
 import { verifyId } from "./middleware/check.js";
-import { compressImage } from "./middleware/media.js";
-import { getPostsInfo, uploadSingleFile } from "./middleware/post.js";
+import { compressImages } from "./middleware/media.js";
+import { getPostsInfo } from "./middleware/post.js";
+import { uploadSingleFile } from "./middleware/media.js";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -59,19 +60,20 @@ const upload = multer({ storage });
 
 /*ROUTES WITH FILES*/
 app.patch(
-  "/set_profile",
+  "/profile/set",
   verifyToken,
   upload.fields([
-    { name: "avatar", maxCount: 1 },
-    { name: "cover", maxCount: 1 },
+    { name: "profilePic", maxCount: 1 },
+    { name: "coverPic", maxCount: 1 },
   ]),
+  compressImages,
   setProfile
 );
 app.post(
   "/post/create",
   verifyToken,
   upload.fields([{ name: "media", maxCount: 5 }]),
-  compressImage,
+  compressImages,
   create
 );
 app.post(
@@ -79,7 +81,7 @@ app.post(
   verifyId,
   verifyToken,
   upload.fields([{ name: "media", maxCount: 5 }]),
-  compressImage,
+  compressImages,
   share
 );
 app.post(

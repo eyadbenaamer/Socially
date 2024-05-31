@@ -18,6 +18,12 @@ const ProfileSchema = new Schema({
     min: 2,
     max: 20,
   },
+  username: {
+    type: String,
+    unique: true,
+    min: 1,
+    max: 20,
+  },
   profilePicPath: {
     type: String,
     default: `${process.env.API_URL}/assets/blank_user.jpg`,

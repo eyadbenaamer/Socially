@@ -17,7 +17,7 @@ const VerifyAccount = () => {
   return (
     <>
       {/* once the account is verified, the router will redirect to the set profile page*/}
-      {isVerified && <Navigate to={"/set-profile"} />}
+      {isVerified && <Navigate to={"/welcome"} />}
       <div className="container flex flex-col p-3">
         <div className="">
           {isAlertOpen && (
@@ -34,7 +34,7 @@ const VerifyAccount = () => {
             theme === "light" ? "text-slate-800" : ""
           } my-8 bg-300 rounded-xl p-4 shadow-md self-center`}
         >
-          We sent a code to : <span className="primary-text">{email}</span> to
+          We sent a code to : <span className="text-primary">{email}</span> to
           verify your account.
           <Form setIsAlertOpen={setIsAlertOpen} setMessage={setMessage} />
         </div>

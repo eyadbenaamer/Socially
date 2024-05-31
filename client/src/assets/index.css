@@ -79,7 +79,7 @@ svg.icon-hover:hover {
   color: var(--primary-color);
 }
 
-.icon.primary-text {
+.icon.text-primary {
   color: #4361ee !important;
 }
 
@@ -153,7 +153,6 @@ svg.icon-hover:hover {
 }
 
 .circle img {
-  width: 100%;
   font-size: 8px;
 }
 
@@ -307,7 +306,7 @@ svg.icon-hover:hover {
   background-color: var(--bg-dark-alt);
 }
 
-.primary-text {
+.text-primary {
   color: var(--primary-color);
 }
 
@@ -402,10 +401,13 @@ aside,
 }
 
 .auth label {
-  font-size: 0.75rem;
+  color: var(--primary-color);
+  display: block;
+  margin-bottom: 6px;
 }
 
 .dark .auth select,
+.dark .auth textarea,
 .dark .auth input:not([name="password"]):not([name="confirmPassword"]),
 .dark .auth option {
   background-color: var(--bg-dark-alt);
@@ -416,6 +418,7 @@ aside,
 }
 
 .light .auth select,
+.light .auth textarea,
 .light .auth input:not([name="password"]):not([name="confirmPassword"]),
 .light .auth option {
   background-color: var(--bg-light-200);

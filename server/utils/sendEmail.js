@@ -38,7 +38,7 @@ export const sendResetPasswordCode = async (email, code, token) => {
       html: `
       <div>
         <div>code: ${code}</div>
-        <div>or visit this link: <a>${process.env.APP_URL}/verify-account/${token}</a></div>
+        <div>or visit this link: <a href="${process.env.APP_URL}/verify-account/${token}">click here</a></div>
       </div>
       `,
     });

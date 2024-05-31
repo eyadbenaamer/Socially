@@ -6,6 +6,7 @@ import {
   unfollow,
   removeFollower,
   getFollowing,
+  checkUsernameAvailability,
 } from "../controllers/profile.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
@@ -16,6 +17,11 @@ const router = Router();
 router.get("/", verifyId, getProfile);
 router.get("/following", verifyId, getFollowing);
 router.get("/followers", verifyId, getFollowers);
+router.post(
+  "/check_username_availability",
+  verifyId,
+  checkUsernameAvailability
+);
 
 /*UPDATE*/
 router.patch("/follow", verifyId, verifyToken, follow);

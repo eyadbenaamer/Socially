@@ -14,13 +14,13 @@ import Notifications from "pages/notifications";
 import SavedPosts from "pages/saved-posts";
 import Messages from "pages/messages";
 import ResetPassword from "pages/reset-password";
-import SetProfile from "pages/set-profile";
 import Post from "pages/post";
 import NotFound from "pages/NotFound";
 import VerifyAccountByLink from "pages/VerifyAccountByLink";
 
 import Header from "components/header";
 import InfoMessage from "components/InfoMessage";
+import Welcome from "pages/welcome";
 
 const App = () => {
   //if user is stored in redux state, then the user is logged in
@@ -104,7 +104,7 @@ const App = () => {
                 isLoggedin && !isVerified ? (
                   <VerifyAccount />
                 ) : isLoggedin && email && isVerified ? (
-                  <Navigate to="/set-profile" replace={true} />
+                  <Navigate to="/welcome" replace={true} />
                 ) : (
                   <Navigate to="/" />
                 )
@@ -116,7 +116,7 @@ const App = () => {
                 !isLoggedin || (isLoggedin && !isVerified) ? (
                   <VerifyAccountByLink />
                 ) : isLoggedin && email && isVerified ? (
-                  <Navigate to="/set-profile" replace={true} />
+                  <Navigate to="/welcome" replace={true} />
                 ) : (
                   <Navigate to="/" />
                 )
@@ -143,10 +143,10 @@ const App = () => {
               }
             />
             <Route
-              path="/set-profile"
+              path="/welcome"
               element={
                 isLoggedin && isVerified && email ? (
-                  <SetProfile />
+                  <Welcome />
                 ) : isLoggedin && !isVerified && email ? (
                   <Navigate to="/verify-account" replace={true} />
                 ) : (

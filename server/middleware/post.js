@@ -43,29 +43,3 @@ export const getPostsInfo = async (req, res, next) => {
       .json({ message: "An error occurred. Plaese try again later." });
   }
 };
-
-export const uploadSingleFile = (req, res, next) => {
-  try {
-    const uploadsFolder = `${process.env.API_URL}/storage/`;
-
-    const { file } = req;
-    if (file) {
-      if (file.mimetype.startsWith("image")) {
-        req.fileInfo = {
-          path: `${uploadsFolder}${file.filename}`,
-          fileType: "photo",
-        };
-      } else if (file.mimetype.startsWith("video")) {
-        req.fileInfo = {
-          path: `${uploadsFolder}${file.filename}`,
-          fileType: "video",
-        };
-      }
-    }
-    next();
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
-  }
-};

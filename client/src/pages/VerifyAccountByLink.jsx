@@ -39,7 +39,7 @@ const VerifyAccountByLink = () => {
   return (
     <>
       {/* once the account is verified, the router will redirect to the set profile page*/}
-      {isVerified && <Navigate to={"/set-profile"} />}
+      {isVerified && <Navigate to={"/welcome"} />}
       {message && (
         <div
           className="container flex flex-col items-center p-3 text-2xl text-center justify-center"
