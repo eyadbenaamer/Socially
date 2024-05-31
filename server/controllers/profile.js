@@ -17,6 +17,7 @@ export const getProfile = async (req, res) => {
       .json({ message: "An error occurred. Plaese try again later." });
   }
 };
+
 export const getFollowers = async (req, res) => {
   try {
     const { id } = req.query;
@@ -33,6 +34,7 @@ export const getFollowers = async (req, res) => {
       .json({ message: "An error occurred. Plaese try again later." });
   }
 };
+
 export const getFollowing = async (req, res) => {
   try {
     const { id } = req.query;
@@ -49,38 +51,64 @@ export const getFollowing = async (req, res) => {
       .json({ message: "An error occurred. Plaese try again later." });
   }
 };
-/*UPDATE*/
 
-export const setProfile = async (req, res) => {
+export const checkUsernameAvailability = async (req, res) => {
   try {
-    const { id } = req.user;
-    const { avatar, cover } = req.files;
-    const { bio, birthDate, location } = req.body;
-    const profile = await Profile.findById(id);
-    if (avatar) {
-      profile.avatarPath = `${process.env.API_URL}/storage/${avatar.filename}`;
+    const { username } = req.body;
+    const profile = await Profile.findOne({ username });
+    if (profile) {
+      return res.status(409).json({ message: "This username is taken." });
     }
-    if (cover) {
-      profile.coverPath = `${process.env.API_URL}/storage/${cover.filename}`;
-    }
-    if (bio) {
-      profile.bio = bio;
-    }
-    if (birthDate) {
-      profile.birthDate = birthDate;
-    }
-    if (location) {
-      profile.location = location;
-    }
-
-    await profile.save();
-    return res.status(200).json({ token: req.user.token, ...profile._doc });
+    return res.status(200).json({ message: "username is available." });
   } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
   }
 };
+
+/*UPDATE*/
+
+export const setProfile = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const coverPic = req.files.coverPic ? req.files.coverPic[0] : null;
+    const profilePic = req.files.profilePic ? req.files.profilePic[0] : null;
+    const { username, bio, location } = req.body;
+    const profile = await Profile.findById(id);
+    // setting user name is optional because is has a default value.
+    if (username) {
+      /*
+      if the user chose to set it, then we need to check if it't taken or not, if so 
+      the response will return an error that the username must be unique.
+      */
+      if (await Profile.findOne({ username })) {
+        return res.status(409).json({ message: "This username is taken." });
+      }
+      profile.username = username;
+    }
+    if (profilePic) {
+      profile.profilePicPath = `${process.env.API_URL}/storage/${profilePic.filename}`;
+    }
+    if (coverPic) {
+      profile.coverPicPath = `${process.env.API_URL}/storage/${coverPic.filename}`;
+    }
+    if (bio) {
+      profile.bio = bio;
+    }
+
+    if (location) {
+      profile.location = location;
+    }
+    await profile.save();
+    return res.status(200).json(profile);
+  } catch {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
+  }
+};
+
 export const follow = async (req, res) => {
   try {
     const { id } = req.user;
@@ -107,6 +135,7 @@ export const follow = async (req, res) => {
       .json({ message: "An error occurred. Plaese try again later." });
   }
 };
+
 export const unfollow = async (req, res) => {
   try {
     const { id } = req.user;
@@ -138,6 +167,7 @@ export const unfollow = async (req, res) => {
       .json({ message: "An error occurred. Plaese try again later." });
   }
 };
+
 export const removeFollower = async (req, res) => {
   try {
     const { id } = req.user;
