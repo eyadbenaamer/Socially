@@ -62,13 +62,13 @@ const EmailInput = (props) => {
 
   return (
     <>
-      <label htmlFor="eamil">Email</label>
+      <label htmlFor="email">Email</label>
       <div className="flex gap-2 items-center">
         <input
           tabIndex={1}
           ref={input}
           defaultValue={fieldValue}
-          placeholder={placeholder === null ? "email.example.com" : ""}
+          placeholder={!placeholder ? "email.example.com" : ""}
           style={{
             borderRadius: 8,
             boxShadow: "0px 1px 3px 0px #00000026",
