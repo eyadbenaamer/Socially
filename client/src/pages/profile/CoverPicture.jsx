@@ -14,16 +14,21 @@ const CoverPicture = () => {
           borderBottomRightRadius: 16,
         }}
       >
-        {coverPicPath && <div className="loading w-full h-full absolute"></div>}
-        <img
-          loading="lazy"
-          className="h-full w-full"
-          src={coverPicPath}
-          // when the image is loaded remove the loading effect
-          onLoad={() =>
-            document.querySelector(".cover-image-container .loading").remove()
-          }
-        />
+        {coverPicPath && (
+          <div className="loading w-full h-full absolute">
+            <img
+              loading="lazy"
+              className="h-full w-full"
+              src={coverPicPath}
+              // when the image is loaded remove the loading effect
+              onLoad={() =>
+                document
+                  .querySelector(".cover-image-container .loading")
+                  .remove()
+              }
+            />
+          </div>
+        )}
       </div>
       <div className="profile-image-container absolute -translate-y-[50%] translate-x-5 circle w-32 sm:w-36 border-2 bg-300">
         <div className="loading w-full h-full">
