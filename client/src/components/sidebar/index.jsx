@@ -21,7 +21,7 @@ const Sidebar = () => {
           />
         </SidebarItem>
         <SidebarItem
-          to={`/profile/${profile._id}`}
+          to={`/profile/${profile.username}`}
           name={`${profile.firstName} ${profile.lastName}`}
         >
           <span className="circle w-9 border-2">

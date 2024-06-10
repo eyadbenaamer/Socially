@@ -25,17 +25,13 @@ const Reply = (props) => {
       {props.reply && profile && (
         <div className="flex items-start">
           <div className="flex scale-75">
-            <UserPicture
-              id={profile._id}
-              src={profile.profilePicPath}
-              name={`${profile.firstName} ${profile.lastName}`}
-            />
+            <UserPicture profile={profile} />
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center">
               <div className="bg-300 rounded-xl shadow-md px-3 py-2 w-fit">
                 <Link
-                  to={`/profile/${profile._id}`}
+                  to={`/profile/${profile.username}`}
                   className="hover:underline"
                 >
                   {profile.firstName} {profile.lastName}

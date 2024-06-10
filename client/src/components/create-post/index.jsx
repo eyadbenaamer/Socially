@@ -15,25 +15,21 @@ const CreatePost = () => {
   const [isOpened, setIsOpened] = useState(false);
   const [data, setData] = useState({ text: "", location: "" });
 
-  const { id: userIdParam } = useParams();
+  const { username: usernameParam } = useParams();
 
   const theme = useSelector((state) => state.settings.theme);
 
   return (
     <>
       {/* the component will be rendered only on home page and the user's profile */}
-      {(!userIdParam || profile._id == userIdParam) && (
+      {(!usernameParam || profile?.username == usernameParam) && (
         <section
           className={`create-post bg-200 w-full px-4 pt-5 pb-1 rounded-xl flex flex-col gap-3 shadow-md ${
             theme === "light" ? "border" : ""
           }`}
         >
           <div className="flex gap-3 items-center">
-            <UserPicture
-              id={profile._id}
-              src={profile.profilePicPath}
-              name={`${profile.firstName} ${profile.lastName}`}
-            />
+            <UserPicture profile={profile} />
             <div
               onClick={() => setIsOpened(!isOpened)}
               className="cursor-pointer h-[2.75rem] text-ellipsis overflow-clip rounded-xl bg-300 p-2 w-full shadow-md"

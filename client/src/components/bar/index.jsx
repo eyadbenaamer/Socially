@@ -23,7 +23,7 @@ const Bar = () => {
           />
         </BarItem>
 
-        <BarItem to={`/profile/${profile._id}`}>
+        <BarItem to={`/profile/${profile.username}`}>
           <span className="circle w-9 border-[1px]">
             <img className="h-full w-full" src={profile.profilePicPath} />
           </span>

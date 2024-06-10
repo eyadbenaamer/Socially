@@ -182,7 +182,7 @@ const App = () => {
                 isLoggedin ? <SavedPosts /> : <Navigate to="/" replace={true} />
               }
             />
-            <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/profile/:username" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <InfoMessage />

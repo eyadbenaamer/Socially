@@ -32,14 +32,10 @@ const WhoLiked = (props) => {
                 key={profile._id}
                 className="flex gap-2 items-center"
               >
-                <UserPicture
-                  id={profile._id}
-                  src={profile.profilePicPath}
-                  name={`${profile.firstName} ${profile.lastName}`}
-                />
+                <UserPicture profile={profile} />
                 <Link
                   reloadDocument={true}
-                  to={`/profile/${profile._id}`}
+                  to={`/profile/${profile.username}`}
                   className="hover:underline"
                 >
                   {profile.firstName} {profile.lastName}

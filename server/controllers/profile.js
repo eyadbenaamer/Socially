@@ -5,12 +5,29 @@ import User from "../models/user.js";
 
 export const getProfile = async (req, res) => {
   try {
-    const { id } = req.query;
-    const profile = await Profile.findById(id);
-    if (!profile) {
-      return res.status(404).json({ message: "user not found" });
+    const { id, username } = req.query;
+    /*
+    a profile can be retrieved ether with a username or an ID
+    just one method should be used, if ID and username both exist or they both
+    not exist then return bad request.
+   */
+    if (id && !username) {
+      const profile = await Profile.findById(id);
+      if (!profile) {
+        return res.status(404).json({ message: "user not found" });
+      }
+      return res.status(200).json(profile);
     }
-    return res.status(200).json(profile);
+    if (username && !id) {
+      const profile = await Profile.findOne({ username });
+      if (!profile) {
+        return res.status(404).json({ message: "user not found" });
+      }
+      return res.status(200).json(profile);
+    }
+    if ((!id && !username) || (id && username)) {
+      return res.status(400).send("bad request");
+    }
   } catch {
     return res
       .status(500)

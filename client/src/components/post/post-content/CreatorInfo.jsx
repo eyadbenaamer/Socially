@@ -14,19 +14,15 @@ const CreatorInfo = (props) => {
     <>
       {profile && (
         <div className="flex gap-3">
-          <UserPicture
-            id={profile._id}
-            src={profile.profilePicPath}
-            name={`${profile.firstName} ${profile.lastName}`}
-          />
+          <UserPicture profile={profile} />
           <div className="flex flex-col">
-            <Link to={`/profile/${profile._id}`}>
+            <Link to={`/profile/${profile.username}`}>
               <span className=" hover:underline cursor-pointer">
                 {profile.firstName} {profile.lastName}
               </span>
             </Link>
             <Link
-              to={`/post/${profile._id}/${postId}`}
+              to={`/post/${profile.username}/${postId}`}
               className="flex gap-1 text-slate-400 text-xs hover:underline"
             >
               <span>{time}</span>

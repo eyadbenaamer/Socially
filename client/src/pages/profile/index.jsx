@@ -18,20 +18,20 @@ export const ProfileContext = createContext();
 
 const Profile = () => {
   const windowWidth = useWindowWidth();
-  const { id } = useParams();
+  const { username } = useParams();
   const myProfile = useSelector((state) => state.profile);
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     const getUser = () => {
-      axiosClient(`profile?id=${id}`)
+      axiosClient(`profile?username=${username}`)
         .then((response) => {
           setProfile(response.data);
         })
         .catch(() => setProfile("not found"));
     };
     getUser();
-  }, [id]);
+  }, [username]);
 
   return (
     <ProfileContext.Provider value={{ ...profile, setProfile }}>
@@ -42,10 +42,8 @@ const Profile = () => {
             <div className="mb-20">
               <CoverPicture />
               <div dir="rtl" className="absolute w-[95%] my-5">
-                {myProfile && myProfile === id ? (
-                  <FollowingStatus />
-                ) : (
-                  <FollowToggleBtn id={id} />
+                {myProfile && myProfile.username !== username && (
+                  <FollowToggleBtn id={profile.id} />
                 )}
               </div>
             </div>
