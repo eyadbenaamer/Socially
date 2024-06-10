@@ -23,6 +23,7 @@ const Delete = () => {
     await axiosClient
       .delete(`post/delete?userId=${creatorId}&postId=${postId}`)
       .then(() => {
+        document.body.style = null;
         setIsOpen(false);
 
         /*
@@ -56,7 +57,7 @@ const Delete = () => {
           </div>
           <div className="flex justify-between mt-2">
             <PrimaryBtn onClick={() => setIsOpen(false)}>Cancel</PrimaryBtn>
-            <RedBtn onClick={async () => await deletePost()}>Delete</RedBtn>
+            <RedBtn onClick={deletePost}>Delete</RedBtn>
           </div>
         </div>
       </Dialog>

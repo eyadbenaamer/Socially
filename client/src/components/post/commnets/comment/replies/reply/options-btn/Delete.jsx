@@ -20,6 +20,7 @@ const Delete = (props) => {
         `reply/delete?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`
       )
       .then((response) => {
+        document.body.style = null;
         setIsOpen((prev) => !prev);
         setPost(response.data);
       });
