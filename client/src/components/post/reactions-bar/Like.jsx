@@ -47,11 +47,11 @@ const Like = (props) => {
       // makeing a request to update like status, if it failed then the likes will be restored
       let url;
       if (type === "post") {
-        url = `post/like?userId=${userId}&postId=${postId}`;
+        url = `post/like-toggle?userId=${userId}&postId=${postId}`;
       } else if (type === "comment") {
-        url = `comment/like?userId=${userId}&postId=${postId}&commentId=${commentId}`;
+        url = `comment/like-toggle?userId=${userId}&postId=${postId}&commentId=${commentId}`;
       } else {
-        url = `reply/like?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
+        url = `reply/like-toggle?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
       }
       axiosClient
         .patch(url)

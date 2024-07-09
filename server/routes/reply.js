@@ -13,7 +13,7 @@ router.get("/", verifyId, getPostsInfo, get);
 /*UPDATE*/
 
 router.patch("/edit", verifyId, verifyToken, getPostsInfo, edit);
-router.patch("/like", verifyId, verifyToken, getPostsInfo, like);
+router.patch("/like-toggle", verifyId, verifyToken, getPostsInfo, like);
 
 /*DELETE*/
 

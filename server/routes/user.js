@@ -22,4 +22,5 @@ router.get(
   getPostsInfo,
   toggleSavePost
 );
+
 export default router;

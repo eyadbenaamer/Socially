@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import Alert from "components/alert/index.jsx";
 import Form from "./Form.jsx";
-import { clearSignupFields } from "state/index.js";
+import { clearSessionStorage } from "state/index.js";
 
 const VerifyAccount = () => {
   const { email, isVerified } = useSelector((state) => state.authStatus);
@@ -12,7 +12,7 @@ const VerifyAccount = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const theme = useSelector((state) => state.settings.theme);
   const dispatch = useDispatch();
-  dispatch(clearSignupFields());
+  dispatch(clearSessionStorage());
 
   return (
     <>

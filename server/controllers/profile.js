@@ -128,23 +128,25 @@ export const setProfile = async (req, res) => {
 
 export const follow = async (req, res) => {
   try {
-    const { id } = req.user;
+    const { user } = req;
+    const myId = user.id;
     const { userId } = req.query;
-    if (id == userId) {
+    if (myId == userId) {
       return res.status(409).json({ error: "cannot follow yourself" });
     }
-    const profile = await Profile.findById(id);
-    const accountToFollow = await Profile.findById(userId);
-    if (!accountToFollow) {
+    const profile = await Profile.findById(myId);
+    const profileToFollow = await Profile.findById(userId);
+    if (!profileToFollow) {
       return res.status(400).send("bad request");
     }
     if (profile.following.includes(userId)) {
       return res.status(409).json({ error: "already followed" });
     }
     profile.following.push(userId);
-    accountToFollow.followers.push(id);
+    profileToFollow.followers.push(myId);
+
     await profile.save();
-    await accountToFollow.save();
+    await profileToFollow.save();
     return res.status(200).json(profile);
   } catch {
     return res

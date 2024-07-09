@@ -1,5 +1,4 @@
-import { useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useContext, useState } from "react";
 
 import DropZone from "components/dropzone";
 import { PostsContext } from "components/posts";

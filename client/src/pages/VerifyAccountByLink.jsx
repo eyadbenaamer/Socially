@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { clearSignupFields, setAuthStatus, setProfile } from "state/index.js";
+import { clearSessionStorage, setAuthStatus, setProfile } from "state/index.js";
 
 import axiosClient from "utils/AxiosClient.js";
 
@@ -12,7 +12,7 @@ const VerifyAccountByLink = () => {
   const { isVerified } = useSelector((state) => state.authStatus);
   const [message, setMessage] = useState("");
   const dispatch = useDispatch();
-  dispatch(clearSignupFields());
+  dispatch(clearSessionStorage());
   const { token } = useParams();
 
   useEffect(() => {

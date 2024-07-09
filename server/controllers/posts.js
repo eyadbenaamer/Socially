@@ -42,8 +42,7 @@ export const getFeedPosts = async (req, res) => {
     });
     // }
     return res.status(200).json({ posts: finalPostsCollection });
-  } catch (error) {
-    console.log(error);
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });

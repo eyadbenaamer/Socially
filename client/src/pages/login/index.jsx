@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { clearSignupFields, setResetPasswordInfo } from "state";
+import { clearSessionStorage, setResetPasswordInfo } from "state";
 
 import Form from "./Form";
 
@@ -10,7 +10,7 @@ const Login = () => {
   const dispatch = useDispatch();
 
   // clear stored fields in signup and reset password pages
-  dispatch(clearSignupFields());
+  dispatch(clearSessionStorage());
   dispatch(setResetPasswordInfo(null));
 
   return (

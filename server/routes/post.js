@@ -19,7 +19,7 @@ router.get("/", verifyId, getPostsInfo, getPost);
 /*UPDATE*/
 router.patch("/edit", verifyId, verifyToken, getPostsInfo, edit);
 
-router.patch("/like", verifyId, verifyToken, getPostsInfo, likeToggle);
+router.patch("/like-toggle", verifyId, verifyToken, getPostsInfo, likeToggle);
 
 router.patch(
   "/toggle_comments",

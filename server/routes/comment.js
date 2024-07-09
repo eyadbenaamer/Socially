@@ -17,7 +17,7 @@ const router = express.Router();
 router.get("/", verifyId, getPostsInfo, get);
 
 /*UPDATE*/
-router.patch("/like", verifyId, verifyToken, getPostsInfo, likeToggle);
+router.patch("/like-toggle", verifyId, verifyToken, getPostsInfo, likeToggle);
 
 router.patch("/edit", verifyId, verifyToken, getPostsInfo, edit);
 

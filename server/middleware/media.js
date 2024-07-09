@@ -1,9 +1,10 @@
 import fs from "fs";
 import sharp from "sharp";
 
+const uploadsFolder = `${process.env.API_URL}/storage/`;
+
 export const compressImages = async (req, res, next) => {
   try {
-    // let { media } = req.files;
     for (const key in req.files) {
       let item = req.files[key];
       if (key) {
@@ -26,14 +27,30 @@ export const compressImages = async (req, res, next) => {
         });
       }
     }
+    let { media } = req.files;
+    let filesInfo = [];
+    if (media) {
+      media.map((file) => {
+        if (file.mimetype.startsWith("image")) {
+          filesInfo.push({
+            path: `${uploadsFolder}${file.filename}`,
+            fileType: "photo",
+          });
+        } else if (file.mimetype.startsWith("video")) {
+          filesInfo.push({
+            path: `${uploadsFolder}${file.filename}`,
+            fileType: "vedio",
+          });
+        }
+      });
+    }
+    req.filesInfo = filesInfo;
   } catch {}
   next();
 };
 
 export const uploadSingleFile = (req, res, next) => {
   try {
-    const uploadsFolder = `${process.env.API_URL}/storage/`;
-
     const { file } = req;
     if (file) {
       if (file.mimetype.startsWith("image")) {

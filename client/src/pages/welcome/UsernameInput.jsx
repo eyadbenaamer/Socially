@@ -19,7 +19,6 @@ const UsernameInput = (props) => {
   so we need to verify that value once the component is loaded for the first time.
   */
   useEffect(() => {
-    console.log(fieldValue);
     if (fieldValue) {
       verifyValue();
     }

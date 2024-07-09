@@ -1,29 +1,15 @@
+import fs from "fs";
 import Posts from "../models/posts.js";
 
 /*CREATE*/
 
 export const create = async (req, res) => {
-  const uploadsFolder = `${process.env.API_URL}/storage/`;
   try {
     const { id } = req.user;
     let { text, location } = req.body;
+    const { filesInfo } = req;
     const { media } = req.files;
-    let filesInfo = [];
-    if (media) {
-      media.map((file) => {
-        if (file.mimetype.startsWith("image")) {
-          filesInfo.push({
-            path: `${uploadsFolder}${file.filename}`,
-            fileType: "photo",
-          });
-        } else if (file.mimetype.startsWith("video")) {
-          filesInfo.push({
-            path: `${uploadsFolder}${file.filename}`,
-            fileType: "vedio",
-          });
-        }
-      });
-    }
+
     const newPost = {
       creatorId: id.trim(),
       text: text.trim(),
@@ -167,12 +153,15 @@ export const likeToggle = async (req, res) => {
 
 export const setViewed = async (req, res) => {
   try {
-    const { user, postList, post } = req;
+    const { user } = req;
+    const { userId, postId } = req.query;
+    const postList = await Posts.findById(userId);
+    const post = postList.posts.id(postId);
     if (post.views.includes(user.id)) {
       return res.status(409).json({ message: "Already viewed." });
     }
     post.views.push(user.id);
-    await postList.save();
+    await postList.updateOne(postList);
     return res.status(200).send("viewed");
   } catch {
     return res
@@ -189,6 +178,12 @@ export const deletePost = async (req, res) => {
     if (post.creatorId === user.id) {
       postList.posts = postList.posts.filter((item) => item.id != post.id);
       await postList.save();
+      // delete the attached files from the storage
+      post.files?.map((file) => {
+        const filename = `./public/storage/${file.path.split("/").at(-1)}`;
+        fs.unlinkSync(filename);
+      });
+
       return res.status(200).json({ message: "post deleted successfully" });
     } else {
       return res.status(401).send("Unauthorized");

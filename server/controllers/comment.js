@@ -36,8 +36,7 @@ export const add = async (req, res) => {
     } else {
       return res.status(400).json({ error: "comment cannot be empty" });
     }
-  } catch (error) {
-    console.log(error);
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });

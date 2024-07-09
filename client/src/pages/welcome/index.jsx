@@ -25,7 +25,6 @@ const Welcome = () => {
   const dispatch = useDispatch();
 
   const checkValues = () => {
-    console.log(isValidInputs);
     if (data.bio.length <= 1000) {
       setIsValidInputs((prev) => ({ ...prev, bio: true }));
     } else {
