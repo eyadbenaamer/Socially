@@ -22,7 +22,7 @@ const CreatorInfo = (props) => {
               </span>
             </Link>
             <Link
-              to={`/post/${profile.username}/${postId}`}
+              to={`/post/${profile._id}/${postId}`}
               className="flex gap-1 text-slate-400 text-xs hover:underline"
             >
               <span>{time}</span>

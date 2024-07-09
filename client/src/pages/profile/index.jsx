@@ -36,20 +36,20 @@ const Profile = () => {
   return (
     <ProfileContext.Provider value={{ ...profile, setProfile }}>
       {profile === "not found" && <NotFound />}
-      {profile && (
+      {profile?._id && (
         <>
           <div className="container relative center px-2">
             <div className="mb-20">
               <CoverPicture />
               <div dir="rtl" className="absolute w-[95%] my-5">
                 {myProfile && myProfile.username !== username && (
-                  <FollowToggleBtn id={profile.id} />
+                  <FollowToggleBtn id={profile._id} />
                 )}
               </div>
             </div>
             <AboutUser />
+            {profile && <Content profile={profile} />}
           </div>
-          {profile && <Content profile={profile} />}
         </>
       )}
       {windowWidth <= 768 && myProfile && <Bar />}
