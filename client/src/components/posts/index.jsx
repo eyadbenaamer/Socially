@@ -1,27 +1,29 @@
-import { useState, useEffect, useRef, createContext } from "react";
+import { useState, useEffect, useRef, createContext, useContext } from "react";
 
 import Post from "components/post";
-
-import axiosClient from "utils/AxiosClient";
 import CreatePost from "components/create-post";
 import LoadingPost from "./LoadingPost";
 import NoConnectionMessage from "./NoConnectionMessage";
 
+import axiosClient from "utils/AxiosClient";
+import { ProfileContext } from "pages/profile";
+
 export const PostsContext = createContext();
 
-const Posts = (props) => {
-  const { id } = props;
+const Posts = () => {
+  const username = useContext(ProfileContext)?.username;
+  const userId = useContext(ProfileContext)?._id;
   const [currentPage, setCurrentPage] = useState(1);
   const [message, setMessage] = useState(null);
-  const [posts, setPosts] = useState(null);
+  const [posts, setPosts] = useState([]);
 
   const postsEnd = useRef();
 
   const [totalPages, setTotalPages] = useState(2);
 
   const fetchPosts = () => {
-    const requestURL = id
-      ? `posts/user?userId=${id}&page=${currentPage}`
+    const requestURL = userId
+      ? `posts/user?userId=${userId}&page=${currentPage}`
       : `posts`;
     axiosClient
       .get(requestURL)
@@ -43,8 +45,20 @@ const Posts = (props) => {
   };
   // fetch posts once after loading the page
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    const requestURL = userId
+      ? `posts/user?userId=${userId}&page=${1}`
+      : `posts`;
+    axiosClient
+      .get(requestURL)
+      .then((response) => {
+        setTotalPages(response.data.totalPages);
+        setCurrentPage(currentPage + 1);
+        setPosts(response.data.posts);
+      })
+      .catch(() => {
+        setMessage("An error occurred. please try again later.");
+      });
+  }, [username]);
   /*
   fetch posts whenever scrolling reaches to the half distance between the 
   first and the last loaded post, i.e: having 10 posts, when scrolling reaches 
