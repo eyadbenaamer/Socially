@@ -34,7 +34,6 @@ const WhoLiked = (props) => {
               >
                 <UserPicture profile={profile} />
                 <Link
-                  reloadDocument={true}
                   to={`/profile/${profile.username}`}
                   className="hover:underline"
                 >

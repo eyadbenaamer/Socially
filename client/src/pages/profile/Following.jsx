@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import Dialog from "components/dialog";
 import UserPicture from "components/UserPicture";
@@ -16,6 +16,11 @@ const Following = () => {
   const [users, setUsers] = useState([]);
   const [showFollowing, setShowFollowing] = useState(false);
   const myProfile = useSelector((state) => state.profile);
+
+  // close this widget whenever the profile param is changed
+  useEffect(() => {
+    setShowFollowing(false);
+  }, [useParams()]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -52,11 +57,7 @@ const Following = () => {
                 <li className="flex items-center justify-between">
                   <div className="account flex gap-2 items-center">
                     <UserPicture profile={user} />
-                    <Link
-                      to={`/profile/${username}`}
-                      reloadDocument
-                      className="link"
-                    >
+                    <Link to={`/profile/${username}`} className="link">
                       {firstName} {lastName}
                     </Link>
                   </div>
