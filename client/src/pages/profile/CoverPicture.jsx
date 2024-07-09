@@ -38,7 +38,7 @@ const CoverPicture = () => {
               // when the image is loaded remove the loading effect
               document
                 .querySelector(".profile-image-container .loading")
-                .classList.remove("loading");
+                ?.classList.remove("loading");
             }}
             className="h-full max-w-fit min-w-full"
             src={profilePicPath}

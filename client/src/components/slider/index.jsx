@@ -65,7 +65,7 @@ const Slider = (props) => {
       </div>
 
       {files?.length > 1 && (
-        <div className="bullets flex gap-1 my-0 mx-auto">
+        <div className="bullets w-fit flex gap-1 my-0 mx-auto">
           {files.map((flie, i) => {
             return (
               <div
