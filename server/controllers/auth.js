@@ -1,14 +1,17 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
-import { generateCode } from "../utils/generateCode.js";
 import Posts from "../models/posts.js";
+
+import { generateCode } from "../utils/generateCode.js";
 
 import {
   sendAccountVerificationCode,
   sendResetPasswordCode,
 } from "../utils/sendEmail.js";
+import { getOnlineUsers } from "../socket/onlineUsers.js";
 
 /*REGISTER USER*/
 
@@ -45,7 +48,7 @@ export const signup = async (req, res) => {
     // sends the verification code to the user's email address
     await sendResetPasswordCode(email, verificationCode, verificationToken);
     newUser.verificationStatus.verificationToken = verificationToken;
-    newUser.save();
+    await newUser.save();
     // create a profile document for the new user with the user's ID
     const profilesCount = await Profile.count();
     const newProfile = new Profile({
@@ -56,10 +59,11 @@ export const signup = async (req, res) => {
       birthDate,
       gender,
     });
+    newProfile.save();
+
     // create a posts document for the new user with the user's ID
     const newPostList = new Posts({ id: newUser.id });
-    newPostList.save();
-    newProfile.save();
+    await newPostList.save();
     return res.status(201).send("user created.");
   } catch {
     return res
@@ -146,8 +150,8 @@ export const login = async (req, res) => {
       });
     }
     /*
-    if the email is verified and it's correct as well as the password, then a token
-    will be created and returned to the user
+    if the email is verified and it's correct as well as the password,
+    then a token will be created and returned to the user
     */
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: process.env.TOKEN_EXPIRATION,
@@ -155,7 +159,19 @@ export const login = async (req, res) => {
     res.cookie("token", token, { maxAge: 500000, signed: true });
 
     const profile = await Profile.findById(user.id);
-    return res.status(200).json({ isVerified, token, profile });
+
+    // send the users's contact with activity status
+    const onlineUsers = getOnlineUsers();
+    const contacts = [];
+    user.contacts.map((contact) => {
+      if (onlineUsers.get(contact.id)) {
+        contacts.push({ _id: contact.id, isOnline: true });
+      } else {
+        contacts.push({ _id: contact.id, isOnline: false });
+      }
+    });
+
+    return res.status(200).json({ isVerified, token, profile, contacts });
   } catch {
     return res
       .status(500)

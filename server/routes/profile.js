@@ -10,6 +10,7 @@ import {
 } from "../controllers/profile.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
+import { establishNewConversation } from "../middleware/conversation.js";
 
 const router = Router();
 
@@ -24,7 +25,13 @@ router.post(
 );
 
 /*UPDATE*/
-router.patch("/follow", verifyId, verifyToken, follow);
+router.patch(
+  "/follow",
+  verifyId,
+  verifyToken,
+  establishNewConversation,
+  follow
+);
 router.patch("/unfollow", verifyId, verifyToken, unfollow);
 router.patch("/remove_follower", verifyId, verifyToken, removeFollower);
 export default router;

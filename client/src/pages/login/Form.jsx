@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setAuthStatus, setProfile } from "state";
+import { setAuthStatus, setContacts, setProfile } from "state";
 
 import SubmitBtn from "components/SubmitBtn";
 
@@ -19,7 +19,6 @@ const Form = () => {
   const theme = useSelector((state) => state.settings.theme);
   const [passwordInputType, setPasswordInputType] = useState("password");
   const [inputError, setInputError] = useState({ email: "", password: "" });
-
   const handleEnterSubmit = (e) => {
     if (e.key === "Enter") {
       submitButton.current.click();
@@ -30,9 +29,10 @@ const Form = () => {
     await axiosClient
       .post(`/login`, data)
       .then((response) => {
-        const { token, profile, isVerified } = response.data;
+        const { token, profile, isVerified, contacts } = response.data;
         localStorage.setItem("token", token);
         dispatch(setProfile(profile));
+        dispatch(setContacts(contacts));
         dispatch(
           setAuthStatus({
             email: "",

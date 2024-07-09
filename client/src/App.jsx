@@ -22,6 +22,9 @@ import Header from "components/header";
 import InfoMessage from "components/InfoMessage";
 import Welcome from "pages/welcome";
 
+import useHandleSocket, { connectToSocketServer } from "hooks/useHandleSocket";
+import useFetchInitial from "hooks/useFetchInitial";
+
 const App = () => {
   //if user is stored in redux state, then the user is logged in
   const { isLoggedin, isVerified, email } = useSelector(
@@ -29,8 +32,23 @@ const App = () => {
   );
 
   const theme = useSelector((state) => state.settings.theme);
-
+  const conversations = useSelector((state) => state.conversations);
+  console.log(conversations);
   const dispatch = useDispatch();
+
+  // this hook responsible for fetching notification and conversions once the app is loaded
+  useFetchInitial();
+  /*
+  this hook responsible for updating the state of
+  conversations, notifications and online contacts.
+  */
+  useHandleSocket();
+
+  useEffect(() => {
+    if (isLoggedin) {
+      connectToSocketServer();
+    }
+  }, [isLoggedin]);
 
   useEffect(() => {
     /*

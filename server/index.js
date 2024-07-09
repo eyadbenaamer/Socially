@@ -1,4 +1,5 @@
 import express from "express";
+import { createServer } from "http";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -10,6 +11,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 
+import createSocketServer from "./socket/socketServer.js";
+
 import authRoute from "./routes/auth.js";
 import profileRoute from "./routes/profile.js";
 import userRoute from "./routes/user.js";
@@ -17,18 +20,26 @@ import postsRoute from "./routes/posts.js";
 import postRoute from "./routes/post.js";
 import commentRoute from "./routes/comment.js";
 import replyRoute from "./routes/reply.js";
+import conversationRoute from "./routes/conversation.js";
+import messageRoute from "./routes/message.js";
 
 import { setProfile } from "./controllers/profile.js";
 import { getFeedPosts } from "./controllers/posts.js";
-import { create, share } from "./controllers/post.js";
+import {
+  create as createPost,
+  share as sharePost,
+} from "./controllers/post.js";
 import { add as addComment } from "./controllers/comment.js";
 import { add as addReply } from "./controllers/reply.js";
+import { sendMessage } from "./controllers/message.js";
 
 import { verifyToken } from "./middleware/auth.js";
 import { verifyId } from "./middleware/check.js";
 import { compressImages } from "./middleware/media.js";
 import { getPostsInfo } from "./middleware/post.js";
 import { uploadSingleFile } from "./middleware/media.js";
+import { getConversationInfo } from "./middleware/conversation.js";
+import { getOnlineUsers } from "./socket/onlineUsers.js";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -71,10 +82,11 @@ app.patch(
 );
 app.post(
   "/post/create",
+  verifyId,
   verifyToken,
   upload.fields([{ name: "media", maxCount: 5 }]),
   compressImages,
-  create
+  createPost
 );
 app.post(
   "/post/share/",
@@ -82,7 +94,25 @@ app.post(
   verifyToken,
   upload.fields([{ name: "media", maxCount: 5 }]),
   compressImages,
-  share
+  sharePost
+);
+app.post(
+  "/message/send",
+  verifyId,
+  verifyToken,
+  upload.fields([{ name: "media", maxCount: 5 }]),
+  compressImages,
+  getConversationInfo,
+  sendMessage
+);
+app.post(
+  "/message/reply",
+  verifyId,
+  verifyToken,
+  upload.fields([{ name: "media", maxCount: 5 }]),
+  compressImages,
+  getConversationInfo,
+  sendMessage
 );
 app.post(
   "/comment/add",
@@ -111,6 +141,8 @@ app.use("/posts", postsRoute);
 app.use("/post", postRoute);
 app.use("/comment", commentRoute);
 app.use("/reply", replyRoute);
+app.use("/conversation", conversationRoute);
+app.use("/message", messageRoute);
 
 /*MONGOOSE SETUP*/
 const PORT = process.env.PORT;
@@ -118,9 +150,13 @@ mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
+const server = createServer(app);
+createSocketServer(server);
+// setInterval(() => {
+//   console.log(getOnlineUsers());
+// }, 2000);
 try {
-  app.listen(PORT, () => console.log(`Server Connected on Port: ${PORT}`));
+  server.listen(PORT, () => console.log(`Server Connected on Port: ${PORT}`));
 } catch (error) {
   console.error(error);
 }
