@@ -1,4 +1,4 @@
-import { createContext, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import Comments from "./commnets";
@@ -9,6 +9,7 @@ import AddComment from "./AddComment";
 import SharedPost from "components/SharedPost";
 
 import "./index.css";
+import axiosClient from "utils/AxiosClient";
 
 export const PostContext = createContext();
 
@@ -19,6 +20,18 @@ export const Post = (props) => {
 
   const profile = useSelector((state) => state.profile);
   const theme = useSelector((state) => state.settings.theme);
+
+  useEffect(() => {
+    if (profile) {
+      //if the user is not included at the post's views, then they will be included in the post's views
+      if (!post.views.find((view) => view._id === profile._id)) {
+        axiosClient
+          .patch(`/post/set_viewed?userId=${creatorId}&postId=${post._id}`)
+          .then((response) => setPost(response.data))
+          .catch(() => {});
+      }
+    }
+  }, []);
 
   const commentInput = useRef();
   return (

@@ -33,7 +33,7 @@ export const getFeedPosts = async (req, res) => {
             if the user haven't seen the post it will be included in the feed
             otherwise it will be moved to the next post to check if it's not seen
             */
-          if (!post.views.includes(profile.id)) {
+          if (!post.views.find((view) => view._id.toString() == profile.id)) {
             finalPostsCollection.push(post);
             return;
           }

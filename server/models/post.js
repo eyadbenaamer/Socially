@@ -1,5 +1,7 @@
 import { Schema, Types } from "mongoose";
 
+const { ObjectId } = Types;
+
 const ReplySchema = new Schema({
   creatorId: String,
   rootCommentId: String,
@@ -29,11 +31,11 @@ export const PostSchema = new Schema({
       fileType: String,
     },
   ],
-  likes: [],
-  views: [],
-  comments: [CommentSchema],
+  likes: { type: [String], default: [] },
+  views: { type: [{ _id: ObjectId }], default: [] },
+  comments: { type: [CommentSchema], default: [] },
   sharedPost: {
-    _id: Types.ObjectId,
+    _id: ObjectId,
     creatorId: String,
   },
   createdAt: {
