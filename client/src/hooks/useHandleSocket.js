@@ -10,14 +10,26 @@ import {
 } from "state";
 import { useEffect } from "react";
 
-let socket;
+export let socket;
 
 export const connectToSocketServer = () => {
   const token = localStorage.getItem("token");
   if (!token) {
     return;
   }
-  socket = io(process.env.REACT_APP_API_URL, { auth: { token } });
+  // if socket object is undefined then establish a socket connection
+  if (!socket) {
+    socket = io(process.env.REACT_APP_API_URL, { auth: { token } });
+    return;
+  }
+  /*
+  if socket object is defined but socket.connected is false
+  then close the existing one and establish a new connection
+  */
+  if (!socket.connected) {
+    socket.close();
+    socket = io(process.env.REACT_APP_API_URL, { auth: { token } });
+  }
 };
 
 const useHandleSocket = () => {
@@ -28,16 +40,24 @@ const useHandleSocket = () => {
       return;
     }
     socket.on("contact-connected", (data) => {
-      dispatch(updateActivityStatus({ id: data.id, isOnline: true }));
+      dispatch(
+        updateActivityStatus({ id: data.id, isOnline: true, lastSeenAt: null })
+      );
     });
     socket.on("contact-disconnected", (data) => {
-      dispatch(updateActivityStatus({ id: data.id, isOnline: false }));
-    });
-    socket.on("update-conversation", (data) => {
-      dispatch(updateConversationStatus(data));
+      dispatch(
+        updateActivityStatus({
+          id: data.id,
+          isOnline: false,
+          lastSeenAt: Date.now(),
+        })
+      );
     });
     socket.on("send-message", (data) => {
       dispatch(addMessage(data));
+    });
+    socket.on("update-conversation", (data) => {
+      dispatch(updateConversationStatus(data));
     });
     socket.on("message-like-toggle", (data) => {
       dispatch(messageLikeToggle(data));

@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import axios from "axios";
-import { logout, setAuthStatus, setProfile } from "state";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 
@@ -12,77 +10,75 @@ import Signup from "pages/signup";
 import Profile from "pages/profile";
 import Notifications from "pages/notifications";
 import SavedPosts from "pages/saved-posts";
-import Messages from "pages/messages";
+import Chat from "pages/messaging/chat";
+import Messaging from "pages/messaging";
 import ResetPassword from "pages/reset-password";
 import Post from "pages/post";
 import NotFound from "pages/NotFound";
 import VerifyAccountByLink from "pages/VerifyAccountByLink";
-
-import Header from "components/header";
-import InfoMessage from "components/InfoMessage";
 import Welcome from "pages/welcome";
 
+import Header from "components/header";
+import Bar from "components/bar";
+import InfoMessage from "components/InfoMessage";
+
 import useHandleSocket, { connectToSocketServer } from "hooks/useHandleSocket";
-import useFetchInitial from "hooks/useFetchInitial";
+import useUpdate from "hooks/useUpdate";
+import { useWindowWidth } from "hooks/useWindowWidth";
+import { setConversations } from "state";
 
 const App = () => {
   //if user is stored in redux state, then the user is logged in
   const { isLoggedin, isVerified, email } = useSelector(
     (state) => state.authStatus
   );
-
   const theme = useSelector((state) => state.settings.theme);
-  const conversations = useSelector((state) => state.conversations);
-  console.log(conversations);
+  const windowWidth = useWindowWidth();
   const dispatch = useDispatch();
 
-  // this hook responsible for fetching notification and conversions once the app is loaded
-  useFetchInitial();
   /*
-  this hook responsible for updating the state of
-  conversations, notifications and online contacts.
+  this hook responsible for updating notifications and conversions
+  and checking of authentication token once the app is loaded.
+  */
+  useUpdate();
+  /*
+  this hook responsible for handling realtime socket connections
+  conversations, notifications and online contacts connections.
   */
   useHandleSocket();
 
+  /*
+  if the app started and the user is logged in then connect to 
+  the socket server. 
+  */
   useEffect(() => {
     if (isLoggedin) {
       connectToSocketServer();
     }
-  }, [isLoggedin]);
+  }, []);
 
   useEffect(() => {
     /*
-      the app's loading effect dependes on this variable, when the app loads for the first time then
-      the loading effect will be triggered after that it won't be triggered because of this variable.
+      the app's loading effect dependes on this variable, when the app
+      loads for the first time then the loading effect will be triggered 
+      after that it won't be triggered because of this variable.
     */
-    sessionStorage.setItem("isLoaded", true);
-    /*
-    check if the token that saved in thr local storage is 
-    valid in the backend or not once the app is loaded.
-    */
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios(`${process.env.REACT_APP_API_URL}/login`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((response) => {
-          if (response.status === 200) {
-            dispatch(setProfile(response.data));
-            dispatch(setAuthStatus({ isLoggedin: true }));
-          }
-        })
-        .catch(() => {
-          dispatch(logout());
-        });
+    if (isLoggedin) {
+      sessionStorage.setItem("isLoaded", true);
+    }
+  }, [isLoggedin]);
+
+  useEffect(() => {
+    if (!sessionStorage.getItem("isLoaded")) {
+      dispatch(setConversations(null));
     }
   }, []);
 
   return (
     <BrowserRouter>
-      <div className={`App ${theme} bg-100 min-h-screen`}>
+      <div className={`App ${theme} bg-100`}>
         <Header />
         <motion.main
-          className=" min-h-screens"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "linear" }}
@@ -191,9 +187,11 @@ const App = () => {
             <Route
               path="/messages"
               element={
-                isLoggedin ? <Messages /> : <Navigate to="/" replace={true} />
+                isLoggedin ? <Messaging /> : <Navigate to="/" replace={true} />
               }
-            />
+            >
+              <Route path="/messages/:conversationId" element={<Chat />} />
+            </Route>
             <Route
               path="/saved-posts"
               element={
@@ -205,6 +203,7 @@ const App = () => {
           </Routes>
           <InfoMessage />
         </motion.main>
+        {isLoggedin && windowWidth < 1024 && <Bar />}
       </div>
     </BrowserRouter>
   );
