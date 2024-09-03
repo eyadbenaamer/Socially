@@ -12,9 +12,11 @@ const Bar = () => {
   const profile = useSelector((state) => state.profile);
   const location = useLocation();
 
+  const unreadMessagesCount = useSelector((state) => state.unreadMessagesCount);
+
   return (
-    <aside className="fixed bottom-0 bg-300 h-fit w-full z-10 border-t border-t-[#00000073] py-1">
-      <ul className="flex gap-3 items-center px-2 w-full">
+    <aside className="fixed bottom-0 bg-300 w-full h-[50px] z-10 border-t border-t-[#00000073] py-1">
+      <ul className="flex gap-3 items-center h-full px-2 w-full">
         <BarItem to={"/"}>
           <HomeIcon
             className={`icon ${
@@ -38,11 +40,18 @@ const Bar = () => {
         </BarItem>
 
         <BarItem to={"/messages"}>
-          <MessagesIcon
-            className={`icon ${
-              location.pathname === "/messages" ? "text-primary" : ""
-            }`}
-          />
+          <div className="relative w-full">
+            <MessagesIcon
+              className={`icon ${
+                location.pathname.startsWith("/messages") ? "text-primary" : ""
+              }`}
+            />
+            {unreadMessagesCount > 0 ? (
+              <div className="absolute -top-1 -right-2 circle p-[5px] bg-red-500 text-white text-xs">
+                {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+              </div>
+            ) : null}
+          </div>
         </BarItem>
 
         <BarItem to={"/saved-posts"}>

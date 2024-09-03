@@ -12,6 +12,8 @@ const Sidebar = () => {
   const profile = useSelector((state) => state.profile);
   const location = useLocation();
 
+  const unreadMessagesCount = useSelector((state) => state.unreadMessagesCount);
+
   return (
     <aside className="fixed">
       <ul className="flex flex-col gap-3 items-start px-2 w-full">
@@ -38,11 +40,18 @@ const Sidebar = () => {
         </SidebarItem>
 
         <SidebarItem to={"/messages"} name={"Messages"}>
-          <MessagesIcon
-            className={`${
-              location.pathname === "/messages" ? "text-primary" : ""
-            }`}
-          />
+          <div className="relative">
+            <MessagesIcon
+              className={`${
+                location.pathname.startsWith("/messages") ? "text-primary" : ""
+              }`}
+            />
+            {unreadMessagesCount > 0 ? (
+              <div className="absolute -top-1 -right-2 circle w-5 h-5 bg-red-500 text-white text-xs">
+                {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+              </div>
+            ) : null}
+          </div>
         </SidebarItem>
 
         <SidebarItem to={"/saved-posts"} name={"Saved Posts"}>

@@ -10,7 +10,7 @@ const BarItem = (props) => {
         onClick={() => window.scrollTo({ top: 0 })}
         to={to}
       >
-        <div className="bg-hovered flex gap-3 items-center px-3 py-2 rounded-xl">
+        <div className="bg-hovered flex gap-3 items-center px-3 py-1 rounded-xl">
           <span className="w-9 flex justify-center">{children}</span>
         </div>
       </Link>
