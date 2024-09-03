@@ -163,15 +163,27 @@ export const login = async (req, res) => {
     // send the users's contact with activity status
     const onlineUsers = getOnlineUsers();
     const contacts = [];
-    user.contacts.map((contact) => {
+    for (let i = 0; i < user.contacts.length; i++) {
+      const contact = user.contacts[i];
       if (onlineUsers.get(contact.id)) {
-        contacts.push({ _id: contact.id, isOnline: true });
+        contacts.push({ _id: contact.id, isOnline: true, lastSeenAt: null });
       } else {
-        contacts.push({ _id: contact.id, isOnline: false });
+        const contactProfile = await Profile.findById(contact.id);
+        contacts.push({
+          _id: contact.id,
+          isOnline: false,
+          lastSeenAt: contactProfile.lastSeenAt,
+        });
       }
-    });
+    }
 
-    return res.status(200).json({ isVerified, token, profile, contacts });
+    return res.status(200).json({
+      isVerified,
+      token,
+      profile,
+      contacts,
+      unreadMessagesCount: user.unreadMessagesCount,
+    });
   } catch {
     return res
       .status(500)
@@ -190,9 +202,27 @@ export const loginWithToken = async (req, res) => {
       if (!profile) {
         return res.status(404).json({ message: "User not found." });
       }
-      return res.status(200).json(profile);
+      // send the users's contact with activity status
+      const onlineUsers = getOnlineUsers();
+      const contacts = [];
+      const user = await User.findById(userInfo.id);
+      for (let i = 0; i < user.contacts.length; i++) {
+        const contact = user.contacts[i];
+        if (onlineUsers.get(contact.id)) {
+          contacts.push({ _id: contact.id, isOnline: true, lastSeenAt: null });
+        } else {
+          const contactProfile = await Profile.findById(contact.id);
+          contacts.push({
+            _id: contact.id,
+            isOnline: false,
+            lastSeenAt: contactProfile.lastSeenAt,
+          });
+        }
+      }
+      return res.status(200).json({ profile, contacts });
     }
-  } catch {
+  } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ message: "An error occurred. try again later." });

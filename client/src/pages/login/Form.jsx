@@ -2,7 +2,12 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setAuthStatus, setContacts, setProfile } from "state";
+import {
+  setAuthStatus,
+  setContacts,
+  setProfile,
+  setUnreadMessagesCount,
+} from "state";
 
 import SubmitBtn from "components/SubmitBtn";
 
@@ -10,6 +15,7 @@ import axiosClient from "utils/AxiosClient";
 
 import { ReactComponent as ShowPasswordIcon } from "assets/icons/eye.svg";
 import { ReactComponent as HidePasswordIcon } from "assets/icons/hide.svg";
+import { connectToSocketServer } from "hooks/useHandleSocket";
 
 const Form = () => {
   const [data, setData] = useState({ email: "", password: "" });
@@ -29,10 +35,17 @@ const Form = () => {
     await axiosClient
       .post(`/login`, data)
       .then((response) => {
-        const { token, profile, isVerified, contacts } = response.data;
+        const { token, profile, isVerified, contacts, unreadMessagesCount } =
+          response.data;
+        // set all accounts info once login
         localStorage.setItem("token", token);
         dispatch(setProfile(profile));
         dispatch(setContacts(contacts));
+        dispatch(setUnreadMessagesCount(unreadMessagesCount));
+
+        // connect to socket server once login
+        connectToSocketServer();
+
         dispatch(
           setAuthStatus({
             email: "",
@@ -84,6 +97,7 @@ const Form = () => {
             } p-[4px]`}
             type="text"
             name="email"
+            autoFocus
             placeholder="email"
             value={data.email}
             onChange={(e) => {

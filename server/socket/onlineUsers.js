@@ -11,6 +11,9 @@ export const addConnectedUser = (userId, socketId) => {
 
 export const removeConnectedUser = (userId, socketId) => {
   let sessions = connectedUsers.get(userId);
+  if (!sessions) {
+    return;
+  }
   if (sessions.length <= 1) {
     connectedUsers.delete(userId);
   } else {
