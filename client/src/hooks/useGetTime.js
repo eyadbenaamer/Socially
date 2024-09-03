@@ -1,46 +1,47 @@
 import { useEffect, useState } from "react";
 
-const useGetTime = (createdAt) => {
-  const [time, setTime] = useState("");
+const useGetTime = (time) => {
+  const [literalTime, setLiteralTime] = useState("");
   let updateInterval =
-    Date.now() - createdAt > 60000
+    Date.now() - time > 60000
       ? 60000
-      : Date.now() - createdAt > 3600000
+      : Date.now() - time > 3600000
       ? 3600000
       : 1000;
   const updateTime = () => {
-    let interval = Date.now() - createdAt;
+    let interval = Date.now() - time;
     if (interval > 3600000) {
       interval = Math.floor(interval / 3600000);
       if (interval < 24) {
-        setTime(`${interval}h`);
+        setLiteralTime(`${interval}h`);
       } else if (interval >= 24) {
         // clearInterval()
         interval = Math.floor(interval / 24);
         if (interval < 7) {
           let postedDay =
-            new Date(createdAt).getMonth() !== new Date().getMonth()
-              ? new Date(createdAt).getDate() - 30
-              : new Date(createdAt).getDate();
-          setTime(`${new Date().getDate() - postedDay}d`);
+            new Date(time).getMonth() !== new Date().getMonth()
+              ? new Date(time).getDate() - 30
+              : new Date(time).getDate();
+          setLiteralTime(`${new Date().getDate() - postedDay}d`);
         } else {
-          setTime(`${new Date(createdAt).toDateString()}`);
+          setLiteralTime(`${new Date(time).toDateString()}`);
         }
       }
     } else {
       interval = Math.floor(interval / 60000);
       if (interval < 1) {
-        setTime("just now");
+        setLiteralTime("just now");
       } else {
-        setTime(`${interval}m`);
+        setLiteralTime(`${interval}m`);
       }
     }
   };
   useEffect(() => {
     updateTime();
     setInterval(updateTime, updateInterval);
-  }, []);
-  return time;
+    return () => clearInterval(updateTime);
+  }, [time]);
+  return literalTime;
 };
 
 export default useGetTime;

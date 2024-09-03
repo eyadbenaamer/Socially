@@ -8,18 +8,13 @@ export const create = async (req, res) => {
     const { id } = req.user;
     let { text, location } = req.body;
     const { filesInfo } = req;
-    const { media } = req.files;
 
     const newPost = {
       creatorId: id.trim(),
-      text: text.trim(),
-      likes: [],
-      comments: [],
-      views: [],
-      files: media ? filesInfo : null,
+      text: text?.trim(),
+      files: filesInfo,
       createdAt: Date.now(),
-      location: location.trim(),
-      sharedPost: null,
+      location: location?.trim(),
     };
     const postList = await Posts.findById(id);
     postList.posts.unshift(newPost);
@@ -157,13 +152,14 @@ export const setViewed = async (req, res) => {
     const { userId, postId } = req.query;
     const postList = await Posts.findById(userId);
     const post = postList.posts.id(postId);
-    if (post.views.includes(user.id)) {
+    if (post.views.id(user.id)) {
       return res.status(409).json({ message: "Already viewed." });
     }
-    post.views.push(user.id);
+    post.views.addToSet(user.id);
     await postList.updateOne(postList);
-    return res.status(200).send("viewed");
-  } catch {
+    return res.status(200).json(post);
+  } catch (err) {
+    console.log(err);
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
