@@ -38,7 +38,7 @@ import { verifyId } from "./middleware/check.js";
 import { compressImages } from "./middleware/media.js";
 import { getPostsInfo } from "./middleware/post.js";
 import { uploadSingleFile } from "./middleware/media.js";
-import { getConversationInfo } from "./middleware/conversation.js";
+import { getConversationInfo, isInChat } from "./middleware/conversation.js";
 import { getOnlineUsers } from "./socket/onlineUsers.js";
 
 /*CONFIGURATIONS*/
@@ -100,9 +100,10 @@ app.post(
   "/message/send",
   verifyId,
   verifyToken,
-  upload.fields([{ name: "media", maxCount: 5 }]),
+  upload.fields([{ name: "media", maxCount: 10 }]),
   compressImages,
   getConversationInfo,
+  isInChat,
   sendMessage
 );
 app.post(
@@ -112,6 +113,7 @@ app.post(
   upload.fields([{ name: "media", maxCount: 5 }]),
   compressImages,
   getConversationInfo,
+  isInChat,
   sendMessage
 );
 app.post(
@@ -143,7 +145,6 @@ app.use("/comment", commentRoute);
 app.use("/reply", replyRoute);
 app.use("/conversation", conversationRoute);
 app.use("/message", messageRoute);
-
 /*MONGOOSE SETUP*/
 const PORT = process.env.PORT;
 mongoose.connect(process.env.DATABASE_URL, {

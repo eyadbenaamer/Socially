@@ -4,7 +4,7 @@ import { deleteMessage, likeToggle } from "../controllers/message.js";
 
 import { verifyId } from "../middleware/check.js";
 import { verifyToken } from "../middleware/auth.js";
-import { getConversationInfo } from "../middleware/conversation.js";
+import { getConversationInfo, isInChat } from "../middleware/conversation.js";
 
 const router = express.Router();
 //root path: /message
@@ -15,6 +15,7 @@ router.patch(
   verifyId,
   verifyToken,
   getConversationInfo,
+  isInChat,
   likeToggle
 );
 
@@ -24,6 +25,7 @@ router.delete(
   verifyId,
   verifyToken,
   getConversationInfo,
+  isInChat,
   deleteMessage
 );
 

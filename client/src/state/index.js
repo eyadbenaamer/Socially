@@ -10,6 +10,7 @@ const initialState = {
     isVerified: false,
   },
   contacts: [],
+  unreadMessagesCount: 0,
   conversations: [],
   notifications: [],
   resetPasswordInfo: {
@@ -56,51 +57,108 @@ export const slice = createSlice({
     setContacts: (state, action) => {
       state.contacts = action.payload;
     },
+    setUnreadMessagesCount: (state, action) => {
+      state.unreadMessagesCount = action.payload;
+    },
     updateActivityStatus: (state, action) => {
-      const { id, isOnline } = action.payload;
+      const { id, isOnline, lastSeenAt } = action.payload;
       state.contacts.map((item) => {
         if (item._id === id) {
           item.isOnline = isOnline;
+          item.lastSeenAt = lastSeenAt;
         }
       });
     },
     setShowMessage: (state, action) => {
       state.infoMessage = action.payload;
     },
-    // sets the conversations when once login
+    // sets and sorts the conversations
     setConversations: (state, action) => {
-      state.conversations = action.payload;
+      const { conversations } = state;
+      if (action.payload == null) {
+        state.conversations = null;
+        return;
+      }
+      /*
+      if there are no conversations stored then all conversations 
+      in the payload will be stored in state.conversations
+      */
+      if (!conversations) {
+        state.conversations = action.payload;
+        return;
+      }
+      action.payload.map((newConversation) => {
+        const conversation = conversations.find(
+          (c) => c._id === newConversation._id
+        );
+        if (!conversation) {
+          conversations.push(newConversation);
+        } else {
+          conversation.messages = newConversation.messages;
+          conversation.updatedAt = newConversation.updatedAt;
+        }
+      });
+      // state.conversations = conversations.sort(
+      //   (conversation) => conversation.updatedAt
+      // );
+    },
+    /*
+    this function replaces a whole conversation's messages 
+    with the passed messages array
+    */
+    setConversation(state, action) {
+      const newConversation = action.payload;
+      let conversation = state.conversations.find(
+        (conv) => conv._id === newConversation._id
+      );
+      if (newConversation.messages) {
+        conversation.messages = newConversation.messages;
+      }
+      if (newConversation.unreadMessagesCount >= 0) {
+        conversation.unreadMessagesCount = newConversation.unreadMessagesCount;
+      }
     },
     /*
     this fucntion called when a certain conversation's messages status 
-    are updated such as (seenBy, deliveredTo)
+    are updated such as (readBy, deliveredTo)
     */
     updateConversationStatus: (state, action) => {
-      const { conversationId, messages } = action.payload;
+      const { conversationId, messagesInfo } = action.payload;
       const conversation = state.conversations.find(
         (conv) => conv._id === conversationId
       );
-
-      messages.map((newMessage) => {
+      messagesInfo?.map((newMessage) => {
         let message = conversation.messages.find(
           (item) => item._id === newMessage._id
         );
-        message.info = newMessage.info;
+        if (message) {
+          message.info = newMessage.info;
+        }
       });
     },
     // adds the new recieved message to its conversation
     addMessage: (state, action) => {
-      const { conversationId, message, updatedAt } = action.payload;
+      const { conversationId, message, updatedAt, unreadMessagesCount } =
+        action.payload;
+      if (message.senderId !== state.profile._id) {
+        state.unreadMessagesCount += 1;
+      }
       const newConversation = state.conversations.find(
         (conv) => conv._id === conversationId
       );
 
       // if the conversation is not exist or has been cleared, create a new one
-      if (!newConversation) {
-        state.conversations.push({ _id: conversationId, message, updatedAt });
+      if (!newConversation || !newConversation.messages) {
+        state.conversations.unshift({
+          _id: conversationId,
+          messages: [message],
+          updatedAt,
+          unreadMessagesCount,
+        });
       } else {
-        newConversation.messages.push(message);
+        newConversation.messages.unshift(message);
         newConversation.updatedAt = updatedAt;
+        newConversation.unreadMessagesCount = unreadMessagesCount;
       }
     },
     messageLikeToggle: (state, action) => {
@@ -115,10 +173,14 @@ export const slice = createSlice({
       conversation.updatedAt = updatedAt;
     },
     deleteMessage: (state, action) => {
-      const { conversationId, messageId } = action.payload;
-      const conversation = state.conversations.find(
+      const { conversationId, messageId, unreadMessagesCount } = action.payload;
+      let conversation = state.conversations.find(
         (conv) => conv._id === conversationId
       );
+      conversation.unreadMessagesCount = unreadMessagesCount;
+      if (state.unreadMessagesCount > 0) {
+        state.unreadMessagesCount -= 1;
+      }
       conversation.messages = conversation.messages.filter(
         (message) => message._id !== messageId
       );
@@ -132,7 +194,7 @@ export const slice = createSlice({
     clearSessionStorage: () => {
       sessionStorage.clear();
       // set the isLoaded(reponsible for loading effect) again after clearing sessionStorage
-      sessionStorage.setItem("isLoaded", true);
+      // sessionStorage.setItem("isLoaded", true);
     },
     logout: (state) => {
       // disconnect socket connection when logging out
@@ -162,8 +224,10 @@ export const {
   setResetPasswordInfo,
   toggleTheme,
   setContacts,
+  setUnreadMessagesCount,
   updateActivityStatus,
   setConversations,
+  setConversation,
   updateConversationStatus,
   addMessage,
   messageLikeToggle,

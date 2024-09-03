@@ -19,6 +19,7 @@ const UserSchema = new Schema(
       rel: "Conversation",
       default: [],
     },
+    unreadMessagesCount: { type: Number, default: 0 },
     /*
     this is where all undelivered messages are stored, each one will 
     be deliverdTo set once the user is connected

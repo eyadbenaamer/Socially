@@ -12,7 +12,7 @@ const MessageSchema = new Schema({
       type: [{ default: { _id: ObjectId } }],
       default: [],
     },
-    seenBy: {
+    readBy: {
       type: [{ default: { _id: ObjectId } }],
       default: [],
     },
@@ -21,8 +21,7 @@ const MessageSchema = new Schema({
       default: [],
     },
   },
-
-  text: String,
+  text: { type: String, default: "" },
   files: { fileType: String, path: String },
   replyTo: { type: ObjectId, rel: "Message" }, // message ID
   createdAt: Number,
@@ -30,7 +29,12 @@ const MessageSchema = new Schema({
 
 const ConversationSchema = new Schema({
   participants: {
-    type: [{ default: { _id: ObjectId } }],
+    type: [
+      {
+        _id: ObjectId,
+        unreadMessagesCount: { type: Number, default: 0 },
+      },
+    ],
     default: [],
   },
   messages: { type: [MessageSchema], default: [] },

@@ -22,20 +22,21 @@ export const establishNewConversation = async (req, res, next) => {
     the first way: with contacts (mutual following)
     the second way: with non-contact accounts that had replied to a conversation request
     */
-    user.contacts.push({ _id: accountToFollowId });
+    user.contacts.addToSet({ _id: accountToFollowId });
     const conversation = await Conversation.create({
       participants: [
         { _id: new ObjectId(myId) },
         { _id: new ObjectId(accountToFollowId) },
       ],
+      updatedAt: new Date(),
     });
     await conversation.save();
-    user.conversations.unshift(conversation);
+    user.conversations.addToSet(conversation);
     await user.save();
 
     const userToFollow = await User.findById(accountToFollowId);
-    userToFollow.contacts.unshift({ _id: myId });
-    userToFollow.conversations.unshift(conversation);
+    userToFollow.contacts.addToSet({ _id: myId });
+    userToFollow.conversations.addToSet(conversation);
     await userToFollow.save();
     next();
   } catch {
@@ -66,6 +67,21 @@ export const getConversationInfo = async (req, res, next) => {
     }
 
     next();
+  } catch {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
+  }
+};
+
+export const isInChat = (req, res, next) => {
+  try {
+    const { user, conversation } = req;
+    if (conversation.participants.id(user.id)) {
+      next();
+    } else {
+      return res.status(403).json({ message: "You're not in this chat." });
+    }
   } catch {
     return res
       .status(500)

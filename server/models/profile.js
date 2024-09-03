@@ -45,6 +45,7 @@ const ProfileSchema = new Schema({
     min: 2,
     max: 20,
   },
+  lastSeenAt: Number,
   joinedAt: { type: Number, default: Date.now() },
 });
 const Profile = model("Profiles", ProfileSchema);
