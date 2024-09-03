@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import ToggleTheme from "components/ToggleTheme";
 
@@ -30,19 +30,19 @@ const Menu = () => {
       {showMenu && (
         <div className="menu bg-300 cursor-pointer absolute top-0 right-0 rounded-xl w-max">
           <ul className="flex flex-col rounded-xl transition">
-            <li className="flex gap-2 p-3 bg-hovered w-full">
+            <li className="flex gap-2 p-2 bg-hovered w-full">
               <SettingsIcon className="inline mr-2 w-4" />
               Settings
             </li>
             <li
               onClick={() => dispatch(toggleTheme())}
-              className="flex gap-2 p-3 bg-hovered w-full"
+              className="flex gap-2 p-2 bg-hovered w-full"
             >
               <ToggleTheme />
-              Mode
+              Theme
             </li>
             <li
-              className="flex gap-2 p-3 bg-hovered w-full"
+              className="flex gap-2 p-2 bg-hovered w-full"
               onClick={() => {
                 dispatch(logout());
               }}

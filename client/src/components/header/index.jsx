@@ -15,8 +15,8 @@ const Header = () => {
   const theme = useSelector((state) => state.settings.theme);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-300 shadow-lg py-2 transition">
-      <div className="container px-4 py-2 m-auto flex gap-3 items-center justify-between">
+    <header className="sticky top-0 z-40 w-full bg-300 shadow-lg transition">
+      <div className="container px-4 py-2 m-auto flex gap-3 items-center justify-between h-[45px]">
         <Link to="/">
           {theme === "light" ? (
             <img src={lightLogo} alt="Socially" />

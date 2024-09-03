@@ -34,6 +34,10 @@ body,
   }
 }
 
+main {
+  min-height: calc(100svh - 95px);
+}
+
 input,
 textarea {
   background: inherit;
@@ -310,6 +314,45 @@ svg.icon-hover:hover {
   color: var(--primary-color);
 }
 
+.text-secondary {
+  color: var(--secondary-color);
+}
+
+/*  */
+.light .bg-inv-100,
+.light.bg-inv-100 {
+  background-color: var(--bg-dark-100);
+}
+
+.light .bg-inv-200 {
+  background-color: var(--bg-dark-200);
+}
+
+.light .bg-inv-300 {
+  background-color: var(--bg-dark-300);
+}
+
+.light .bg-inv-alt {
+  background-color: var(--bg-dark-alt);
+}
+
+.dark.bg-inv-100,
+.dark .bg-inv-100 {
+  background-color: var(--bg-light-100);
+}
+
+.dark .bg-inv-200 {
+  background-color: var(--bg-light-200);
+}
+
+.dark .bg-inv-300 {
+  background-color: var(--bg-light-300);
+}
+
+.dark .bg-inv-alt {
+  background-color: var(--bg-light-alt);
+}
+
 /* Animated Logo */
 
 #logo1 {
@@ -391,7 +434,7 @@ svg.icon-hover:hover {
 
 aside,
 .sidebar {
-  height: calc(100svh - 62px);
+  height: calc(100svh - 45px);
 }
 
 /* Signup and Login */

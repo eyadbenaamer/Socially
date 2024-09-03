@@ -1,16 +1,25 @@
+// TODO: Fix close by click outside of the component
 import { useEffect, useRef } from "react";
 
 import { ReactComponent as CloseIcon } from "assets/icons/cross.svg";
+import useCloseWidget from "hooks/useCloseWidget";
+import { useLocation } from "react-router-dom";
 
 const Dialog = (props) => {
-  const { isOpened, setIsOpened, children } = props;
-
+  const { isOpened, setIsOpened, children, preventCloseByClick } = props;
+  const { pathname } = useLocation();
   const prompt = useRef(null);
-
+  useCloseWidget(prompt, setIsOpened, preventCloseByClick);
   useEffect(() => {
     if (isOpened) {
-      if (document.body.clientWidth > 768) {
-        // adjust the width when the scrollbar is hidden due to the dialog only in non-mobile screens
+      /*
+      adjust the width when the scrollbar is hidden due to the dialog only 
+      in non-mobile screens and anywhere exepct in "messages" route
+      */
+      if (
+        document.body.clientWidth > 768 &&
+        !pathname.startsWith("/messages")
+      ) {
         document.body.style.width = "calc(100% - 8px)";
       }
       document.body.style.height = "100vh";
