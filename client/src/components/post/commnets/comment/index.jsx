@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 
-import useFetchProfile from "hooks/useFetchUser";
+import useFetchProfile from "hooks/useFetchProfile";
 
 import Replies from "./replies";
 import OptionsBtn from "./options-btn";

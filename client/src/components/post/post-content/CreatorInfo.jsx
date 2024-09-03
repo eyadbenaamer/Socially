@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import UserPicture from "components/UserPicture";
 
 import useGetTime from "hooks/useGetTime";
-import useFetchProfile from "hooks/useFetchUser";
+import useFetchProfile from "hooks/useFetchProfile";
 
 const CreatorInfo = (props) => {
   const { creatorId, createdAt, location, postId } = props;

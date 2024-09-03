@@ -7,7 +7,7 @@ import UserPicture from "components/UserPicture";
 import Media from "../../Media";
 import OptionsBtn from "./options-btn";
 
-import useFetchProfile from "hooks/useFetchUser";
+import useFetchProfile from "hooks/useFetchProfile";
 import useGetTime from "hooks/useGetTime";
 
 import { PostContext } from "components/post";
