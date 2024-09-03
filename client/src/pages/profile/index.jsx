@@ -52,7 +52,7 @@ const Profile = () => {
           </div>
         </>
       )}
-      {windowWidth <= 768 && myProfile && <Bar />}
+      {windowWidth < 768 && myProfile && <Bar />}
     </ProfileContext.Provider>
   );
 };

@@ -1,5 +1,4 @@
 import Sidebar from "components/sidebar";
-import Bar from "components/bar";
 
 import { useWindowWidth } from "hooks/useWindowWidth";
 
@@ -8,8 +7,8 @@ const Notification = () => {
 
   return (
     <>
-      <div className="grid grid-cols-8 pt-5 pb-28 min-h-screen">
-        {windowWidth >= 768 && (
+      <div className="grid grid-cols-10 pt-5 pb-28 min-h-screen">
+        {windowWidth > 1024 && (
           <div className="sidebar flex justify-center col-span-2">
             <Sidebar />
           </div>
@@ -18,7 +17,6 @@ const Notification = () => {
           <div className="my-0 mx-auto"></div>
         </div>
       </div>
-      {windowWidth <= 768 && <Bar />}
     </>
   );
 };

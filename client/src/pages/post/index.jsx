@@ -35,7 +35,7 @@ const Post = () => {
           {post && <PostComponent post={post} showComments={true} />}
         </div>
       )}
-      {windowWidth <= 768 && user && <Bar />}
+      {windowWidth < 768 && user && <Bar />}
     </>
   );
 };
