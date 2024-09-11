@@ -219,7 +219,13 @@ export const loginWithToken = async (req, res) => {
           });
         }
       }
-      return res.status(200).json({ profile, contacts });
+      return res
+        .status(200)
+        .json({
+          profile,
+          contacts,
+          unreadMessagesCount: user.unreadMessagesCount,
+        });
     }
   } catch (error) {
     console.log(error);

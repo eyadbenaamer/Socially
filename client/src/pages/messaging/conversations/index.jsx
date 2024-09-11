@@ -16,11 +16,9 @@ const Conversations = () => {
   const container = useRef(null);
 
   useEffect(() => {
-    if (!conversations) {
-      axiosClient("conversation/all")
-        .then((response) => dispatch(setConversations(response.data)))
-        .catch((err) => {});
-    }
+    axiosClient("conversation/all")
+      .then((response) => dispatch(setConversations(response.data)))
+      .catch((err) => {});
   }, []);
 
   /*

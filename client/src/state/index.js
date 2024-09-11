@@ -94,6 +94,8 @@ export const slice = createSlice({
         if (!conversation) {
           conversations.push(newConversation);
         } else {
+          conversation.unreadMessagesCount =
+            newConversation.unreadMessagesCount;
           conversation.messages = newConversation.messages;
           conversation.updatedAt = newConversation.updatedAt;
         }
