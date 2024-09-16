@@ -18,7 +18,7 @@ const Like = (props) => {
   const [likes, setLikes] = useState(props.likes);
   const [firstLoad, setFirstLoad] = useState(true);
   const [isLiked, setIsliked] = useState(
-    likes.includes(profile ? profile._id : false)
+    Boolean(likes.find((like) => like._id === profile?._id))
   );
   const [showLikes, setShowLikes] = useState(false);
   const options = {
@@ -88,17 +88,11 @@ const Like = (props) => {
             className="md:cursor-pointer absolute top-0 left-0 z-10 h-full w-full"
             onClick={likeToggle}
           ></div>
-          <div className=" w-8 scale-[3]">
+          <div className="w-8 scale-[3]">
             {isLiked && !firstLoad ? (
               <Lottie options={options} ariaRole="" />
             ) : (
-              <LikeIcon
-                color={`${
-                  likes.includes(profile ? profile._id : "")
-                    ? "#e53935"
-                    : "transparent"
-                }`}
-              />
+              <LikeIcon color={`${isLiked ? "#e53935" : "transparent"}`} />
             )}
           </div>
         </div>

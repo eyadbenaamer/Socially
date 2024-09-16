@@ -9,9 +9,11 @@ import axiosClient from "utils/AxiosClient";
 
 const FollowToggleBtn = (props) => {
   const { id: accountToFollowId } = props;
-  const { following, _id: myProfileId } = useSelector((state) => state.profile);
+  const myProfile = useSelector((state) => state.profile);
+  const following = myProfile?.following;
+  const myProfileId = myProfile?._id;
   const { _id: profileId, setProfile } = useContext(ProfileContext);
-  const isFollowing = following.includes(accountToFollowId);
+  const isFollowing = following?.find((acc) => acc._id === profileId);
   const dispatch = useDispatch();
 
   const followToggle = () => {
@@ -33,7 +35,7 @@ const FollowToggleBtn = (props) => {
   return (
     <>
       {/* only show "follow toggle" button for loggedin user */}
-      {accountToFollowId !== myProfileId && (
+      {myProfile && accountToFollowId !== myProfileId && (
         <button
           className={`py-1 px-3 h-fit rounded-xl text-white ${
             isFollowing ? "bg-red-500" : "bg-primary"

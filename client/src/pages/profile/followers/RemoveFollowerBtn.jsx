@@ -9,7 +9,7 @@ import axiosClient from "utils/AxiosClient";
 const RemoveFollowerBtn = (props) => {
   const { id } = props;
   const { _id: profileId, setProfile } = useContext(ProfileContext);
-  const { _id: myProfileId } = useSelector((state) => state.profile);
+  const myProfileId = useSelector((state) => state.profile)?._id;
   const dispatch = useDispatch();
   const followToggle = () => {
     axiosClient

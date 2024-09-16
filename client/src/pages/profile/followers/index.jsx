@@ -25,7 +25,7 @@ const Followers = () => {
     const fetchUsers = async () => {
       const result = [];
       for (let i = 0; i < followers?.length; i++) {
-        const user = await axiosClient(`profile?id=${followers[i]}`).then(
+        const user = await axiosClient(`profile?id=${followers[i]._id}`).then(
           (response) => response.data
         );
         result.push(user);

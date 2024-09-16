@@ -26,7 +26,7 @@ const Following = () => {
     const fetchUsers = async () => {
       const result = [];
       for (let i = 0; i < following?.length; i++) {
-        const user = await axiosClient(`profile?id=${following[i]}`).then(
+        const user = await axiosClient(`profile?id=${following[i]._id}`).then(
           (response) => response.data
         );
         result.push(user);
@@ -61,7 +61,7 @@ const Following = () => {
                       {firstName} {lastName}
                     </Link>
                   </div>
-                  {myProfile._id !== id && <FollowToggleBtn id={id} />}
+                  {myProfile?._id !== id && <FollowToggleBtn id={id} />}
                 </li>
               );
             })}
