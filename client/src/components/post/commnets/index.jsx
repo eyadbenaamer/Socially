@@ -1,6 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 import Comment from "./comment";
 
@@ -17,11 +17,13 @@ const Comments = () => {
       if (!document.getElementById(commentId) && commentId) {
         axiosClient(
           `comment?userId=${userId}&postId=${postId}&commentId=${commentId}`
-        ).then((response) => {
-          if (response.status === 200) {
-            setSearchedComment(response.data);
-          }
-        });
+        )
+          .then((response) => {
+            if (response.status === 200) {
+              setSearchedComment(response.data);
+            }
+          })
+          .catch(() => setSearchedComment("not found"));
       }
     }
   }, [comments]);
@@ -36,30 +38,35 @@ const Comments = () => {
   }, [focusedComment.current, commentId, replyId]);
 
   return (
-    <div className={`flex flex-col gap-5`}>
-      {comments.length > 0 ? (
-        <>
-          {comments.map((comment) => (
-            <div
-              className={
-                commentId === comment._id && !replyId ? "focused" : null
-              }
-              ref={comment._id === commentId ? focusedComment : null}
-              id={comment._id}
-            >
-              <Comment postId={postId} key={comment._id} comment={comment} />
-            </div>
-          ))}
-          {searchedComment && (
-            <div ref={focusedComment}>
-              <Comment postId={postId} comment={searchedComment} />
-            </div>
-          )}
-        </>
-      ) : (
-        <>No comments.</>
+    <>
+      {searchedComment === "not found" && (
+        <Navigate to={"/not-found"} replace />
       )}
-    </div>
+      <div className={`flex flex-col gap-5`}>
+        {comments.length > 0 ? (
+          <>
+            {comments.map((comment) => (
+              <div
+                className={
+                  commentId === comment._id && !replyId ? "focused" : null
+                }
+                ref={comment._id === commentId ? focusedComment : null}
+                id={comment._id}
+              >
+                <Comment postId={postId} key={comment._id} comment={comment} />
+              </div>
+            ))}
+            {searchedComment && (
+              <div ref={focusedComment}>
+                <Comment postId={postId} comment={searchedComment} />
+              </div>
+            )}
+          </>
+        ) : (
+          <>No comments.</>
+        )}
+      </div>
+    </>
   );
 };
 

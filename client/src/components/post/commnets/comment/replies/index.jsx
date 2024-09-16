@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 import Reply from "./reply";
 
@@ -15,11 +15,13 @@ const Replies = (props) => {
       if (!document.getElementById(replyId) && replyId) {
         axiosClient(
           `reply?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`
-        ).then((response) => {
-          if (response.status === 200) {
-            setSearchedReply(response.data);
-          }
-        });
+        )
+          .then((response) => {
+            if (response.status === 200) {
+              setSearchedReply(response.data);
+            }
+          })
+          .catch(() => setSearchedReply("not found"));
       }
     }
   }, [replies]);
@@ -33,6 +35,7 @@ const Replies = (props) => {
 
   return (
     <>
+      {searchedReply === "not found" && <Navigate to={"/not-found"} replace />}
       {replies.length > 0 && (
         <div className="flex flex-col gap-3 mt-4">
           {replies.map((reply) => (
