@@ -1,6 +1,9 @@
 import Profile from "../models/profile.js";
 import User from "../models/user.js";
 
+import { getOnlineUsers } from "../socket/onlineUsers.js";
+import { getServerSocketInstance } from "../socket/socketServer.js";
+
 /*READ*/
 
 export const getProfile = async (req, res) => {
@@ -40,11 +43,7 @@ export const getFollowers = async (req, res) => {
     const { id } = req.query;
     const user = await User.findById(id);
     const followers = user.followers;
-    if (followers) {
-      return res.status(200).json(followers);
-    } else {
-      return res.status(404).json({ error: "No followers found" });
-    }
+    return res.status(200).json(followers);
   } catch {
     return res
       .status(500)
@@ -57,11 +56,7 @@ export const getFollowing = async (req, res) => {
     const { id } = req.query;
     const user = await User.findById(id);
     const following = user.following;
-    if (following) {
-      return res.status(200).json(following);
-    } else {
-      return res.status(404).json({ error: "No following found" });
-    }
+    return res.status(200).json(following);
   } catch {
     return res
       .status(500)
@@ -134,20 +129,49 @@ export const follow = async (req, res) => {
     if (myId == userId) {
       return res.status(409).json({ error: "cannot follow yourself" });
     }
-    const profile = await Profile.findById(myId);
+    const myProfile = await Profile.findById(myId);
     const profileToFollow = await Profile.findById(userId);
     if (!profileToFollow) {
       return res.status(400).send("bad request");
     }
-    if (profile.following.includes(userId)) {
+    if (myProfile.following.id(userId)) {
       return res.status(409).json({ error: "already followed" });
     }
-    profile.following.push(userId);
-    profileToFollow.followers.push(myId);
+    // creating a following notification
+    const userToFollow = await User.findById(userId);
+    const newNotification = {
+      content: `${myProfile.firstName} started following you.`,
+      picture: myProfile.profilePicPath,
+      type: "follow",
+      url: `${process.env.APP_URL}/profile/${myProfile.username}`,
+      cratedAt: Date.now(),
+      isRead: false,
+    };
+    userToFollow.notifications.unshift(newNotification);
+    userToFollow.unreadNotificationsCount += 1;
+    await userToFollow.save();
 
-    await profile.save();
+    const notification = userToFollow.notifications[0];
+
+    // sending the following notification to the followed user
+    const socketIdsList = getOnlineUsers().get(userId);
+    if (socketIdsList) {
+      socketIdsList.map((socketId) => {
+        getServerSocketInstance()
+          .to(socketId)
+          .emit("push-notification", notification);
+      });
+    }
+
+    myProfile.following.addToSet({ _id: userId });
+    profileToFollow.followers.addToSet({
+      _id: myId,
+      notificationId: notification.id,
+    });
+
+    await myProfile.save();
     await profileToFollow.save();
-    return res.status(200).json(profile);
+    return res.status(200).json(myProfile);
   } catch {
     return res
       .status(500)
@@ -157,29 +181,46 @@ export const follow = async (req, res) => {
 
 export const unfollow = async (req, res) => {
   try {
-    const { id } = req.user;
+    const { id: myId } = req.user;
     const { userId } = req.query;
-    if (id == userId) {
+    if (myId == userId) {
       return res.status(409).json({ error: "cannot unfollow yourself" });
     }
-    const profile = await Profile.findById(id);
+    const myProfile = await Profile.findById(myId);
     const accountToUnfollow = await Profile.findById(userId);
 
-    if (!(profile && accountToUnfollow)) {
+    if (!(myProfile && accountToUnfollow)) {
       return res.status(400).send("bad request");
     }
 
-    if (profile.following.includes(userId)) {
-      profile.following = profile.following.filter((item) => item != userId);
-      accountToUnfollow.followers = accountToUnfollow.followers.filter(
-        (item) => item != id
-      );
-    } else {
+    if (!myProfile.following.id(userId)) {
       return res.status(409).json({ error: "not followed" });
     }
-    await profile.save();
+    // removing the notification from database and from the client
+    const { notificationId } = accountToUnfollow.followers.id(myId);
+    const userToUnfollow = await User.findById(userId);
+    const notification = userToUnfollow.notifications.id(notificationId);
+    if (notification) {
+      const socketIdsList = getOnlineUsers().get(userId);
+      if (socketIdsList) {
+        socketIdsList.map((socketId) => {
+          getServerSocketInstance()
+            .to(socketId)
+            .emit("remove-notification", notification.id);
+        });
+      }
+      if (!notification.isRead) {
+        userToUnfollow.unreadNotificationsCount--;
+      }
+      notification.deleteOne();
+      await userToUnfollow.save();
+    }
+
+    accountToUnfollow.followers.id(myId).deleteOne();
+    myProfile.following.id(userId).deleteOne();
+    await myProfile.save();
     await accountToUnfollow.save();
-    return res.status(200).json(profile);
+    return res.status(200).json(myProfile);
   } catch {
     return res
       .status(500)
@@ -189,27 +230,42 @@ export const unfollow = async (req, res) => {
 
 export const removeFollower = async (req, res) => {
   try {
-    const { id } = req.user;
+    const { id: myId } = req.user;
     const { userId } = req.query;
-    if (id == userId) {
+    if (myId == userId) {
       return res.status(400).send("bad request");
     }
-    const profile = await Profile.findById(id);
-    const accountToRemove = await Profile.findById(userId);
-    if (!(profile && accountToRemove)) {
+    const myProfile = await Profile.findById(myId);
+    const followerToRemove = await Profile.findById(userId);
+    if (!(myProfile && followerToRemove)) {
       return res.status(400).send("bad request");
     }
-    if (profile.followers.includes(userId)) {
-      profile.followers = profile.followers.filter((item) => item != userId);
-      accountToRemove.following = accountToRemove.following.filter(
-        (item) => item != id
-      );
-    } else {
+    if (!myProfile.followers.id(userId)) {
       return res.status(409).json({ error: "not following" });
     }
-    await profile.save();
-    await accountToRemove.save();
-    return res.status(200).json(profile);
+
+    const { notificationId } = myProfile.followers.id(userId);
+    const user = await User.findById(myId);
+    const notification = user.notifications.id(notificationId);
+    const socketIdsList = getOnlineUsers().get(myId);
+    if (socketIdsList) {
+      socketIdsList.map((socketId) => {
+        getServerSocketInstance()
+          .to(socketId)
+          .emit("remove-notification", notification.id);
+      });
+    }
+    if (!notification.isRead) {
+      user.unreadNotificationsCount--;
+    }
+    notification.deleteOne();
+    await user.save();
+
+    myProfile.followers.id(userId).deleteOne();
+    followerToRemove.following.id(myId).deleteOne();
+    await myProfile.save();
+    await followerToRemove.save();
+    return res.status(200).json(myProfile);
   } catch {
     return res
       .status(500)

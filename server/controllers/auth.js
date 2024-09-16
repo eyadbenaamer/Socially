@@ -183,6 +183,7 @@ export const login = async (req, res) => {
       profile,
       contacts,
       unreadMessagesCount: user.unreadMessagesCount,
+      unreadNotificationsCount: user.unreadNotificationsCount,
     });
   } catch {
     return res
@@ -219,16 +220,14 @@ export const loginWithToken = async (req, res) => {
           });
         }
       }
-      return res
-        .status(200)
-        .json({
-          profile,
-          contacts,
-          unreadMessagesCount: user.unreadMessagesCount,
-        });
+      return res.status(200).json({
+        profile,
+        contacts,
+        unreadMessagesCount: user.unreadMessagesCount,
+        unreadNotificationsCount: user.unreadNotificationsCount,
+      });
     }
-  } catch (error) {
-    console.log(error);
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. try again later." });

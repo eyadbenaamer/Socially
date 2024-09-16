@@ -11,6 +11,7 @@ const initialState = {
   },
   contacts: [],
   unreadMessagesCount: 0,
+  unreadNotificationsCount: 0,
   conversations: [],
   notifications: [],
   resetPasswordInfo: {
@@ -181,18 +182,55 @@ export const slice = createSlice({
       );
       conversation.unreadMessagesCount = unreadMessagesCount;
       if (state.unreadMessagesCount > 0) {
-        state.unreadMessagesCount -= 1;
+        state.unreadMessagesCount--;
       }
       conversation.messages = conversation.messages.filter(
         (message) => message._id !== messageId
       );
     },
     // sets the notifications when once login
-    setNotifications: (state, action) => {},
+    setNotifications: (state, action) => {
+      state.notifications = action.payload;
+    },
+    setUnreadNotificationsCount: (state, action) => {
+      state.unreadNotificationsCount = action.payload;
+    },
     // adds the new recieved notification to notifications array
-    addNotification: (state, action) => {},
+    addNotification: (state, action) => {
+      state.notifications.unshift(action.payload);
+      state.unreadNotificationsCount += 1;
+    },
+    // removes a notification from notifications array
+    removeNotification: (state, action) => {
+      const notificationToBeRemoved = state.notifications.find(
+        (notification) => notification._id === action.payload
+      );
+      state.notifications = state.notifications.filter(
+        (notification) => notification._id !== notificationToBeRemoved._id
+      );
+      /*
+      if the notification to be removed is not read then
+      decrease unreadNotificationsCount by 1.
+      */
+      if (!notificationToBeRemoved?.isRead) {
+        state.unreadNotificationsCount--;
+      }
+    },
     // updates a notification status(isRead)
-    updateNotificationStatus: (state, action) => {},
+    setNotificationIsRead: (state, action) => {
+      let notification = state.notifications.find(
+        (notification) => notification._id === action.payload
+      );
+      notification.isRead = true;
+    },
+    // sets (isRead) true for all notifications
+    setNotificationsAllRead: (state) => {
+      state.notifications.map((notification) => (notification.isRead = true));
+    },
+    clearNotifications: (state) => {
+      state.notifications = [];
+      state.unreadNotificationsCount = 0;
+    },
     clearSessionStorage: () => {
       sessionStorage.clear();
       // set the isLoaded(reponsible for loading effect) again after clearing sessionStorage
@@ -209,7 +247,10 @@ export const slice = createSlice({
       // set the state back to the initial state
       state.token = null;
       state.profile = null;
-      state.conversations = null;
+      state.conversations = [];
+      state.notifications = [];
+      state.unreadMessagesCount = 0;
+      state.unreadNotificationsCount = 0;
       state.authStatus.email = null;
       state.authStatus.isLoggedin = false;
       state.authStatus.isVerified = false;
@@ -234,6 +275,13 @@ export const {
   addMessage,
   messageLikeToggle,
   deleteMessage,
+  setNotifications,
+  setUnreadNotificationsCount,
+  addNotification,
+  removeNotification,
+  setNotificationIsRead,
+  setNotificationsAllRead,
+  clearNotifications,
   setShowMessage,
   clearSessionStorage,
   logout,

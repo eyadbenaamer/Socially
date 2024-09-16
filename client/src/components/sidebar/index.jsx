@@ -1,3 +1,4 @@
+// TODO: fix media queries for height
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
@@ -13,6 +14,9 @@ const Sidebar = () => {
   const location = useLocation();
 
   const unreadMessagesCount = useSelector((state) => state.unreadMessagesCount);
+  const unreadNotificationsCount = useSelector(
+    (state) => state.unreadNotificationsCount
+  );
 
   return (
     <aside className="fixed">
@@ -32,11 +36,20 @@ const Sidebar = () => {
         </SidebarItem>
 
         <SidebarItem to={"/notifications"} name={"Notifications"}>
-          <NotificationsIcon
-            className={`${
-              location.pathname === "/notifications" ? "text-primary" : ""
-            }`}
-          />
+          <div className="relative">
+            <NotificationsIcon
+              className={`${
+                location.pathname === "/notifications" ? "text-primary" : ""
+              }`}
+            />
+            {unreadNotificationsCount > 0 ? (
+              <div className="absolute bottom-0 -right-2 circle w-5 h-5 p-[1px] bg-red-500 text-white text-[10px]">
+                {unreadNotificationsCount > 99
+                  ? "99+"
+                  : unreadNotificationsCount}
+              </div>
+            ) : null}
+          </div>
         </SidebarItem>
 
         <SidebarItem to={"/messages"} name={"Messages"}>
@@ -47,7 +60,7 @@ const Sidebar = () => {
               }`}
             />
             {unreadMessagesCount > 0 ? (
-              <div className="absolute -top-1 -right-2 circle w-5 h-5 bg-red-500 text-white text-xs">
+              <div className="absolute bottom-0 -right-2 circle w-5 h-5 p-[1px] bg-red-500 text-white text-[10px]">
                 {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
               </div>
             ) : null}

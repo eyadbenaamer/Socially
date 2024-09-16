@@ -1,5 +1,16 @@
 import { Schema, model, Types } from "mongoose";
 const { ObjectId } = Types;
+
+const NotificationSchema = new Schema({
+  content: String,
+  picture: String,
+  type: String, // following, like, comment or reply
+  // the url reffered to when the notification is clicked
+  url: String,
+  cratedAt: Number,
+  isRead: { type: Boolean, default: false },
+});
+
 const UserSchema = new Schema(
   {
     email: { type: String, uniqe: true, max: 50 },
@@ -9,7 +20,12 @@ const UserSchema = new Schema(
       min: 8,
       max: 50,
     },
-    contacts: { type: [{ _id: ObjectId }], rel: "User", default: [] },
+    contacts: {
+      type: [{ _id: ObjectId, conversationId: String }],
+      rel: "User",
+      default: [],
+    },
+    notifications: [NotificationSchema],
     conversations: {
       type: [
         {
@@ -19,7 +35,8 @@ const UserSchema = new Schema(
       rel: "Conversation",
       default: [],
     },
-    unreadMessagesCount: { type: Number, default: 0 },
+    unreadMessagesCount: { type: Number, default: 0, min: 0 },
+    unreadNotificationsCount: { type: Number, default: 0, min: 0 },
     /*
     this is where all undelivered messages are stored, each one will 
     be deliverdTo set once the user is connected

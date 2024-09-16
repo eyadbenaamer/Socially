@@ -13,6 +13,9 @@ const Bar = () => {
   const location = useLocation();
 
   const unreadMessagesCount = useSelector((state) => state.unreadMessagesCount);
+  const unreadNotificationsCount = useSelector(
+    (state) => state.unreadNotificationsCount
+  );
 
   return (
     <aside className="fixed bottom-0 bg-300 w-full h-[50px] z-10 border-t border-t-[#00000073] py-1">
@@ -32,11 +35,20 @@ const Bar = () => {
         </BarItem>
 
         <BarItem to={"/notifications"}>
-          <NotificationsIcon
-            className={`icon ${
-              location.pathname === "/notifications" ? "text-primary" : ""
-            }`}
-          />
+          <div className="relative w-full">
+            <NotificationsIcon
+              className={`icon ${
+                location.pathname === "/notifications" ? "text-primary" : ""
+              }`}
+            />
+            {unreadNotificationsCount > 0 ? (
+              <div className="absolute bottom-0 -right-2 circle w-5 p-[1px] bg-red-500 text-white text-[8px] sm:text-[10px]">
+                {unreadNotificationsCount > 99
+                  ? "99+"
+                  : unreadNotificationsCount}
+              </div>
+            ) : null}
+          </div>
         </BarItem>
 
         <BarItem to={"/messages"}>
@@ -47,7 +59,7 @@ const Bar = () => {
               }`}
             />
             {unreadMessagesCount > 0 ? (
-              <div className="absolute -top-1 -right-2 circle p-[5px] bg-red-500 text-white text-xs">
+              <div className="absolute bottom-0 -right-2 circle w-5 p-[1px] bg-red-500 text-white text-[8px] sm:text-[10px]">
                 {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
               </div>
             ) : null}

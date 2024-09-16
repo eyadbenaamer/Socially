@@ -1,14 +1,16 @@
 import { io } from "socket.io-client";
 import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 
 import {
   addMessage,
+  addNotification,
   deleteMessage,
   messageLikeToggle,
+  removeNotification,
   updateActivityStatus,
   updateConversationStatus,
 } from "state";
-import { useEffect } from "react";
 
 export let socket;
 
@@ -64,6 +66,13 @@ const useHandleSocket = () => {
     });
     socket.on("delete-message", (data) => {
       dispatch(deleteMessage(data));
+    });
+    socket.on("push-notification", (data) => {
+      dispatch(addNotification(data));
+    });
+
+    socket.on("remove-notification", (data) => {
+      dispatch(removeNotification(data));
     });
   }, [socket]);
 };

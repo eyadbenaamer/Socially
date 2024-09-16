@@ -7,14 +7,16 @@ const ReplySchema = new Schema({
   rootCommentId: String,
   text: String,
   file: { fileType: String, path: String },
-  likes: [],
+  likes: { type: [{ _id: ObjectId, notificationId: String }], default: [] },
+  notificationId: String,
   createdAt: Number,
 });
 
 const CommentSchema = new Schema({
   creatorId: String,
   text: String,
-  likes: [],
+  likes: { type: [{ _id: ObjectId, notificationId: String }], default: [] },
+  notificationId: String,
   file: { fileType: String, path: String },
   replies: [ReplySchema],
   createdAt: Number,
@@ -31,12 +33,17 @@ export const PostSchema = new Schema({
       fileType: String,
     },
   ],
-  likes: { type: [String], default: [] },
+  likes: { type: [{ _id: ObjectId, notificationId: String }], default: [] },
+  notificationId: String,
   views: { type: [{ _id: ObjectId }], default: [] },
   comments: { type: [CommentSchema], default: [] },
   sharedPost: {
-    _id: ObjectId,
-    creatorId: String,
+    type: {
+      _id: ObjectId,
+      creatorId: String,
+      notificationId: String,
+    },
+    default: null,
   },
   createdAt: {
     type: Number,

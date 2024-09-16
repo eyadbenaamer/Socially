@@ -5,9 +5,9 @@ import {
   logout,
   setAuthStatus,
   setContacts,
-  setConversations,
   setProfile,
   setUnreadMessagesCount,
+  setUnreadNotificationsCount,
 } from "state";
 
 import axiosClient from "utils/AxiosClient";
@@ -24,9 +24,15 @@ const useUpdate = () => {
     axiosClient(`/login`)
       .then((response) => {
         if (response.status === 200) {
-          const { profile, contacts, unreadMessagesCount } = response.data;
+          const {
+            profile,
+            contacts,
+            unreadMessagesCount,
+            unreadNotificationsCount,
+          } = response.data;
           dispatch(setProfile(profile));
           dispatch(setUnreadMessagesCount(unreadMessagesCount));
+          dispatch(setUnreadNotificationsCount(unreadNotificationsCount));
           dispatch(setContacts(contacts));
           dispatch(setAuthStatus({ isLoggedin: true }));
         }

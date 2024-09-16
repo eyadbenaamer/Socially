@@ -21,6 +21,7 @@ import postRoute from "./routes/post.js";
 import commentRoute from "./routes/comment.js";
 import replyRoute from "./routes/reply.js";
 import conversationRoute from "./routes/conversation.js";
+import notificationRoute from "./routes/notification.js";
 import messageRoute from "./routes/message.js";
 
 import { setProfile } from "./controllers/profile.js";
@@ -143,6 +144,7 @@ app.use("/posts", postsRoute);
 app.use("/post", postRoute);
 app.use("/comment", commentRoute);
 app.use("/reply", replyRoute);
+app.use("/notifications", notificationRoute);
 app.use("/conversation", conversationRoute);
 app.use("/message", messageRoute);
 /*MONGOOSE SETUP*/
@@ -153,9 +155,7 @@ mongoose.connect(process.env.DATABASE_URL, {
 });
 const server = createServer(app);
 createSocketServer(server);
-// setInterval(() => {
-//   console.log(getOnlineUsers());
-// }, 2000);
+
 try {
   server.listen(PORT, () => console.log(`Server Connected on Port: ${PORT}`));
 } catch (error) {

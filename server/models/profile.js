@@ -33,11 +33,11 @@ const ProfileSchema = new Schema({
   birthDate: String,
   gender: String,
   followers: {
-    type: Array,
+    type: [{ _id: ObjectId, notificationId: String }],
     default: [],
   },
   following: {
-    type: Array,
+    type: [{ _id: ObjectId }],
     default: [],
   },
   location: {

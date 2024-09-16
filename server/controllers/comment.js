@@ -1,5 +1,8 @@
-import Posts from "../models/posts.js";
-// import Post from "../models/post.js";
+import Profile from "../models/profile.js";
+import User from "../models/user.js";
+
+import { getOnlineUsers } from "../socket/onlineUsers.js";
+import { getServerSocketInstance } from "../socket/socketServer.js";
 //TODO: find a way to send comments on patches
 
 /*READ*/
@@ -17,25 +20,72 @@ export const get = async (req, res) => {
 /*CREAT*/
 export const add = async (req, res) => {
   try {
-    let { text } = req.body;
-    text = text.trim();
     const { user, postList, post } = req;
-    if (post.isCommentsDisabled) {
+    const { text } = req.body;
+    const { fileInfo } = req;
+    const profile = await Profile.findById(user.id);
+    // if the comment disabled then only the post author can comment
+    if (post.isCommentsDisabled && user.id !== post.creatorId) {
       return res.status(409).json({ error: "comments are disabled" });
     }
-    const { fileInfo } = req;
-    if (text || fileInfo) {
-      post.comments.addToSet({
-        creatorId: user.id,
-        text,
-        file: fileInfo ? fileInfo : null,
-        createdAt: Date.now(),
-      });
-      await postList.save();
-      return res.status(200).json(post);
-    } else {
+    if (!(text || fileInfo)) {
       return res.status(400).json({ error: "comment cannot be empty" });
     }
+    /*
+    if who commented is NOT the same as the post creator 
+    then a notification will be created.
+    */
+    if (user.id !== post.creatorId) {
+      const newNotification = {
+        content: `${profile.firstName} commented on your post.`,
+        picture: profile.profilePicPath,
+        type: "comment",
+        cratedAt: Date.now(),
+        isRead: false,
+      };
+      const postCreator = await User.findById(post.creatorId);
+      if (postCreator) {
+        postCreator.notifications.unshift(newNotification);
+        postCreator.unreadNotificationsCount += 1;
+        await postCreator.save();
+
+        const notification = postCreator.notifications[0];
+
+        post.comments.addToSet({
+          creatorId: user.id,
+          text: text.trim(),
+          notificationId: notification?.id,
+          file: fileInfo ? fileInfo : null,
+          createdAt: Date.now(),
+        });
+        await postList.save();
+        const comment = post.comments[post.comments?.length - 1];
+        notification.url = `${process.env.APP_URL}/post/${post.creatorId}/${post.id}/${comment.id}`;
+        await postCreator.save();
+        // sending the notification by web socket
+        const socketIdsList = getOnlineUsers().get(post.creatorId);
+        if (socketIdsList) {
+          socketIdsList.map((socketId) => {
+            getServerSocketInstance()
+              .to(socketId)
+              .emit("push-notification", notification);
+          });
+        }
+        return res.status(200).json(post);
+      }
+    }
+    /*
+    if who commented is the same as the post creator 
+    then no notification will be created.
+    */
+    post.comments.addToSet({
+      creatorId: user.id,
+      text: text.trim(),
+      file: fileInfo ? fileInfo : null,
+      createdAt: Date.now(),
+    });
+    await postList.save();
+    return res.status(200).json(post);
   } catch {
     return res
       .status(500)
@@ -48,7 +98,7 @@ export const add = async (req, res) => {
 export const edit = async (req, res) => {
   try {
     const { text } = req.body;
-    const { user, postList, post, comment } = req;
+    const { user, postList, comment } = req;
     if (text) {
       if (comment.creatorId === user.id) {
         comment.text = text;
@@ -69,13 +119,89 @@ export const edit = async (req, res) => {
 
 export const likeToggle = async (req, res) => {
   try {
-    const { postList, user, comment } = req;
-    if (comment.likes.includes(user.id)) {
-      comment.likes = comment.likes.filter((id) => id !== user.id);
-    } else {
-      comment.likes.push(user.id);
+    const { postList, post, user, comment } = req;
+    const profile = await Profile.findById(user.id);
+    const { creatorId } = comment;
+    const commentCreator = await User.findById(comment.creatorId);
+
+    /*
+    if the comment's likes includes the user id, then
+    it means that the user liked the comment, therefore 
+    the user id will be removed from the comment's likes  
+    */
+    const like = comment.likes.id(user.id);
+    if (like) {
+      /*
+    if who unliked the comment is the same as the comment creator 
+    then no notification will be removed.
+    */
+      if (user.id !== comment.creatorId) {
+        // romving the like's notification
+        const notification = commentCreator.notifications.id(
+          like.notificationId
+        );
+        if (notification) {
+          const socketIdsList = getOnlineUsers().get(creatorId);
+          if (socketIdsList) {
+            socketIdsList.map((socketId) => {
+              getServerSocketInstance()
+                .to(socketId)
+                .emit("remove-notification", notification.id);
+            });
+          }
+
+          if (!notification.isRead) {
+            commentCreator.unreadNotificationsCount--;
+          }
+          notification.deleteOne();
+          await commentCreator.save();
+        }
+      }
+      like.deleteOne();
+      await postList.save();
+
+      return res.status(200).json({ likes: comment.likes });
     }
+
+    /*
+    if who liked the comment is the same as the comment creator 
+    then no notification will be created.
+    */
+    if (user.id !== comment.creatorId) {
+      const newNotification = {
+        content: `${profile.firstName} liked your comment.`,
+        picture: profile.profilePicPath,
+        type: "like",
+        url: `${process.env.APP_URL}/post/${post.creatorId}/${post.id}/${comment.id}`,
+        cratedAt: Date.now(),
+        isRead: false,
+      };
+      if (commentCreator) {
+        commentCreator.notifications.unshift(newNotification);
+        commentCreator.unreadNotificationsCount += 1;
+        await commentCreator.save();
+
+        const notification = commentCreator.notifications[0];
+        comment.likes.addToSet({
+          _id: user.id,
+          notificationId: notification.id,
+        });
+        await postList.save();
+
+        const socketIdsList = getOnlineUsers().get(creatorId);
+        if (socketIdsList) {
+          socketIdsList.map((socketId) => {
+            getServerSocketInstance()
+              .to(socketId)
+              .emit("push-notification", notification);
+          });
+        }
+      }
+      return res.status(200).json({ likes: comment.likes });
+    }
+    comment.likes.addToSet({ _id: user.id });
     await postList.save();
+
     return res.status(200).json({ likes: comment.likes });
   } catch {
     return res
@@ -89,13 +215,35 @@ export const likeToggle = async (req, res) => {
 export const deleteComment = async (req, res) => {
   try {
     const { user, postList, post, comment } = req;
-    if (user.id === comment.creatorId || user.id === post.creatorId) {
-      post.comments.id(comment.id).deleteOne();
-      await postList.save();
-      return res.status(200).json(post);
-    } else {
+    /*
+    the comment can be deleted ether by the comment
+    creator or the post creator
+    */
+    if (!(user.id === comment.creatorId || user.id === post.creatorId)) {
       return res.status(401).send("Unauthorized");
     }
+
+    const postCreator = await User.findById(post.creatorId);
+    const notification = postCreator.notifications.id(comment.notificationId);
+    if (notification) {
+      const socketIdsList = getOnlineUsers().get(post.creatorId);
+      if (socketIdsList) {
+        socketIdsList.map((socketId) => {
+          getServerSocketInstance()
+            .to(socketId)
+            .emit("remove-notification", notification.id);
+        });
+      }
+
+      if (!notification.isRead) {
+        postCreator.unreadNotificationsCount--;
+      }
+      notification.deleteOne();
+      await postCreator.save();
+    }
+    comment.deleteOne();
+    await postList.save();
+    return res.status(200).json(post);
   } catch {
     return res
       .status(500)

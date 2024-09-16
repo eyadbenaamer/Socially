@@ -7,6 +7,7 @@ import {
   setContacts,
   setProfile,
   setUnreadMessagesCount,
+  setUnreadNotificationsCount,
 } from "state";
 
 import SubmitBtn from "components/SubmitBtn";
@@ -35,13 +36,20 @@ const Form = () => {
     await axiosClient
       .post(`/login`, data)
       .then((response) => {
-        const { token, profile, isVerified, contacts, unreadMessagesCount } =
-          response.data;
+        const {
+          token,
+          profile,
+          isVerified,
+          contacts,
+          unreadMessagesCount,
+          unreadnotificationsCount,
+        } = response.data;
         // set all accounts info once login
         localStorage.setItem("token", token);
         dispatch(setProfile(profile));
         dispatch(setContacts(contacts));
         dispatch(setUnreadMessagesCount(unreadMessagesCount));
+        dispatch(setUnreadNotificationsCount(unreadnotificationsCount));
 
         // connect to socket server once login
         connectToSocketServer();
