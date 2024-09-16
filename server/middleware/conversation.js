@@ -12,8 +12,11 @@ export const establishNewConversation = async (req, res, next) => {
     const { userId: accountToFollowId } = req.query;
     const profileToFollow = await Profile.findById(accountToFollowId);
 
-    // if there is no mutual follow then conversation will not be created
-    if (!profileToFollow.following.includes(myId)) {
+    /*
+    if there is no mutual follow then conversation will not be created
+    it will be no contact between both users.
+    */
+    if (!profileToFollow.following.id(myId)) {
       return next();
     }
     /*
@@ -22,20 +25,36 @@ export const establishNewConversation = async (req, res, next) => {
     the first way: with contacts (mutual following)
     the second way: with non-contact accounts that had replied to a conversation request
     */
-    user.contacts.addToSet({ _id: accountToFollowId });
-    const conversation = await Conversation.create({
-      participants: [
-        { _id: new ObjectId(myId) },
-        { _id: new ObjectId(accountToFollowId) },
-      ],
-      updatedAt: new Date(),
+
+    // check if the conversation is already existing
+    let conversation = await Conversation.findOne({
+      participants: {
+        $in: [{ _id: myId }, { _id: accountToFollowId }],
+      },
     });
-    await conversation.save();
+
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [
+          { _id: new ObjectId(myId) },
+          { _id: new ObjectId(accountToFollowId) },
+        ],
+        updatedAt: new Date(),
+      });
+      await conversation.save();
+    }
+    user.contacts.addToSet({
+      _id: accountToFollowId,
+      conversationId: conversation.id,
+    });
     user.conversations.addToSet(conversation);
     await user.save();
 
     const userToFollow = await User.findById(accountToFollowId);
-    userToFollow.contacts.addToSet({ _id: myId });
+    userToFollow.contacts.addToSet({
+      _id: myId,
+      conversationId: conversation.id,
+    });
     userToFollow.conversations.addToSet(conversation);
     await userToFollow.save();
     next();
