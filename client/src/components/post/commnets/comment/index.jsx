@@ -26,7 +26,8 @@ const Comment = (props) => {
   } = props;
   const { replyId } = useParams();
   const post = useContext(PostContext);
-  const [profile] = useFetchProfile(creatorId);
+  const myProfile = useSelector((state) => state.profile);
+  const [postCreatorProfile] = useFetchProfile(creatorId);
   const currentUser = useSelector((state) => state.profile);
   const [isModifying, setIsModifying] = useState(false);
   const [showReplies, setShowReplies] = useState(Boolean(replyId));
@@ -34,12 +35,12 @@ const Comment = (props) => {
 
   return (
     <>
-      {props.comment && profile && (
+      {props.comment && postCreatorProfile && (
         <div className="flex flex-col gap-2 rounded-xl items-start justify-start">
           <div className="flex items-center gap-2">
             <div className="flex gap-2 items-start">
               <div className="flex">
-                <UserPicture profile={profile} />
+                <UserPicture profile={postCreatorProfile} />
               </div>
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
@@ -49,10 +50,11 @@ const Comment = (props) => {
                         className={`bg-300 rounded-xl shadow-md w-fit px-3 py-2`}
                       >
                         <Link
-                          to={`/profile/${profile.username}`}
+                          to={`/profile/${postCreatorProfile.username}`}
                           className="hover:underline"
                         >
-                          {profile.firstName} {profile.lastName}
+                          {postCreatorProfile.firstName}{" "}
+                          {postCreatorProfile.lastName}
                         </Link>
                         <Text
                           postCreatorId={post.creatorId}
@@ -103,12 +105,17 @@ const Comment = (props) => {
                 {showReplies && (
                   <div className="-ms-5">
                     {replies && (
-                      <Replies commentCreator={profile} replies={replies} />
+                      <Replies
+                        commentCreator={postCreatorProfile}
+                        replies={replies}
+                      />
                     )}
                     <div className="-ms-6">
-                      {!post.isCommentsDisabled && currentUser && (
-                        <AddComment type="reply" commentId={id} />
-                      )}
+                      {(!post.isCommentsDisabled ||
+                        myProfile?._id === post.creatorId) &&
+                        currentUser && (
+                          <AddComment type="reply" commentId={id} />
+                        )}
                     </div>
                   </div>
                 )}

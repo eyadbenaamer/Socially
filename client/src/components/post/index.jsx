@@ -68,16 +68,18 @@ export const Post = (props) => {
                   show more
                 </button>
                 {profile &&
-                  (post.isCommentsDisabled === false ? (
+                  (!post.isCommentsDisabled ||
+                    profile._id === post.creatorId) && (
                     <AddComment type="comment" />
-                  ) : (
-                    <div className="text-center p-4 bg-300 rounded-xl w-full">
-                      {profile && profile._id === creatorId
-                        ? "You"
-                        : "The post creator"}{" "}
-                      turned off the comments.
-                    </div>
-                  ))}
+                  )}
+                {post.isCommentsDisabled && profile?._id !== post.creatorId && (
+                  <div className="text-center p-4 bg-300 rounded-xl w-full">
+                    {profile && profile._id === creatorId
+                      ? "You"
+                      : "The post creator"}{" "}
+                    turned off the comments.
+                  </div>
+                )}
               </div>
             )}
           </PostContext.Provider>
