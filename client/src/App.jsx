@@ -33,6 +33,7 @@ const App = () => {
     (state) => state.authStatus
   );
   const theme = useSelector((state) => state.settings.theme);
+  const profile = useSelector((state) => state.profile);
   const windowWidth = useWindowWidth();
   const dispatch = useDispatch();
 
@@ -70,7 +71,7 @@ const App = () => {
 
   useEffect(() => {
     if (!sessionStorage.getItem("isLoaded")) {
-      dispatch(setConversations(null));
+      dispatch(setConversations([]));
     }
   }, []);
 
@@ -203,7 +204,7 @@ const App = () => {
           </Routes>
           <InfoMessage />
         </motion.main>
-        {isLoggedin && windowWidth < 1024 && <Bar />}
+        {isLoggedin && !email && windowWidth < 1024 && <Bar />}
       </div>
     </BrowserRouter>
   );

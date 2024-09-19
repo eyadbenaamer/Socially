@@ -78,6 +78,6 @@ const useHandleSocket = () => {
 };
 
 export const disconnectFromSocketServer = () => {
-  socket.close();
+  socket?.close();
 };
 export default useHandleSocket;

@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import Conversation from "../models/conversation.js";
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
+import User from "../models/user.js";
 
 const { ObjectId } = Types;
 
@@ -12,19 +13,11 @@ export const getAll = async (req, res) => {
     if (!page) {
       page = 1;
     }
+
     let conversations = await Conversation.aggregate([
       {
         $match: {
           participants: { $elemMatch: { _id: user._id } },
-          messages: {
-            $elemMatch: {
-              to: {
-                $elemMatch: {
-                  _id: user._id,
-                },
-              },
-            },
-          },
         },
       },
       {
@@ -84,7 +77,8 @@ export const getAll = async (req, res) => {
 
     conversations = conversations.slice((page - 1) * 10, page * 10);
     return res.status(200).json(conversations);
-  } catch {
+  } catch (err) {
+    console.log(err);
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
@@ -159,8 +153,9 @@ export const setRead = async (req, res) => {
     while (true) {
       const message = conversation.messages[index];
       if (!message) {
+        break;
       }
-      const isRead = Boolean(message?.info.readBy.id(user.id));
+      const isRead = Boolean(message.info.readBy.id(user.id));
       if (!isRead) {
         message.info.readBy.addToSet(user.id);
         conversation.participants.id(user.id).unreadMessagesCount -= 1;
@@ -185,7 +180,8 @@ export const setRead = async (req, res) => {
       }
     });
     return res.status(200).json(conversation[0]?.messages);
-  } catch {
+  } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });

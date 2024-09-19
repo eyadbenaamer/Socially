@@ -98,6 +98,7 @@ export const slice = createSlice({
           conversation.unreadMessagesCount =
             newConversation.unreadMessagesCount;
           conversation.messages = newConversation.messages;
+          conversation.participants = newConversation.participants;
           conversation.updatedAt = newConversation.updatedAt;
         }
       });

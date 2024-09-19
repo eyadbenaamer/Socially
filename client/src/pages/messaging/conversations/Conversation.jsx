@@ -10,18 +10,17 @@ import useFetchProfile from "hooks/useFetchProfile";
 const Conversation = ({ conversation }) => {
   const { conversationId } = useParams();
   const myProfile = useSelector((state) => state.profile);
-
   const theme = useSelector((state) => state.settings.theme);
 
-  const { _id: participantId } = conversation.participants.find(
+  const participantId = conversation.participants?.find(
     (participant) => participant._id !== myProfile._id
-  );
+  )._id;
   const [senderProfile] = useFetchProfile(participantId);
   const { unreadMessagesCount } = conversation;
   const lastMessage = conversation.messages[0];
-  const { isOnline } = useSelector((state) => state.contacts).find(
+  const isOnline = useSelector((state) => state.contacts).find(
     (contact) => contact._id === participantId
-  );
+  )?.isOnline;
 
   return (
     <>
@@ -63,13 +62,14 @@ const Conversation = ({ conversation }) => {
                   }`}
                 >
                   <div className="h-4 overflow-hidden">
-                    {lastMessage.senderId === myProfile._id && "You: "}
-                    {lastMessage.text.slice(0, 20)}
-                    {lastMessage.text.length > 20 ? "..." : ""}
+                    {!lastMessage && "No Messages."}
+                    {lastMessage?.senderId === myProfile._id && "You: "}
+                    {lastMessage?.text.slice(0, 20)}
+                    {lastMessage?.text.length > 20 ? "..." : ""}
                   </div>
                 </div>
                 <div className="flex items-center  h-fit self-end text-xs text-gray-500">
-                  {lastMessage.senderId === myProfile._id && (
+                  {lastMessage?.senderId === myProfile._id && (
                     <Status info={lastMessage.info} />
                   )}
                   <div>19:20</div>

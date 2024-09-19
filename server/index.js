@@ -155,7 +155,9 @@ mongoose.connect(process.env.DATABASE_URL, {
 });
 const server = createServer(app);
 createSocketServer(server);
-
+setInterval(() => {
+  console.log(getOnlineUsers());
+}, 2000);
 try {
   server.listen(PORT, () => console.log(`Server Connected on Port: ${PORT}`));
 } catch (error) {
