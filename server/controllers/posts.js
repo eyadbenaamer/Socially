@@ -11,7 +11,7 @@ export const getFeedPosts = async (req, res) => {
       profile.following.map((id) => {
         Posts.findById(id).then((account) => {
           // including one post for each following account
-          account.posts.map((post) => {
+          account.posts?.map((post) => {
             // if the user haven't seen the post it will be included in the feed
             // otherwise it will be moved to the next post to check if it's not seen
             if (!post.views.includes(profile.id)) {

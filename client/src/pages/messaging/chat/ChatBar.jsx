@@ -23,12 +23,7 @@ const ChatBar = (props) => {
       </Link>
       {participantProfile && (
         <>
-          <div className="relative">
-            <UserPicture profile={participantProfile} />
-            {participant.isOnline && (
-              <div className="green-dot h-2.5 w-2.5 circle bg-green-700 absolute left-1 bottom-0.5"></div>
-            )}
-          </div>
+          <UserPicture profile={participantProfile} />
           <div className="flex flex-col justify-around">
             <span className="font-bold">
               {participantProfile.firstName} {participantProfile.lastName}

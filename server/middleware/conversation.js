@@ -29,7 +29,7 @@ export const establishNewConversation = async (req, res, next) => {
     // check if the conversation is already existing
     let conversation = await Conversation.findOne({
       participants: {
-        $in: [{ _id: myId }, { _id: accountToFollowId }],
+        $all: [{ _id: myId }, { _id: accountToFollowId }],
       },
     });
 

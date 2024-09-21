@@ -26,15 +26,7 @@ const UserSchema = new Schema(
       default: [],
     },
     notifications: [NotificationSchema],
-    conversations: {
-      type: [
-        {
-          _id: { type: ObjectId, rel: "User" },
-        },
-      ],
-      rel: "Conversation",
-      default: [],
-    },
+    conversations: [{ type: ObjectId, ref: "Conversation" }],
     unreadMessagesCount: { type: Number, default: 0, min: 0 },
     unreadNotificationsCount: { type: Number, default: 0, min: 0 },
     /*

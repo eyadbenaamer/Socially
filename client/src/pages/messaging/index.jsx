@@ -1,4 +1,3 @@
-// TODO:fix height issue
 import { createContext, useEffect, useMemo, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -67,20 +66,17 @@ const Messaging = () => {
     )
       .then((response) => setUnreadMessages(response.data))
       .catch((err) => {
-        console.log(err);
         // TODO: handle error
       });
     if (!unreadMessages || conversation?.messages?.length === 1) {
       axiosClient(`/conversation/?conversationId=${conversationId}&page=1`)
         .then((response) => dispatch(setConversation(response.data)))
         .catch((err) => {
-          console.log(err);
           // TODO: handle error
         });
     }
   }, [conversationId]);
 
-  console.log(conversation);
   return (
     <>
       <ConversationContext.Provider

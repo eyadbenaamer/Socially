@@ -7,6 +7,7 @@ import SubmitBtn from "components/SubmitBtn";
 import axiosClient from "utils/AxiosClient";
 import UsernameInput from "./UsernameInput";
 import Pictures from "./Pictures";
+import { connectToSocketServer } from "hooks/useHandleSocket";
 
 const Welcome = () => {
   const [data, setData] = useState({
@@ -134,6 +135,7 @@ const Welcome = () => {
                   // if the request was successful, the response will return the updated profile
                   dispatch(setAuthStatus({ email: "" }));
                   dispatch(setProfile(resposnse.data));
+                  connectToSocketServer();
                 })
                 .catch(() => {});
             }}

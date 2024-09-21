@@ -21,7 +21,6 @@ const MessagesArea = () => {
           )
         )
         .catch((err) => {
-          console.log(err);
           // TODO: handle error
         });
     }
