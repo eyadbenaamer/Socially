@@ -33,7 +33,6 @@ const App = () => {
     (state) => state.authStatus
   );
   const theme = useSelector((state) => state.settings.theme);
-  const profile = useSelector((state) => state.profile);
   const windowWidth = useWindowWidth();
   const dispatch = useDispatch();
 

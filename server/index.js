@@ -40,7 +40,6 @@ import { compressImages } from "./middleware/media.js";
 import { getPostsInfo } from "./middleware/post.js";
 import { uploadSingleFile } from "./middleware/media.js";
 import { getConversationInfo, isInChat } from "./middleware/conversation.js";
-import { getOnlineUsers } from "./socket/onlineUsers.js";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -147,17 +146,24 @@ app.use("/reply", replyRoute);
 app.use("/notifications", notificationRoute);
 app.use("/conversation", conversationRoute);
 app.use("/message", messageRoute);
+
 /*MONGOOSE SETUP*/
-const PORT = process.env.PORT;
-mongoose.connect(process.env.DATABASE_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+mongoose
+  .connect(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .catch((error) => {
+    console.error("MongoDB connection error:", error);
+  });
+mongoose.connection.on("error", (error) => {
+  console.error("MongoDB connection error:", error);
 });
+
+const PORT = process.env.PORT;
 const server = createServer(app);
 createSocketServer(server);
-setInterval(() => {
-  console.log(getOnlineUsers());
-}, 2000);
+
 try {
   server.listen(PORT, () => console.log(`Server Connected on Port: ${PORT}`));
 } catch (error) {

@@ -1,12 +1,6 @@
 import express from "express";
 
-import {
-  clear,
-  getAll,
-  getOne,
-  getUnreadMessages,
-  setRead,
-} from "../controllers/conversation.js";
+import { clear, getAll, getOne, setRead } from "../controllers/conversation.js";
 
 import { verifyId } from "../middleware/check.js";
 import { verifyToken } from "../middleware/auth.js";
@@ -20,7 +14,6 @@ const router = express.Router();
 
 router.get("/all", verifyId, verifyToken, getAll);
 router.get("/", verifyId, verifyToken, getOne);
-router.get("/unread_messages", verifyId, verifyToken, getUnreadMessages);
 router.get("/set_read", verifyId, verifyToken, setRead);
 
 /*DELETE*/

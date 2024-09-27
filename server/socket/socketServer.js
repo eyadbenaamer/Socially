@@ -1,10 +1,12 @@
 import { Server } from "socket.io";
+
 import { verifySocketToken } from "../middleware/auth.js";
 
 import {
   connectHandler,
   disconnectHandler,
 } from "../socketControllers/status.js";
+import { notifyTypingHandler } from "../socketControllers/message.js";
 
 let io;
 
