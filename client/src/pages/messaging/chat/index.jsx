@@ -11,30 +11,30 @@ import { useWindowWidth } from "hooks/useWindowWidth";
 
 const Chat = () => {
   const windowWidth = useWindowWidth();
-  const { participantProfile, participant } = useContext(ConversationContext);
+  const { conversation } = useContext(ConversationContext);
+
+  const { theme } = useSelector((state) => state.settings);
+
   const transition = {
     initial: { x: 1000 },
     animate: { x: 0 },
-    transition: { duration: 0.5, ease: "circInOut" },
+    transition: { duration: 0.7 },
   };
-  const { theme } = useSelector((state) => state.settings);
   const boxShadow =
     theme === "dark" ? "0 0 6px 1px #00000036" : "0 0 5px 0px #00000021";
 
   return (
     <motion.div
       {...transition}
-      className="relative h-full bg-alt w-full"
+      className="relative h-full bg-alt"
       style={{
         height: windowWidth < 1024 ? "calc(100vh - 95px)" : "",
         boxShadow,
       }}
     >
-      {participantProfile && participant && (
-        <ChatBar participantProfile={participantProfile} />
-      )}
-      <div className="px-2 overflow-y-scroll h-[85%]">
-        <MessagesArea />
+      <ChatBar />
+      <div className="px-2 h-[80%]">
+        <MessagesArea unreadMessagesCount={conversation.unreadMessagesCount} />
       </div>
       <div className="absolute bottom-0 px-4 w-full">
         <SendMessage />

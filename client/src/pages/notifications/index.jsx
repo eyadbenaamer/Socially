@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import Sidebar from "components/sidebar";
 import Notification from "./notification";
+import LoadingNotification from "./LoadingNotification";
 
 import {
   clearNotifications,
@@ -13,8 +14,6 @@ import {
 
 import { useWindowWidth } from "hooks/useWindowWidth";
 import axiosClient from "utils/AxiosClient";
-
-import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const Notifications = () => {
   const windowWidth = useWindowWidth();
@@ -136,15 +135,15 @@ it changes in /notifications route
           </div>
         </div>
         {notifications?.length === 0 && <>No notifications</>}
-        <ul ref={container} className="flex flex-col gap-2">
-          <li>
-            {notifications.map((notification) => (
+        <ul ref={container} className="flex flex-col gap-2 pt-4">
+          {notifications.map((notification) => (
+            <li>
               <Notification {...notification} />
-            ))}
-          </li>
+            </li>
+          ))}
           {notifications?.length >= 10 && (
-            <div ref={loading} className="w-8 self-center">
-              <LoadingIcon className="icon" />
+            <div ref={loading}>
+              <LoadingNotification />
             </div>
           )}
         </ul>
