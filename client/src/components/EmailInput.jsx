@@ -9,16 +9,14 @@ import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const EmailInput = (props) => {
   const { fieldValue, setData, setIsValid, type, placeholder } = props;
-  const [check, setCheck] = useState({ state: "", message: "" });
-
   const regex = /((\w)+.?)+@\w{1,}\.\w{2,}/gi;
-  const input = useRef(null);
-  useEffect(
-    () => setIsValid(check.state === "success" ? true : false),
-    [check]
-  );
+
+  const [check, setCheck] = useState({ state: "", message: "" });
   const [focused, setFocused] = useState(false);
-  const [isEmailChecked, setIsEmailChecked] = useState(true);
+  const [changed, setChanged] = useState(false);
+  const [isEmailChecked, setIsEmailChecked] = useState(false);
+
+  const input = useRef(null);
 
   const verifyValue = () => {
     if (!fieldValue) {
@@ -34,6 +32,8 @@ const EmailInput = (props) => {
         ...prev,
         email: fieldValue.trim().toLowerCase(),
       }));
+
+      // checking of email availability
       axiosClient(`check_email_availability/${type}/${fieldValue}`)
         .then((response) => {
           const { message } = response.data;
@@ -42,14 +42,16 @@ const EmailInput = (props) => {
             state: "success",
             message,
           });
+          setIsEmailChecked(true);
         })
         .catch((error) => {
+          setIsEmailChecked(true);
           setCheck({ state: "fail", message: error.response.data.message });
           input.current.style.border = "solid 2px red";
         });
-      setIsEmailChecked(true);
-      setCheck({ state: "success" });
-    } else {
+      return;
+    }
+    if (!isValid) {
       input.current.style.border = "solid 2px red";
       setData((prev) => ({ ...prev, email: fieldValue }));
       setIsEmailChecked(true);
@@ -60,11 +62,24 @@ const EmailInput = (props) => {
     }
   };
 
+  useEffect(
+    () => setIsValid(check.state === "success" ? true : false),
+    [check]
+  );
+
+  useEffect(() => {
+    if (!focused && fieldValue && input.current) {
+      verifyValue(input.current);
+    }
+  }, [fieldValue]);
+
   return (
     <>
       <label htmlFor="email">Email</label>
       <div className="flex gap-2 items-center">
         <input
+          type="text"
+          name="email"
           tabIndex={1}
           ref={input}
           defaultValue={fieldValue}
@@ -79,21 +94,26 @@ const EmailInput = (props) => {
             e.target.style.border = "solid 2px transparent";
             setIsEmailChecked(false);
             setFocused(true);
+            if (!changed) {
+              setChanged(true);
+            }
           }}
           onChange={(e) => {
             const value = e.target.value.trim();
             setData((prev) => ({ ...prev, email: value }));
             window.sessionStorage.setItem("email", value);
+            if (!focused && changed) {
+              verifyValue(e.target);
+            }
           }}
           onBlur={() => {
             verifyValue();
             setFocused(false);
           }}
-          type="text"
-          name="email"
         />
         <div className="w-10">
           {!focused &&
+            fieldValue &&
             (!isEmailChecked ? (
               <LoadingIcon />
             ) : (

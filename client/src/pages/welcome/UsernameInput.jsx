@@ -31,53 +31,56 @@ const UsernameInput = (props) => {
     [check]
   );
   const [focused, setFocused] = useState(false);
-  const [isUsernameChecked, setIsUsernameChecked] = useState(true);
+  const [isUsernameChecked, setIsUsernameChecked] = useState(false);
 
   const verifyValue = () => {
-    setIsUsernameChecked(true);
     setData((prev) => ({
       ...prev,
       username: fieldValue.trim().toLowerCase(),
     }));
     if (!fieldValue) {
+      setIsUsernameChecked(true);
       input.current.style.border = "solid 2px red";
       setCheck({ state: "fail", message: "Required" });
       return;
     }
     const isValid = /^\w+$/gi.test(fieldValue);
     if (isValid && fieldValue.length <= 20) {
-      if (fieldValue) {
-        axiosClient
-          .post(`profile/check_username_availability`, {
-            username: fieldValue,
-          })
-          .then((response) => {
-            const { message } = response.data;
-            input.current.style.border = "solid 2px green";
-            setCheck({
-              state: "success",
-              message,
-            });
-          })
-          .catch((error) => {
-            setCheck({ state: "fail", message: error.response.data.message });
-            input.current.style.border = "solid 2px red";
+      axiosClient
+        .post(`profile/check_username_availability`, {
+          username: fieldValue,
+        })
+        .then((response) => {
+          const { message } = response.data;
+          input.current.style.border = "solid 2px green";
+          setCheck({
+            state: "success",
+            message,
           });
-      }
-      setCheck({ state: "success" });
-    } else {
-      input.current.style.border = "solid 2px red";
-      if (isValid && fieldValue.length > 20) {
-        setCheck({
-          state: "fail",
-          message: "Username is too large.",
+          setIsUsernameChecked(true);
+        })
+        .catch((error) => {
+          setCheck({ state: "fail", message: error.response.data.message });
+          input.current.style.border = "solid 2px red";
+          setIsUsernameChecked(true);
         });
-      } else {
-        setCheck({
-          state: "fail",
-          message: "Invalid username",
-        });
-      }
+      return;
+    }
+    input.current.style.border = "solid 2px red";
+    if (isValid && fieldValue.length > 20) {
+      setIsUsernameChecked(true);
+      setCheck({
+        state: "fail",
+        message: "Username is too large.",
+      });
+      return;
+    }
+    if (!isValid) {
+      setIsUsernameChecked(true);
+      setCheck({
+        state: "fail",
+        message: "Invalid username",
+      });
     }
   };
 
@@ -87,7 +90,7 @@ const UsernameInput = (props) => {
       <div className="flex gap-1 items-center">
         @
         <input
-          tabIndex={1}
+          autoFocus
           ref={input}
           defaultValue={fieldValue}
           placeholder={"username"}
@@ -160,7 +163,7 @@ const UsernameInput = (props) => {
             check.state === "fail" ? "text-red-500" : "text-green-500"
           }`}
         >
-          {!focused && check.message}
+          {!focused && isUsernameChecked && check.message}
         </div>
         <div>{fieldValue.length}/20</div>
       </div>

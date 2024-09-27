@@ -14,55 +14,62 @@ const Input = (props) => {
     setIsValid,
     placeholder,
   } = props;
-  const [check, setCheck] = useState({ state: "", message: "" });
 
   const regex =
     /.[^!|@|#|$|%|^|&|*|(|)|_|-|=|+|<|>|/|\\|'|"|:|;|[|]|\{|\}]{2,}/gi;
 
-  const input = useRef(null);
-  useEffect(() => {
-    if (!focused && fieldValue && input.current) {
-      verifyValue(input.current);
-    }
-  }, []);
-
-  useEffect(
-    () => setIsValid(check.state === "success" ? true : false),
-    [check]
-  );
-
+  const [check, setCheck] = useState({ state: "", message: "" });
   const [focused, setFocused] = useState(autoFocus);
+  const [changed, setChanged] = useState(false);
+
+  const input = useRef(null);
+
   const verifyValue = () => {
     if (!fieldValue) {
       input.current.style.border = "solid 2px red";
       setData((prev) => ({ ...prev, [name]: fieldValue }));
       setCheck({ state: "fail", message: "Required" });
-    } else {
-      const isValid = regex.test(fieldValue);
-      if (isValid) {
-        input.current.style.border = "solid 2px green";
-        setData((prev) => ({
-          ...prev,
-          [name]: fieldValue.trim(),
-        }));
-        setCheck({ state: "success" });
-      } else {
-        input.current.style.border = "solid 2px red";
-        setData((prev) => ({ ...prev, [name]: fieldValue }));
+      return;
+    }
 
-        setCheck({
-          state: "fail",
-          message: `Invalid ${label.toLowerCase()}`,
-        });
-      }
+    const isValid = regex.test(fieldValue);
+    if (isValid) {
+      input.current.style.border = "solid 2px green";
+      setData((prev) => ({
+        ...prev,
+        [name]: fieldValue.trim(),
+      }));
+      setCheck({ state: "success" });
+      return;
+    }
+
+    if (!isValid) {
+      input.current.style.border = "solid 2px red";
+      setData((prev) => ({ ...prev, [name]: fieldValue }));
+      setCheck({
+        state: "fail",
+        message: `Invalid ${label.toLowerCase()}`,
+      });
     }
   };
+
+  useEffect(() => {
+    setIsValid(check.state === "success" ? true : false);
+  }, [check]);
+
+  useEffect(() => {
+    if (!focused && fieldValue && input.current) {
+      verifyValue(input.current);
+    }
+  }, [fieldValue]);
 
   return (
     <>
       <label htmlFor={name}>{label}</label>
       <div className="flex gap-2 items-center">
         <input
+          type="text"
+          name={name}
           tabIndex={1}
           ref={input}
           defaultValue={fieldValue}
@@ -77,12 +84,15 @@ const Input = (props) => {
           onFocus={(e) => {
             e.target.style.border = "solid 2px transparent";
             setFocused(true);
+            if (!changed) {
+              setChanged(true);
+            }
           }}
           onChange={(e) => {
             const value = e.target.value.trim();
             setData((prev) => ({ ...prev, [name]: value }));
             window.sessionStorage.setItem([e.target.name], value);
-            if (!focused) {
+            if (!focused && changed) {
               verifyValue(e.target);
             }
           }}
@@ -90,8 +100,6 @@ const Input = (props) => {
             verifyValue(e.target);
             setFocused(false);
           }}
-          type="text"
-          name={name}
         />
         <div className="w-10">
           {!focused && (

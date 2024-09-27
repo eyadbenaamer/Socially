@@ -80,7 +80,7 @@ const Form = (props) => {
           <div className="col-span-1">
             <Input
               setIsValid={(isValid) =>
-                setIsValidInputs({ ...isValidInputs, firstName: isValid })
+                setIsValidInputs((prev) => ({ ...prev, firstName: isValid }))
               }
               fieldValue={data.firstName}
               name={"firstName"}
@@ -93,7 +93,7 @@ const Form = (props) => {
           <div className="col-span-1">
             <Input
               setIsValid={(isValid) =>
-                setIsValidInputs({ ...isValidInputs, lastName: isValid })
+                setIsValidInputs((prev) => ({ ...prev, lastName: isValid }))
               }
               fieldValue={data.lastName}
               name={"lastName"}
@@ -106,7 +106,7 @@ const Form = (props) => {
             <EmailInput
               type="register"
               setIsValid={(isValid) =>
-                setIsValidInputs({ ...isValidInputs, email: isValid })
+                setIsValidInputs((prev) => ({ ...prev, email: isValid }))
               }
               fieldValue={data.email}
               setData={setData}
@@ -115,7 +115,7 @@ const Form = (props) => {
           <div className="col-span-1 ">
             <PasswordInput
               setIsValid={(isValid) =>
-                setIsValidInputs({ ...isValidInputs, password: isValid })
+                setIsValidInputs((prev) => ({ ...prev, password: isValid }))
               }
               data={data}
               setData={setData}
@@ -127,7 +127,10 @@ const Form = (props) => {
           <div className="col-span-1 ">
             <PasswordInput
               setIsValid={(isValid) =>
-                setIsValidInputs({ ...isValidInputs, confirmPassword: isValid })
+                setIsValidInputs((prev) => ({
+                  ...prev,
+                  confirmPassword: isValid,
+                }))
               }
               data={data}
               setData={setData}

@@ -11,14 +11,16 @@ import crossAnimationData from "assets/icons/cross.json";
 const PasswordInput = (props) => {
   const { setData, fieldValue, setIsValid, data, name, placeholder } = props;
   const theme = useSelector((state) => state.settings.theme);
+  const regex =
+    /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}/g;
+
   const [inputType, setInputType] = useState("password");
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [changed, setChanged] = useState(false);
   const [check, setCheck] = useState({ state: "", message: "" });
-  const input = useRef(null);
 
-  const regex =
-    /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}/g;
+  const input = useRef(null);
 
   const verifyValue = () => {
     if (name === "password") {
@@ -36,7 +38,9 @@ const PasswordInput = (props) => {
         }));
         input.current.style.border = "solid 2px green";
         setCheck({ state: "success" });
-      } else {
+        return;
+      }
+      if (!isValid) {
         input.current.style.border = "solid 2px red";
         setData((prev) => ({ ...prev, [name]: fieldValue }));
         setCheck({
@@ -44,20 +48,20 @@ const PasswordInput = (props) => {
           message: "Invalid password",
         });
       }
+      return;
     }
     if (name === "confirmPassword") {
       if (!input.current.value) {
         input.current.style.border = "solid 2px red";
         setCheck({ state: "fail", message: "Required" });
         return;
+      }
+      if (input.current.value === data.password) {
+        input.current.style.border = "solid 2px green";
+        setCheck({ state: "success" });
       } else {
-        if (input.current.value === data.password) {
-          input.current.style.border = "solid 2px green";
-          setCheck({ state: "success" });
-        } else {
-          input.current.style.border = "solid 2px red";
-          setCheck({ state: "fail", message: "Passwords don't match" });
-        }
+        input.current.style.border = "solid 2px red";
+        setCheck({ state: "fail", message: "Passwords don't match" });
       }
     }
   };
@@ -98,12 +102,18 @@ const PasswordInput = (props) => {
               if (name === "password") {
                 setShowPasswordForm(true);
               }
+              if (!changed) {
+                setChanged(true);
+              }
               setFocused(true);
             }}
             onChange={(e) => {
               const value = e.target.value.trim();
               setData((prev) => ({ ...prev, [name]: value }));
               window.sessionStorage.setItem([e.target.name], value);
+              if (!focused && changed) {
+                verifyValue(e.target);
+              }
             }}
             onBlur={(e) => {
               verifyValue(e.target);
@@ -133,7 +143,7 @@ const PasswordInput = (props) => {
             >
               <div>Length at least 8 letters</div>
               <div>Contains at least 1 digit</div>
-              <div>Contains at least 1 character</div>
+              <div>Contains at least 1 special character</div>
               <div>Contains at least 1 upper case letter</div>
               <div>Contains at least 1 lower case letter</div>
             </motion.div>
