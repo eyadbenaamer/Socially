@@ -3,8 +3,9 @@ import { ReactComponent as DoubleTickIcon } from "assets/icons/double-tick.svg";
 
 const Status = (props) => {
   const { deliveredTo, readBy } = props.info;
+
   return (
-    <div className="w-6">
+    <>
       {deliveredTo.length === 1 && <SingleTickIcon />}
       {deliveredTo.length === 2 && (
         <DoubleTickIcon
@@ -12,7 +13,7 @@ const Status = (props) => {
           className={readBy.length === 2 ? "text-primary" : "text-[#464851]"}
         />
       )}
-    </div>
+    </>
   );
 };
 
