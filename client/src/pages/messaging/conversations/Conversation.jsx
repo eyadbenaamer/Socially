@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 
 import UserPicture from "../UserPicture";
 import Status from "../chat/messages-area/message/Status";
+import Time from "components/time";
 
 import useFetchProfile from "hooks/useFetchProfile";
 
@@ -72,7 +72,7 @@ const Conversation = ({ conversation }) => {
                   {lastMessage?.senderId === myProfile._id && (
                     <Status info={lastMessage.info} />
                   )}
-                  <div>19:20</div>
+                  <Time date={conversation.updatedAt} withDate />
                 </div>
               </div>
             </div>
