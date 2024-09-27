@@ -8,6 +8,7 @@ import {
   deleteMessage,
   messageLikeToggle,
   removeNotification,
+  setNotifyTyping,
   updateActivityStatus,
   updateConversationStatus,
 } from "state";
@@ -66,6 +67,10 @@ const useHandleSocket = () => {
     });
     socket.on("delete-message", (data) => {
       dispatch(deleteMessage(data));
+    });
+
+    socket.on("notify-typing", (data) => {
+      dispatch(setNotifyTyping(data));
     });
     socket.on("push-notification", (data) => {
       dispatch(addNotification(data));

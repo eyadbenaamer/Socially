@@ -1,22 +1,23 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-
-import UserPicture from "components/UserPicture";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import axiosClient from "utils/AxiosClient";
 
 import { ReactComponent as PhotoIcon } from "assets/icons/photo.svg";
 import { ReactComponent as AddCommentIcon } from "assets/icons/create-comment.svg";
 import { ReactComponent as CloseIcon } from "assets/icons/cross.svg";
-import { useParams } from "react-router-dom";
+import { socket } from "hooks/useHandleSocket";
 
-const SendMessage = (props) => {
-  const profile = useSelector((state) => state.profile);
+const SendMessage = () => {
+  const { conversationId } = useParams();
+
   const [text, setText] = useState("");
   const [media, setMedia] = useState(null);
   const [replyTo, setReplyTo] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  const textArea = useRef(null);
   const mediaBtn = useRef(null);
-  const { conversationId } = useParams();
 
   const send = () => {
     const formData = new FormData();
@@ -28,33 +29,57 @@ const SendMessage = (props) => {
         `message/send?conversationId=${conversationId}&replyTo=${replyTo}`,
         formData
       )
-      .then((response) => null)
       .catch((err) => {});
   };
 
   const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit("notify-typing", { conversationId, isTyping });
+    }
+  }, [isTyping, socket]);
+
+  // this refocuses on the text area once the conversation changes
+  useEffect(() => {
+    textArea.current.focus();
+  }, [conversationId]);
+
   return (
     <div className="w-full py-3">
       <div className="flex flex-col gap-2 w-full">
         <div className="flex items-center gap-2 bg-300 py-2 px-2 rounded-xl shadow-md">
           <textarea
+            ref={textArea}
+            autoFocus
             onKeyDown={(e) => {
-              if (text) {
-                if (e.key === "Enter" && !e.ctrlKey) {
-                  send();
-                  setMedia(null);
-                  setFile(null);
-                  setText("");
-                } else if (e.key === "Enter") {
-                  e.target.value += "\n";
-                }
+              if (!text) {
+                return;
+              }
+              if (e.key === "Enter" && !e.ctrlKey) {
+                setIsTyping(false);
+                send();
+                setMedia(null);
+                setFile(null);
+                setText("");
+              } else if (e.key === "Enter") {
+                e.target.value += "\n";
               }
             }}
             value={text}
             dir="auto"
             className="comment-input h-6 w-4/5"
             placeholder={"Message"}
-            onChange={(e) => setText(e.target.value.trimStart())}
+            onChange={(e) => {
+              const input = e.target.value.trimStart();
+              if (input) {
+                setIsTyping(true);
+              }
+              setText(input);
+            }}
+            onBlur={() => {
+              setIsTyping(false);
+            }}
           ></textarea>
           <div className="flex justify-end w-1/5">
             <input
@@ -87,6 +112,8 @@ const SendMessage = (props) => {
                 !(text || media) ? "icon opacity-30" : "icon-hover"
               }`}
               onClick={() => {
+                setIsTyping(false);
+                textArea.current?.focus();
                 send();
                 setMedia(null);
                 setFile(null);
