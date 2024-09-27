@@ -144,7 +144,7 @@ export const follow = async (req, res) => {
       picture: myProfile.profilePicPath,
       type: "follow",
       url: `${process.env.APP_URL}/profile/${myProfile.username}`,
-      cratedAt: Date.now(),
+      createdAt: Date.now(),
       isRead: false,
     };
     userToFollow.notifications.unshift(newNotification);

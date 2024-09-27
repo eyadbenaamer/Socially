@@ -28,7 +28,7 @@ export const add = async (req, res) => {
         content: `${profile.firstName} replied to your comment.`,
         picture: profile.profilePicPath,
         type: "comment",
-        cratedAt: Date.now(),
+        createdAt: Date.now(),
         isRead: false,
       };
       const commentCreator = await User.findById(comment.creatorId);
@@ -167,7 +167,7 @@ export const likeToggle = async (req, res) => {
         picture: profile.profilePicPath,
         type: "like",
         url: `${process.env.APP_URL}/post/${post.creatorId}/${post.id}/${comment.id}/${reply.id}`,
-        cratedAt: Date.now(),
+        createdAt: Date.now(),
         isRead: false,
       };
       if (replyCreator) {

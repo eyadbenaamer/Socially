@@ -7,7 +7,7 @@ const NotificationSchema = new Schema({
   type: String, // following, like, comment or reply
   // the url reffered to when the notification is clicked
   url: String,
-  cratedAt: Number,
+  createdAt: Number,
   isRead: { type: Boolean, default: false },
 });
 

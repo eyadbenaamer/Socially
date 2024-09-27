@@ -74,7 +74,7 @@ export const share = async (req, res) => {
         content: `${profile.firstName} shared your post.`,
         picture: profile.profilePicPath,
         type: "share",
-        cratedAt: Date.now(),
+        createdAt: Date.now(),
         isRead: false,
       };
       const postCreator = await User.findById(sharedPost.creatorId);
@@ -240,7 +240,7 @@ export const likeToggle = async (req, res) => {
         picture: profile.profilePicPath,
         type: "like",
         url: `${process.env.APP_URL}/post/${post.creatorId}/${post.id}`,
-        cratedAt: Date.now(),
+        createdAt: Date.now(),
         isRead: false,
       };
       if (postCreator) {
