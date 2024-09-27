@@ -77,8 +77,7 @@ export const getAll = async (req, res) => {
 
     conversations = conversations.slice((page - 1) * 10, page * 10);
     return res.status(200).json(conversations);
-  } catch (err) {
-    console.log(err);
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
@@ -92,13 +91,13 @@ export const getOne = async (req, res) => {
     if (!page) {
       page = 1;
     }
+    page = parseInt(page);
 
     const conversation = await Conversation.aggregate([
       {
         $match: {
           _id: new ObjectId(conversationId),
           participants: { $elemMatch: { _id: user._id } },
-          "messages.info.readBy": { $in: [{ _id: new ObjectId(user._id) }] },
         },
       },
       {
@@ -124,6 +123,7 @@ export const getOne = async (req, res) => {
                   },
                 },
               },
+              (page - 1) * 10,
               10,
             ],
           },
@@ -153,6 +153,8 @@ export const setRead = async (req, res) => {
     while (true) {
       const message = conversation.messages[index];
       if (!message) {
+        user.unreadMessagesCount -= index;
+        await user.save();
         break;
       }
       const isRead = Boolean(message.info.readBy.id(user.id));
@@ -182,39 +184,6 @@ export const setRead = async (req, res) => {
     return res.status(200).json(conversation[0]?.messages);
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
-  }
-};
-
-export const getUnreadMessages = async (req, res) => {
-  try {
-    const { conversationId } = req.query;
-    const { user } = req;
-    const conversation = await Conversation.aggregate([
-      {
-        $match: {
-          _id: new ObjectId(conversationId),
-        },
-      },
-      { $unwind: "$messages" },
-      {
-        $match: {
-          "messages.to": { $in: [{ _id: new ObjectId(user._id) }] },
-          "messages.info.readBy": { $nin: [{ _id: new ObjectId(user._id) }] },
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          messages: { $push: "$messages" },
-        },
-      },
-      { $project: { _id: 0, messages: 1 } },
-    ]);
-    return res.status(200).json(conversation[0]?.messages);
-  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });

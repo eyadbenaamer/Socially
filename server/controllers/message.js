@@ -181,6 +181,11 @@ export const deleteMessage = async (req, res) => {
     } else {
       message.to.id(user._id).deleteOne();
     }
+    if (conversation.messages[0]) {
+      conversation.updatedAt = conversation.messages[0].createdAt;
+    } else {
+      conversation.updatedAt = null;
+    }
     await conversation.save();
     /*
     if the deletion is for everyone and the user is
@@ -198,11 +203,13 @@ export const deleteMessage = async (req, res) => {
                 conversationId: conversation.id,
                 messageId: message.id,
                 unreadMessagesCount,
+                updatedAt: conversation.updatedAt,
               };
             } else {
               data = {
                 conversationId: conversation.id,
                 messageId: message.id,
+                updatedAt: conversation.updatedAt,
               };
             }
             getServerSocketInstance().to(socketId).emit("delete-message", data);

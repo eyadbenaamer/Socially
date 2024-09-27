@@ -73,43 +73,9 @@ export const slice = createSlice({
     setShowMessage: (state, action) => {
       state.infoMessage = action.payload;
     },
-    // sets and sorts the conversations
     setConversations: (state, action) => {
-      const { conversations } = state;
-      if (action.payload == null) {
-        state.conversations = null;
-        return;
-      }
-      /*
-      if there are no conversations stored then all conversations 
-      in the payload will be stored in state.conversations
-      */
-      if (!conversations) {
-        state.conversations = action.payload;
-        return;
-      }
-      action.payload.map((newConversation) => {
-        const conversation = conversations.find(
-          (c) => c._id === newConversation._id
-        );
-        if (!conversation) {
-          conversations.push(newConversation);
-        } else {
-          conversation.unreadMessagesCount =
-            newConversation.unreadMessagesCount;
-          conversation.messages = newConversation.messages;
-          conversation.participants = newConversation.participants;
-          conversation.updatedAt = newConversation.updatedAt;
-        }
-      });
-      // state.conversations = conversations.sort(
-      //   (conversation) => conversation.updatedAt
-      // );
+      state.conversations = action.payload;
     },
-    /*
-    this function replaces a whole conversation's messages 
-    with the passed messages array
-    */
     setConversation(state, action) {
       const newConversation = action.payload;
       let conversation = state.conversations.find(
@@ -131,6 +97,9 @@ export const slice = createSlice({
       const conversation = state.conversations.find(
         (conv) => conv._id === conversationId
       );
+      if (!conversation) {
+        return;
+      }
       messagesInfo?.map((newMessage) => {
         let message = conversation.messages.find(
           (item) => item._id === newMessage._id
@@ -142,27 +111,48 @@ export const slice = createSlice({
     },
     // adds the new recieved message to its conversation
     addMessage: (state, action) => {
-      const { conversationId, message, updatedAt, unreadMessagesCount } =
-        action.payload;
-      if (message.senderId !== state.profile._id) {
+      const {
+        conversationId,
+        message: newMessage,
+        updatedAt,
+        unreadMessagesCount,
+      } = action.payload;
+      if (newMessage.senderId !== state.profile._id) {
         state.unreadMessagesCount += 1;
       }
-      const newConversation = state.conversations.find(
+      const updatedConversation = state.conversations.find(
         (conv) => conv._id === conversationId
       );
 
       // if the conversation is not exist or has been cleared, create a new one
-      if (!newConversation || !newConversation.messages) {
+      if (!updatedConversation || !updatedConversation.messages) {
         state.conversations.unshift({
           _id: conversationId,
-          messages: [message],
+          messages: [newMessage],
           updatedAt,
           unreadMessagesCount,
         });
       } else {
-        newConversation.messages.unshift(message);
-        newConversation.updatedAt = updatedAt;
-        newConversation.unreadMessagesCount = unreadMessagesCount;
+        const message = updatedConversation.messages.find(
+          (message) => message._id === newMessage._id
+        );
+        /*
+        if the message is already existing then the new message
+        won't be added to the list 
+        */
+        if (message) {
+          return;
+        }
+
+        updatedConversation.messages.unshift(newMessage);
+        updatedConversation.updatedAt = updatedAt;
+        updatedConversation.unreadMessagesCount = unreadMessagesCount;
+
+        const updatedConversationsList = state.conversations.filter(
+          (conversation) => conversation._id !== conversationId
+        );
+        updatedConversationsList.unshift(updatedConversation);
+        state.conversations = updatedConversationsList;
       }
     },
     messageLikeToggle: (state, action) => {
@@ -177,7 +167,8 @@ export const slice = createSlice({
       conversation.updatedAt = updatedAt;
     },
     deleteMessage: (state, action) => {
-      const { conversationId, messageId, unreadMessagesCount } = action.payload;
+      const { conversationId, messageId, unreadMessagesCount, updatedAt } =
+        action.payload;
       let conversation = state.conversations.find(
         (conv) => conv._id === conversationId
       );
@@ -188,6 +179,19 @@ export const slice = createSlice({
       conversation.messages = conversation.messages.filter(
         (message) => message._id !== messageId
       );
+      // set the new value of updatedAt
+      conversation.updatedAt = updatedAt;
+      // sort the conversations according to the new value of updatedAt
+      state.conversations = state.conversations.sort(
+        (a, b) => b.updatedAt - a.updatedAt
+      );
+    },
+    setNotifyTyping: (state, action) => {
+      const { conversationId, isTyping } = action.payload;
+      const conversation = state.conversations.find(
+        (conversation) => conversation._id === conversationId
+      );
+      conversation.isTyping = isTyping;
     },
     // sets the notifications when once login
     setNotifications: (state, action) => {
@@ -276,6 +280,7 @@ export const {
   addMessage,
   messageLikeToggle,
   deleteMessage,
+  setNotifyTyping,
   setNotifications,
   setUnreadNotificationsCount,
   addNotification,

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import useUpdate from "hooks/useUpdate";
 
 import Conversation from "./Conversation";
 import { setConversations } from "state";
@@ -9,14 +10,16 @@ import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const Conversations = () => {
   const conversations = useSelector((state) => state.conversations);
-  const [page, setPage] = useState(2);
+  const [page, setPage] = useState(1);
   const dispatch = useDispatch();
 
   const loading = useRef(null);
   const container = useRef(null);
 
+  useUpdate();
+
   useEffect(() => {
-    axiosClient("conversation/all")
+    axiosClient("conversation/all?page=1")
       .then((response) => dispatch(setConversations(response.data)))
       .catch((err) => {});
   }, []);
@@ -49,7 +52,11 @@ const Conversations = () => {
         end of the conversations list and loading elements will be removed
         */
         if (response.data?.length > 0) {
-          dispatch(setConversations(response.data));
+          if (page === 1) {
+            dispatch(setConversations(response.data));
+          } else {
+            dispatch(setConversations([...conversations, ...response?.data]));
+          }
           setPage(page + 1);
           if (response.data?.length < 10) {
             loading.current?.remove();

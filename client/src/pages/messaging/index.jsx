@@ -1,6 +1,8 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, useEffect, useMemo } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+
+import { setUnreadMessagesCount } from "state";
 
 import Sidebar from "components/sidebar";
 import Contact from "./contact";
@@ -8,8 +10,6 @@ import Conversations from "./conversations";
 
 import { useWindowWidth } from "hooks/useWindowWidth";
 import useFetchProfile from "hooks/useFetchProfile";
-import { setConversation, setUnreadMessagesCount } from "state";
-import axiosClient from "utils/AxiosClient";
 
 export const ConversationContext = createContext();
 
@@ -33,16 +33,15 @@ const Messaging = () => {
   const conversation = conversations?.find(
     (conv) => conv._id === conversationId
   );
-
-  const [unreadMessages, setUnreadMessages] = useState(null);
-
   const participantId = conversation?.participants.find(
     (part) => part._id !== myProfile._id
   )._id;
 
   // to fetch the other participant's info in the conversation
-  const [participantProfile] = useFetchProfile(participantId);
-  const participant = contacts.find((contact) => contact._id === participantId);
+  let [participantProfile, setParicipantProfile] =
+    useFetchProfile(participantId);
+  let participant = contacts.find((contact) => contact._id === participantId);
+
   // for all conversations
   const unreadMessagesCount = useSelector((state) => state.unreadMessagesCount);
 
@@ -53,28 +52,8 @@ const Messaging = () => {
     }
   }, [conversation]);
 
-  /*
-  fetching the first page of messages if there is not unread meassages, next pages will be
-  fetched on "conversations" component, each page is fetched 
-  when the screen renders the last message of the previous page.
-  */
   useEffect(() => {
-    if (!conversationId) return;
-
-    axiosClient(
-      `/conversation/unread_messages/?conversationId=${conversationId}`
-    )
-      .then((response) => setUnreadMessages(response.data))
-      .catch((err) => {
-        // TODO: handle error
-      });
-    if (!unreadMessages || conversation?.messages?.length === 1) {
-      axiosClient(`/conversation/?conversationId=${conversationId}&page=1`)
-        .then((response) => dispatch(setConversation(response.data)))
-        .catch((err) => {
-          // TODO: handle error
-        });
-    }
+    setParicipantProfile(null);
   }, [conversationId]);
 
   return (
@@ -125,7 +104,7 @@ const Messaging = () => {
               {/* for large screens the chat will take a part of 
                 the screen rather than the entire screen */}
               {windowWidth >= 768 && (
-                <div className="chat md:col-span-2 bg-200 row-span-6">
+                <div className="chat overflow-hidden md:col-span-2 bg-200 row-span-6">
                   <Outlet />
                 </div>
               )}
