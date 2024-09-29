@@ -13,9 +13,10 @@ export const PostsContext = createContext();
 const Posts = () => {
   const username = useContext(ProfileContext)?.username;
   const userId = useContext(ProfileContext)?._id;
+
   const [currentPage, setCurrentPage] = useState(1);
   const [message, setMessage] = useState(null);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState(null);
 
   const postsEnd = useRef();
 
@@ -88,14 +89,14 @@ const Posts = () => {
         {posts?.map((post) => (
           <Post key={post._id} post={post} />
         ))}
-        {/* the loading component appears only when there is more pages */}
+        {/* the loading component appears only when there are more pages */}
         {currentPage <= totalPages && (
           <div className="w-full" ref={postsEnd}>
             <LoadingPost />
           </div>
         )}
 
-        {posts?.length === 0 && <>No posts.</>}
+        {posts?.length === 0 && <>No posts</>}
 
         {/* message component appears the posts request fails */}
         {message && currentPage <= totalPages && (

@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
 
 import DropZone from "components/dropzone";
-import { PostsContext } from "components/posts";
 import axiosClient from "utils/AxiosClient";
 import SubmitBtn from "components/SubmitBtn";
+
+import { PostsContext } from "components/posts";
 
 const Form = (props) => {
   const { data, setData, setIsOpened } = props;

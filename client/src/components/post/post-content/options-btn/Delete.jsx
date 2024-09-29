@@ -33,7 +33,7 @@ const Delete = () => {
         if (location.pathname.startsWith("/post")) {
           window.history.back();
         } else {
-          setPosts((prev) => prev.filter((post) => post._id !== postId));
+          setPosts((prev) => prev?.filter((post) => post._id !== postId));
         }
       });
   };
