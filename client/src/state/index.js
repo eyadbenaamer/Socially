@@ -76,12 +76,28 @@ export const slice = createSlice({
     setConversations: (state, action) => {
       state.conversations = action.payload;
     },
-    setConversation(state, action) {
-      const newConversation = action.payload;
-      let conversation = state.conversations.find(
-        (conv) => conv._id === newConversation._id
+    setConversation: (state, action) => {
+      const {
+        _id: id,
+        messages,
+        unreadMessagesCount,
+        updatedAt,
+      } = action.payload;
+      let conversation = state.conversations.find((conv) => conv._id === id);
+      conversation.unreadMessagesCount = unreadMessagesCount;
+      conversation.messages = messages;
+      conversation.updatedAt = updatedAt;
+    },
+    setConversationRead: (state, action) => {
+      const conversation = state.conversations.find(
+        (conversation) => conversation._id === action.payload
       );
-      newConversation.messages?.map((newMessage) => {
+      conversation.unreadMessagesCount = 0;
+    },
+    addMessages(state, action) {
+      const { id, messages } = action.payload;
+      let conversation = state.conversations.find((conv) => conv._id === id);
+      messages.map((newMessage) => {
         const existingMessage = conversation.messages.find(
           (message) => message._id === newMessage._id
         );
@@ -89,9 +105,6 @@ export const slice = createSlice({
           conversation.messages.push(newMessage);
         }
       });
-      if (newConversation.unreadMessagesCount >= 0) {
-        conversation.unreadMessagesCount = newConversation.unreadMessagesCount;
-      }
     },
     /*
     this fucntion called when a certain conversation's messages status 
@@ -281,6 +294,8 @@ export const {
   updateActivityStatus,
   setConversations,
   setConversation,
+  setConversationRead,
+  addMessages,
   updateConversationStatus,
   addMessage,
   messageLikeToggle,

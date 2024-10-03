@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-import { setConversation } from "state";
+import { addMessages, setConversation, setConversationRead } from "state";
 
 import Message from "./message";
 
@@ -38,11 +38,7 @@ const MessagesArea = (props) => {
   useEffect(() => {
     if (conversation.unreadMessagesCount) {
       axiosClient(`/conversation/set_read?conversationId=${conversation._id}`)
-        .then(() =>
-          dispatch(
-            setConversation({ _id: conversation._id, unreadMessagesCount: 0 })
-          )
-        )
+        .then(() => dispatch(setConversationRead(conversation._id)))
         .catch((err) => {
           // TODO: handle error
         });
@@ -111,18 +107,13 @@ const MessagesArea = (props) => {
       `/conversation/?conversationId=${conversation._id}&page=${page}`
     )
       .then((response) => {
-        const { messages } = response?.data;
+        const { _id: id, messages } = response?.data;
         /*
         if the conversations count is less than 10 or equal to 0 then it's the 
         end of the conversations list and loading elements will be removed
         */
         if (messages?.length > 0) {
-          dispatch(
-            setConversation({
-              ...conversation,
-              messages: [...conversation.messages, ...messages],
-            })
-          );
+          dispatch(addMessages({ id, messages }));
           setPage(page + 1);
           if (messages?.length < 10) {
             setIsMessagesFinished(true);
