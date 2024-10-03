@@ -81,9 +81,14 @@ export const slice = createSlice({
       let conversation = state.conversations.find(
         (conv) => conv._id === newConversation._id
       );
-      if (newConversation.messages) {
-        conversation.messages = newConversation.messages;
-      }
+      newConversation.messages?.map((newMessage) => {
+        const existingMessage = conversation.messages.find(
+          (message) => message._id === newMessage._id
+        );
+        if (!existingMessage) {
+          conversation.messages.push(newMessage);
+        }
+      });
       if (newConversation.unreadMessagesCount >= 0) {
         conversation.unreadMessagesCount = newConversation.unreadMessagesCount;
       }

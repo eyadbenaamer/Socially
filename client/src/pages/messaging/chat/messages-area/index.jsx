@@ -15,13 +15,17 @@ import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 const MessagesArea = (props) => {
   const dispatch = useDispatch();
 
-  const unreadMessagesCount = useMemo(() => props.unreadMessagesCount, []);
   const { conversation } = useContext(ConversationContext);
+
+  const firstUnreadMessageId = useMemo(
+    () => conversation.messages[props.unreadMessagesCount - 1]?._id,
+    []
+  );
   const { conversationId } = useParams();
   const [page, setPage] = useState(2);
   // this indicates wether if the chat is closed or not
   const [isClosed, setIsClosed] = useState(false);
-  // this indicates wether if the chat is closed or not
+  // this indicates wether if there is more messages to fetch or not
   const [isMessagesFinished, setIsMessagesFinished] = useState(false);
 
   const container = useRef(null);
@@ -113,16 +117,12 @@ const MessagesArea = (props) => {
         end of the conversations list and loading elements will be removed
         */
         if (messages?.length > 0) {
-          if (page === 1) {
-            dispatch(setConversation(response.data));
-          } else {
-            dispatch(
-              setConversation({
-                ...conversation,
-                messages: [...conversation.messages, ...messages],
-              })
-            );
-          }
+          dispatch(
+            setConversation({
+              ...conversation,
+              messages: [...conversation.messages, ...messages],
+            })
+          );
           setPage(page + 1);
           if (messages?.length < 10) {
             setIsMessagesFinished(true);
@@ -133,7 +133,7 @@ const MessagesArea = (props) => {
       })
       .catch((err) => {});
   };
-
+  console.log(conversation?.messages);
   return (
     <>
       {isClosed && <Navigate to="/messages" replace />}
@@ -158,7 +158,7 @@ const MessagesArea = (props) => {
                   <Time date={message.createdAt} withDate forChat />
                 </div>
               )}
-              {unreadMessagesCount - 1 === i && (
+              {firstUnreadMessageId === message._id && (
                 <div className="self-center bg-300 px-3 p-1 rounded-xl shadow-sm">
                   Unread Messages
                 </div>

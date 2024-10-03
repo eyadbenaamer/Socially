@@ -30,13 +30,6 @@ const Delete = (props) => {
         `message/delete?conversationId=${conversationId}&messageId=${id}&forEveryone=${forEveryone}`
       )
       .then(() => {
-        const newMessagesArray = conversation.messages.filter(
-          (message) => message._id !== id
-        );
-        dispatch(
-          setConversation({ ...conversation, messages: newMessagesArray })
-        );
-
         document.body.style = null;
         setIsOpen((prev) => !prev);
       });
