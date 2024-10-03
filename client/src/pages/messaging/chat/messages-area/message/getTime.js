@@ -4,37 +4,29 @@ const useGetTime = (time) => {
   const [literalTime, setLiteralTime] = useState("");
 
   const updateTime = () => {
-    let interval = Date.now() - time;
-    if (interval > 3600000) {
-      interval = Math.floor(interval / 3600000);
-      if (interval === 1) {
+    let difference = Date.now() - time;
+
+    if (difference > 3600000) {
+      // if more than an hour
+      difference = Math.floor(difference / 3600000);
+      if (difference === 1) {
         setLiteralTime("an hour ago");
         return;
       }
-      if (interval < 24) {
-        setLiteralTime(`${interval} hours ago`);
+      if (difference < 24) {
+        setLiteralTime(`${difference} hours ago`);
         return;
       }
-      if (interval >= 24) {
-        interval = Math.floor(interval / 24);
-        if (interval < 7) {
-          let postedDay =
-            new Date(time).getMonth() !== new Date().getMonth()
-              ? new Date(time).getDate() - 30
-              : new Date(time).getDate();
-          const days = new Date().getDate() - postedDay;
-          setLiteralTime(`${days} day${days > 1 ? "s" : ""} ago`);
-          return;
-        }
-        if (interval >= 7 && interval < 30) {
-          const weeksCount = Math.floor(interval / 7);
+      if (difference >= 24) {
+        difference = Math.floor(difference / 24);
+        if (difference < 30) {
           setLiteralTime(
-            `${weeksCount === 1 ? "week" : weeksCount + " weeks"} ago`
+            `${difference === 1 ? "a day ago" : difference + " days"} ago`
           );
           return;
         }
-        if (interval >= 30 && interval < 60) {
-          setLiteralTime("a month ago");
+        if (difference >= 30 && difference < 60) {
+          setLiteralTime("within a month");
           return;
         } else {
           setLiteralTime("long time ago");
@@ -42,12 +34,12 @@ const useGetTime = (time) => {
       }
       return;
     }
-    interval = Math.floor(interval / 60000);
-    if (interval < 1) {
+    difference = Math.floor(difference / 60000);
+    if (difference < 1) {
       setLiteralTime("just now");
     } else {
       setLiteralTime(
-        `${interval} ${interval === 1 ? "minute" : "minutes"} ago`
+        `${difference} ${difference === 1 ? "minute" : "minutes"} ago`
       );
       return;
     }
