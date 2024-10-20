@@ -24,7 +24,7 @@ const Text = (props) => {
   const profile = useSelector((state) => state.profile);
 
   const editText = async () => {
-    const API_URL = process.env.REACT_APP_API_URL;
+    const API_URL = process.env.REACT_APP_APP_URL;
     let requestUrl;
     if (type === "post") {
       requestUrl = `${API_URL}/post/edit?userId=${postCreatorId}&postId=${postId}`;

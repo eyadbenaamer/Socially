@@ -71,7 +71,7 @@ const upload = multer({ storage });
 
 /*ROUTES WITH FILES*/
 app.patch(
-  "/profile/set",
+  "/api/profile/set",
   verifyToken,
   upload.fields([
     { name: "profilePic", maxCount: 1 },
@@ -81,7 +81,7 @@ app.patch(
   setProfile
 );
 app.post(
-  "/post/create",
+  "/api/post/create",
   verifyId,
   verifyToken,
   upload.fields([{ name: "media", maxCount: 5 }]),
@@ -89,7 +89,7 @@ app.post(
   createPost
 );
 app.post(
-  "/post/share/",
+  "/api/post/share/",
   verifyId,
   verifyToken,
   upload.fields([{ name: "media", maxCount: 5 }]),
@@ -97,7 +97,7 @@ app.post(
   sharePost
 );
 app.post(
-  "/message/send",
+  "/api/message/send",
   verifyId,
   verifyToken,
   upload.fields([{ name: "media", maxCount: 10 }]),
@@ -107,7 +107,7 @@ app.post(
   sendMessage
 );
 app.post(
-  "/message/reply",
+  "/api/message/reply",
   verifyId,
   verifyToken,
   upload.fields([{ name: "media", maxCount: 5 }]),
@@ -117,7 +117,7 @@ app.post(
   sendMessage
 );
 app.post(
-  "/comment/add",
+  "/api/comment/add",
   verifyId,
   verifyToken,
   upload.single("media"),
@@ -126,7 +126,7 @@ app.post(
   addComment
 );
 app.post(
-  "/reply/add",
+  "/api/reply/add",
   verifyId,
   verifyToken,
   upload.single("media"),
@@ -135,17 +135,17 @@ app.post(
   addReply
 );
 /*ROUTES*/
-app.use("/", userRoute);
-app.use("/", authRoute);
-app.use("/home", getFeedPosts);
-app.use("/profile", profileRoute);
-app.use("/posts", postsRoute);
-app.use("/post", postRoute);
-app.use("/comment", commentRoute);
-app.use("/reply", replyRoute);
-app.use("/notifications", notificationRoute);
-app.use("/conversation", conversationRoute);
-app.use("/message", messageRoute);
+app.use("/api/", userRoute);
+app.use("/api/", authRoute);
+app.use("/api/home", getFeedPosts);
+app.use("/api/profile", profileRoute);
+app.use("/api/posts", postsRoute);
+app.use("/api/post", postRoute);
+app.use("/api/comment", commentRoute);
+app.use("/api/reply", replyRoute);
+app.use("/api/notifications", notificationRoute);
+app.use("/api/conversation", conversationRoute);
+app.use("/api/message", messageRoute);
 
 /*MONGOOSE SETUP*/
 mongoose

@@ -22,7 +22,7 @@ export const connectToSocketServer = () => {
   }
   // if socket object is undefined then establish a socket connection
   if (!socket) {
-    socket = io(process.env.REACT_APP_SOCKET_URL, { auth: { token } });
+    socket = io(process.env.REACT_APP_APP_URL, { auth: { token } });
     return;
   }
   /*
@@ -31,7 +31,7 @@ export const connectToSocketServer = () => {
   */
   if (!socket.connected) {
     socket.close();
-    socket = io(process.env.REACT_APP_SOCKET_URL, { auth: { token } });
+    socket = io(process.env.REACT_APP_APP_URL, { auth: { token } });
   }
 };
 

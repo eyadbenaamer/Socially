@@ -13,7 +13,7 @@ let io;
 const createSocketServer = (server) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.APP_URL,
+      origin: "*",
       methods: ["GET", "POST", "PATCH", "DELETE"],
     },
   });
