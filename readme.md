@@ -26,11 +26,11 @@ A social media platform built with the MERN stack (MongoDB, Express, React, Node
 
 Here are some screenshots of the app in action:
 
-<img src="../assets/preview-1.png" alt="preview-1"  style="border-radius:8px;width:30%;display:inline-block">
-<img src="../assets/preview-2.png" alt="preview-2" style="border-radius:8px;width:100%;display:inline-block">
-<img src="../assets/preview-3.png" alt="preview-3"style="border-radius:8px;width:30%;display:inline-block" >
-<img src="../assets/preview-4.png" alt="preview-4"style="border-radius:8px;width:30%;display:inline-block" >
-<img src="../assets/preview-5.png" alt="preview-5"style="border-radius:8px;width:30%;display:inline-block" >
+<img src="assets/preview-1.png" alt="preview-1"  style="border-radius:8px;width:30%;display:inline-block">
+<img src="assets/preview-2.png" alt="preview-2" style="border-radius:8px;width:100%;display:inline-block">
+<img src="assets/preview-3.png" alt="preview-3"style="border-radius:8px;width:30%;display:inline-block" >
+<img src="assets/preview-4.png" alt="preview-4"style="border-radius:8px;width:30%;display:inline-block" >
+<img src="assets/preview-5.png" alt="preview-5"style="border-radius:8px;width:30%;display:inline-block" >
 
 ## Getting Started
 
@@ -111,4 +111,4 @@ Check out the live version of the app at [socially.us.to](https://socially.us.to
 
 ### License
 
-This project is licensed under the MIT License. See the [LICENSE](../LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
