@@ -1,70 +1,114 @@
-# Getting Started with Create React App
+# Socially
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A social media platform built with the MERN stack (MongoDB, Express, React, Node.js). You can view the live demo at [socially.us.to](https://socially.us.to) or [socially-sm.netlify.app](https://socially-sm.netlify.app).
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Registration and Login System**: Secure user authentication.
+- **Email Verification**: Users can verify their accounts through email and URL.
+- **Password Reset**: Reset your password with a secure process.
+- **Following Accounts**: Follow other users and view their posts.
+- **Posting Text, Images, and Videos**: Share posts with multimedia support.
+- **Sharing Posts**: Repost content from other users.
+- **Saving Posts**: Save posts for later viewing.
+- **Commenting and Replying**: Engage with posts through comments and replies.
+- **Liking Posts, Comments, and Replies**: Interact by liking posts and comments.
+- **Notifications**: Receive real-time notifications for all interactions.
+- **Real-Time Messaging**: Includes features like:
+  - User activity status (online, last seen)
+  - Message status (sent, delivered, seen)
+- **Responsive Design**: Works smoothly across all devices.
+- **High Performance**: Optimized for fast loading and performance.
+- **File Compression**: Automatically compresses uploaded files.
+- **Light and Dark Themes**: Users can switch between light and dark modes.
 
-### `npm start`
+## Preview
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Here are some screenshots of the app in action:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+<img src="../assets/preview-1.png" alt="preview-1"  style="border-radius:8px;width:30%;display:inline-block">
+<img src="../assets/preview-2.png" alt="preview-2" style="border-radius:8px;width:100%;display:inline-block">
+<img src="../assets/preview-3.png" alt="preview-3"style="border-radius:8px;width:30%;display:inline-block" >
+<img src="../assets/preview-4.png" alt="preview-4"style="border-radius:8px;width:30%;display:inline-block" >
+<img src="../assets/preview-5.png" alt="preview-5"style="border-radius:8px;width:30%;display:inline-block" >
 
-### `npm test`
+## Getting Started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Prerequisites
 
-### `npm run build`
+To run this project locally, you will need:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- MongoDB Database (Local or MongoDB Atlas)
+- A Gmail account to send emails via a third-party service
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Follow these steps to set up the project:
 
-### `npm run eject`
+1. **Clone the repository:**
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+   ```bash
+   $ git clone https://github.com/eyadbenaamer/Socially
+   $ cd Socially
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. **Set up environment variables:**
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+   You will need to create `.env` files in both the `client` and `server` directories.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+   - **Client `.env` (located in `/client/.env`):**
 
-## Learn More
+     ```env
+     REACT_APP_APP_URL=http://localhost:5000
+     ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   - **Server `.env` (located in `/server/.env`):**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+     ```env
+     APP_URL=http://localhost:3000
+     API_URL=http://localhost:5000
+     GMAIL_USER=<your Gmail>
+     GMAIL_PASSWORD=<your email password>
+     COOKIE_SECRET=<your cookie secret key>
+     JWT_SECRET=<your JWT secret key>
+     DATABASE_URL=<your MongoDB URL>
+     PORT=5000
+     TOKEN_EXPIRATION=10d
+     ```
 
-### Code Splitting
+3. **Install dependencies:**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+   Open two terminal windows or tabs:
 
-### Analyzing the Bundle Size
+   - In the first terminal, navigate to the client directory, install dependencies, and start the client:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+     ```bash
+     $ cd client
+     $ npm i --force
+     $ npm start
+     ```
 
-### Making a Progressive Web App
+   - In the second terminal, navigate to the server directory, install dependencies, and start the server:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+     ```bash
+     $ cd server
+     $ npm i
+     $ npm start
+     ```
 
-### Advanced Configuration
+### Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Once both the client and server are running, the application should be available at:
 
-### Deployment
+- **Client (Frontend):** `http://localhost:3000`
+- **Server (Backend):** `http://localhost:5000`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+You can now use the app locally.
 
-### `npm run build` fails to minify
+### Live Demo
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Check out the live version of the app at [socially.us.to](https://socially.us.to) or [socially-sm.netlify.app](https://socially-sm.netlify.app).
+
+### License
+
+This project is licensed under the MIT License. See the [LICENSE](../LICENSE) file for details.
