@@ -160,9 +160,9 @@ export const deleteMessage = async (req, res) => {
       const undeliveredConversation =
         participantProfile.undeliveredConversations.id(conversation.id);
       /*
-      if the conversation has only one message the delete the entire
+      if the conversation has only one message delete the entire
       conversation, otherwise delete the message from
-      undeliveredConversations.messages.
+      "undeliveredConversations.messages".
       */
       if (undeliveredConversation?.messages?.length === 1) {
         undeliveredConversation.deleteOne();
@@ -217,6 +217,25 @@ export const deleteMessage = async (req, res) => {
         }
       });
     }
+    /*
+    if the deletion is not for everyone then send the message
+    update by socket to the user
+    */
+    if (forEveryone === "false") {
+      const socketIdsList = getOnlineUsers().get(user.id);
+      if (socketIdsList) {
+        socketIdsList.map((socketId) => {
+          let data;
+          data = {
+            conversationId: conversation.id,
+            messageId: message.id,
+            updatedAt: conversation.updatedAt,
+          };
+          getServerSocketInstance().to(socketId).emit("delete-message", data);
+        });
+      }
+    }
+
     return res.status(200).send("success");
   } catch {
     return res
