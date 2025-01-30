@@ -1,6 +1,6 @@
 # Socially
 
-A social media platform built with the MERN stack (MongoDB, Express, React, Node.js). You can view the live demo at [socially.us.to](https://socially.us.to) or [socially-sm.netlify.app](https://socially-sm.netlify.app).
+A social media platform built with the MERN stack (MongoDB, Express, React, Node.js). You can view the live demo at [socially.my.to](https://socially.my.to).
 
 ## Features
 
