@@ -41,7 +41,9 @@ const AddComment = (props) => {
       commentInput.current.focus();
     }
   }, [commentInput]);
+
   const [file, setFile] = useState(null);
+
   return (
     <div className="w-full py-3">
       <div className={`flex gap-2 ${media ? "items-start" : "items-center"}`}>

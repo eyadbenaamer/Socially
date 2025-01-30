@@ -13,7 +13,7 @@ import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-//root path: /notification
+//root path: /notifications
 
 /*READ*/
 

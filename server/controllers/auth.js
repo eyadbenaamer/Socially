@@ -121,7 +121,7 @@ export const login = async (req, res) => {
     } else if (!username && email) {
       user = await User.findOne({ email });
     } else {
-      return res.status(400).json({ message: "bad request." });
+      return res.status(400).json({ message: "Invalid login." });
     }
     if (!user) {
       return res.status(404).json({ message: "The user doesn't exist." });

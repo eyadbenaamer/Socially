@@ -21,7 +21,7 @@ const useGetTime = (time) => {
         difference = Math.floor(difference / 24);
         if (difference < 30) {
           setLiteralTime(
-            `${difference === 1 ? "a day ago" : difference + " days"} ago`
+            `${difference === 1 ? "a day" : difference + " days"} ago`
           );
           return;
         }
