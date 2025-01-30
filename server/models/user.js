@@ -3,10 +3,11 @@ const { ObjectId } = Types;
 
 const NotificationSchema = new Schema({
   content: String,
-  picture: String,
   type: String, // following, like, comment or reply
   // the url reffered to when the notification is clicked
-  url: String,
+  path: String,
+  // the ID of the engaged user in the notification
+  userId: String,
   createdAt: Number,
   isRead: { type: Boolean, default: false },
 });

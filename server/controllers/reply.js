@@ -26,8 +26,8 @@ export const add = async (req, res) => {
     if (user.id !== comment.creatorId) {
       const newNotification = {
         content: `${profile.firstName} replied to your comment.`,
-        picture: profile.profilePicPath,
         type: "comment",
+        userId: profile._id,
         createdAt: Date.now(),
         isRead: false,
       };
@@ -49,7 +49,7 @@ export const add = async (req, res) => {
         });
         await postList.save();
         const reply = comment.replies[comment.replies?.length - 1];
-        notification.url = `${process.env.APP_URL}/post/${post.creatorId}/${post.id}/${comment.id}/${reply.id}`;
+        notification.path = `/post/${post.creatorId}/${post.id}/${comment.id}/${reply.id}`;
         await commentCreator.save();
         // sending the notification by web socket
         const socketIdsList = getOnlineUsers().get(comment.creatorId);

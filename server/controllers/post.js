@@ -72,8 +72,8 @@ export const share = async (req, res) => {
     if (user.id !== sharedPost.creatorId) {
       const newNotification = {
         content: `${profile.firstName} shared your post.`,
-        picture: profile.profilePicPath,
         type: "share",
+        userId: profile._id,
         createdAt: Date.now(),
         isRead: false,
       };
@@ -101,7 +101,7 @@ export const share = async (req, res) => {
         postList.posts.unshift(newPost);
         await postList.save();
         const post = postList.posts[0];
-        notification.url = `${process.env.APP_URL}/post/${user.id}/${post.id}`;
+        notification.path = `/post/${user.id}/${post.id}`;
         await postCreator.save();
         // sending the notification by web socket
         const socketIdsList = getOnlineUsers().get(sharedPost.creatorId);
@@ -236,10 +236,10 @@ export const likeToggle = async (req, res) => {
     */
     if (user.id !== post.creatorId) {
       const newNotification = {
+        userId: profile._id,
         content: `${profile.firstName} liked your post.`,
-        picture: profile.profilePicPath,
         type: "like",
-        url: `${process.env.APP_URL}/post/${post.creatorId}/${post.id}`,
+        path: `/post/${post.creatorId}/${post.id}`,
         createdAt: Date.now(),
         isRead: false,
       };

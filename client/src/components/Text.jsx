@@ -24,14 +24,13 @@ const Text = (props) => {
   const profile = useSelector((state) => state.profile);
 
   const editText = async () => {
-    const API_URL = process.env.REACT_APP_APP_URL;
     let requestUrl;
     if (type === "post") {
-      requestUrl = `${API_URL}/post/edit?userId=${postCreatorId}&postId=${postId}`;
+      requestUrl = `post/edit?userId=${postCreatorId}&postId=${postId}`;
     } else if (type === "comment") {
-      requestUrl = `${API_URL}/comment/edit?userId=${postCreatorId}&postId=${postId}&commentId=${commentId}`;
+      requestUrl = `comment/edit?userId=${postCreatorId}&postId=${postId}&commentId=${commentId}`;
     } else if (type === "reply") {
-      requestUrl = `${API_URL}/reply/edit?userId=${postCreatorId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
+      requestUrl = `reply/edit?userId=${postCreatorId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
     }
     axiosClient
       .patch(

@@ -1,7 +1,7 @@
 import fs from "fs";
 import sharp from "sharp";
 
-const uploadsFolder = `${process.env.API_URL}/storage/`;
+const uploadsFolder = `/storage/`;
 
 export const compressImages = async (req, res, next) => {
   try {

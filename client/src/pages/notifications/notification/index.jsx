@@ -8,7 +8,7 @@ import axiosClient from "utils/AxiosClient";
 import Time from "components/time";
 
 const Notification = (props) => {
-  const { _id: id, url, content, picture, type, isRead, createdAt } = props;
+  const { _id: id, path, content, userId, type, isRead, createdAt } = props;
   const theme = useSelector((state) => state.settings.theme);
 
   return (
@@ -19,10 +19,10 @@ const Notification = (props) => {
             axiosClient.patch(`notifications/set_read/${id}`);
           }
         }}
-        to={url}
+        to={path}
         className="flex gap-3 items-center flex-grow"
       >
-        <Picture picture={picture} notificationType={type} />
+        <Picture userId={userId} notificationType={type} />
         <div>
           <div className={`${!isRead ? "font-bold" : ""}`}>{content}</div>
           <div

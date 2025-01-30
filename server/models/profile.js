@@ -1,7 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 const { ObjectId } = Types;
-import { config } from "dotenv";
-config();
+
 const ProfileSchema = new Schema({
   _id: {
     type: ObjectId,
@@ -26,7 +25,7 @@ const ProfileSchema = new Schema({
   },
   profilePicPath: {
     type: String,
-    default: `${process.env.API_URL}/assets/blank_user.jpg`,
+    default: `/assets/blank_user.jpg`,
   },
   coverPicPath: { type: String, default: "" },
   bio: { type: String, default: "" },

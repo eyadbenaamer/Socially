@@ -141,9 +141,9 @@ export const follow = async (req, res) => {
     const userToFollow = await User.findById(userId);
     const newNotification = {
       content: `${myProfile.firstName} started following you.`,
-      picture: myProfile.profilePicPath,
+      userId: myProfile._id,
       type: "follow",
-      url: `${process.env.APP_URL}/profile/${myProfile.username}`,
+      path: `/profile/${myProfile.username}`,
       createdAt: Date.now(),
       isRead: false,
     };
@@ -246,20 +246,23 @@ export const removeFollower = async (req, res) => {
 
     const { notificationId } = myProfile.followers.id(userId);
     const user = await User.findById(myId);
+
     const notification = user.notifications.id(notificationId);
-    const socketIdsList = getOnlineUsers().get(myId);
-    if (socketIdsList) {
-      socketIdsList.map((socketId) => {
-        getServerSocketInstance()
-          .to(socketId)
-          .emit("remove-notification", notification.id);
-      });
+    if (notification) {
+      const socketIdsList = getOnlineUsers().get(myId);
+      if (socketIdsList) {
+        socketIdsList.map((socketId) => {
+          getServerSocketInstance()
+            .to(socketId)
+            .emit("remove-notification", notification.id);
+        });
+      }
+      if (!notification.isRead) {
+        user.unreadNotificationsCount--;
+      }
+      notification.deleteOne();
+      await user.save();
     }
-    if (!notification.isRead) {
-      user.unreadNotificationsCount--;
-    }
-    notification.deleteOne();
-    await user.save();
 
     myProfile.followers.id(userId).deleteOne();
     followerToRemove.following.id(myId).deleteOne();
