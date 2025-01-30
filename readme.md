@@ -107,7 +107,7 @@ You can now use the app locally.
 
 ### Live Demo
 
-Check out the live version of the app at [socially.us.to](https://socially.us.to) or [socially-sm.netlify.app](https://socially-sm.netlify.app).
+Check out the live version of the app at [socially.my.to](https://socially.my.to).
 
 ### License
 
