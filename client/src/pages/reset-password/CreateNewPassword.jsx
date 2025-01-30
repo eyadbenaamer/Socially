@@ -101,7 +101,7 @@ const CreateNewPassword = () => {
             Your password has been reset successfully!
           </h1>
           <Link
-            className="w-full rounded-xl bg-primary p-2 text-center"
+            className="w-full rounded-xl bg-primary p-2 text-center text-white"
             to="/"
             onClick={authenticateAfterReset}
           >

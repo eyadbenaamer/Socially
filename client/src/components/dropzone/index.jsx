@@ -79,7 +79,7 @@ const DropZone = (props) => {
             onClick={() => input.current.click()}
             className="bg-[var(--primary-color)] h-[50px] w-[50px] rounded-xl"
           >
-            <AddIcon stroke="white" />
+            <AddIcon className="text-white" />
           </button>
         </div>
       </div>
