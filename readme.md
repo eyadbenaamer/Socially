@@ -1,6 +1,6 @@
 # Socially
 
-A social media platform built with the MERN stack (MongoDB, Express, React, Node.js). You can view the live demo at [socially.my.to](https://socially.my.to).
+A social media platform built with the MERN stack (MongoDB, Express, React, Node.js). You can view the live demo at [socially-sm.netliify](https://socially-sm.netliify).
 
 ## Features
 
@@ -107,7 +107,7 @@ You can now use the app locally.
 
 ### Live Demo
 
-Check out the live version of the app at [socially.my.to](https://socially.my.to).
+Check out the live version of the app at [socially-sm.netliify](https://socially-sm.netliify).
 
 ### License
 
