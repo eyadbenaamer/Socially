@@ -164,9 +164,9 @@ export const likeToggle = async (req, res) => {
     if (user.id !== reply.creatorId) {
       const newNotification = {
         content: `${profile.firstName} liked your reply.`,
-        picture: profile.profilePicPath,
+        userId: profile.id,
         type: "like",
-        url: `${process.env.APP_URL}/post/${post.creatorId}/${post.id}/${comment.id}/${reply.id}`,
+        path: `/post/${post.creatorId}/${post.id}/${comment.id}/${reply.id}`,
         createdAt: Date.now(),
         isRead: false,
       };

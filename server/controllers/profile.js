@@ -100,10 +100,10 @@ export const setProfile = async (req, res) => {
       profile.username = username;
     }
     if (profilePic) {
-      profile.profilePicPath = `${process.env.API_URL}/storage/${profilePic.filename}`;
+      profile.profilePicPath = `/storage/${profilePic.filename}`;
     }
     if (coverPic) {
-      profile.coverPicPath = `${process.env.API_URL}/storage/${coverPic.filename}`;
+      profile.coverPicPath = `/storage/${coverPic.filename}`;
     }
     if (bio) {
       profile.bio = bio;
