@@ -23,6 +23,7 @@ const SendMessage = () => {
     const formData = new FormData();
     formData.append("text", text.trim());
     media && formData.append("media", media);
+    textArea.current.value = "";
 
     axiosClient
       .post(
@@ -40,10 +41,15 @@ const SendMessage = () => {
     }
   }, [isTyping, socket]);
 
-  // this refocuses on the text area once the conversation changes
   useEffect(() => {
+    // this refocuses on the text area once the conversation changes
     textArea.current.focus();
-  }, [conversationId]);
+    // this resets text once the conversation changes
+    setText("");
+    if (textArea.current) {
+      textArea.current.value = "";
+    }
+  }, [conversationId, textArea.current]);
 
   return (
     <div className="w-full py-3">
@@ -66,7 +72,6 @@ const SendMessage = () => {
                 e.target.value += "\n";
               }
             }}
-            value={text}
             dir="auto"
             className="comment-input h-6 w-4/5"
             placeholder={"Message"}

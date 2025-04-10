@@ -6,12 +6,10 @@ const Media = (props) => {
   const [isOpened, setIsOpened] = useState(false);
   return (
     <>
-      <div onClick={() => setIsOpened(!isOpened)}>
+      <div onClick={() => setIsOpened(true)}>{children}</div>
+      <Dialog isOpened={isOpened} setIsOpened={setIsOpened}>
         {children}
-        <Dialog isOpened={isOpened} setIsOpened={setIsOpened}>
-          {children}
-        </Dialog>
-      </div>
+      </Dialog>
     </>
   );
 };

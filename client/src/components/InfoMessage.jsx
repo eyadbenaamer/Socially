@@ -13,11 +13,11 @@ const InfoMessage = () => {
   return (
     <>
       {infoMessage && (
-        <div className="popup fixed bg-200 shadow-lg py-6 px-8 bottom-5 left-6 z-40 rounded-xl">
-          <span onClick={resetMessage} className="cursor-pointer block w-2">
+        <div className="popup fixed bg-200 shadow-lg p-2 bottom-5 right-6 z-40 rounded-xl">
+          <span onClick={resetMessage} className="cursor-pointer block w-3">
             <CLoseIcon />
           </span>
-          {infoMessage}
+          <div className="p-2">{infoMessage}</div>
         </div>
       )}
     </>

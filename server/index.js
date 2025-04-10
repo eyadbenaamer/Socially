@@ -1,7 +1,6 @@
 import express from "express";
 import { createServer } from "http";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
@@ -40,6 +39,7 @@ import { compressImages } from "./middleware/media.js";
 import { getPostsInfo } from "./middleware/post.js";
 import { uploadSingleFile } from "./middleware/media.js";
 import { getConversationInfo, isInChat } from "./middleware/conversation.js";
+import connectDB from "./config/db.js";
 
 /*CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url);
@@ -148,17 +148,7 @@ app.use("/api/conversation", conversationRoute);
 app.use("/api/message", messageRoute);
 
 /*MONGOOSE SETUP*/
-mongoose
-  .connect(process.env.DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .catch((error) => {
-    console.error("MongoDB connection error:", error);
-  });
-mongoose.connection.on("error", (error) => {
-  console.error("MongoDB connection error:", error);
-});
+connectDB();
 
 const PORT = process.env.PORT;
 const server = createServer(app);

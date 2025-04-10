@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 
 import ChatBar from "./ChatBar";
-import SendMessage from "./SendMessage";
+import SendMessage from "./send-message";
 import MessagesArea from "./messages-area";
 
 import { ConversationContext } from "..";
