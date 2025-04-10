@@ -304,7 +304,9 @@ export const deletePost = async (req, res) => {
     // delete the attached files from the storage
     post.files?.map((file) => {
       const filename = `./public/storage/${file.path.split("/").at(-1)}`;
-      fs.unlinkSync(filename);
+      try {
+        fs.unlinkSync(filename);
+      } catch {}
     });
 
     // if the post is a shared post then the share notification should be deleted
@@ -341,7 +343,6 @@ export const deletePost = async (req, res) => {
     }
     postList.posts.id(post.id).deleteOne();
     await postList.save();
-
     return res.status(200).json({ message: "post deleted successfully" });
   } catch {
     return res

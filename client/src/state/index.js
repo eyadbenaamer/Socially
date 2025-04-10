@@ -209,7 +209,9 @@ export const slice = createSlice({
       const conversation = state.conversations.find(
         (conversation) => conversation._id === conversationId
       );
-      conversation.isTyping = isTyping;
+      if (conversation) {
+        conversation.isTyping = isTyping;
+      }
     },
     // sets the notifications when once login
     setNotifications: (state, action) => {
