@@ -13,7 +13,7 @@ const FollowToggleBtn = (props) => {
   const following = myProfile?.following;
   const myProfileId = myProfile?._id;
   const { _id: profileId, setProfile } = useContext(ProfileContext);
-  const isFollowing = following?.find((acc) => acc._id === profileId);
+  const isFollowing = following?.find((acc) => acc._id === accountToFollowId);
   const dispatch = useDispatch();
 
   const followToggle = () => {
