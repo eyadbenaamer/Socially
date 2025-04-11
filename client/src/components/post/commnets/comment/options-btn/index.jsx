@@ -4,55 +4,74 @@ import { useSelector } from "react-redux";
 import Delete from "./Delete";
 import Edit from "./Edit";
 import CopyLink from "./CopyLink";
-import { PostContext } from "components/post";
 
+import { PostContext } from "components/post";
 import useCloseWidget from "hooks/useCloseWidget";
 
 import { ReactComponent as MoreIcon } from "assets/icons/more.svg";
 
-const OptionsBtn = (props) => {
-  const { commentId, commentCreatorId, setIsModifying } = props;
-  const profile = useSelector((state) => state.profile);
-  const theme = useSelector((state) => state.settings.theme);
-  const [isOpen, setIsOpen] = useState(false);
-  const post = useContext(PostContext);
-  const optionsList = useRef(null);
+const OptionsBtn = ({ commentId, commentCreatorId, setIsModifying }) => {
+  // Get current user ID from Redux store
+  const { _id: profileId } = useSelector((state) => state.profile);
 
-  useCloseWidget(optionsList, setIsOpen);
+  // Get current theme (dark/light) from Redux store
+  const theme = useSelector((state) => state.settings.theme);
+
+  // Whether the options menu is open
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Post context provides the current post's data
+  const post = useContext(PostContext);
+
+  // Ref to detect outside clicks and close the menu
+  const optionsListRef = useRef(null);
+
+  // Hook to close the widget when clicked outside
+  useCloseWidget(optionsListRef, setIsOpen);
+
+  // Determine if the current user is the comment owner
+  const isOwner = profileId === commentCreatorId;
+
+  // Determine if the current user is the post creator (moderation rights)
+  const isPostCreator = profileId === post.creatorId;
+
+  // Theme-based class for hover/focus on the button
+  const buttonThemeClass =
+    theme === "dark"
+      ? "hover:bg-[#303343] focus:bg-[#303343]"
+      : "hover:bg-[#eaedfb] focus:bg-[#eaedfb]";
+
+  // Icon color based on theme
+  const iconFill = theme === "dark" ? "#c3c5cd" : "#5b5d67";
+
+  // Menu background color based on theme
+  const menuBg = theme === "dark" ? "bg-300" : "bg-100";
 
   return (
-    <div ref={optionsList} className="relative">
+    <div ref={optionsListRef} className="relative">
+      {/* Button to toggle the options menu */}
       <button
         aria-label="comment options"
-        className={`aspect-square w-10 flex justify-center ${
-          theme === "dark"
-            ? "hover:bg-[#303343] focus:bg-[#303343]"
-            : "hover:bg-[#eaedfb] focus:bg-[#eaedfb]"
-        } items-center icon transition cursor-pointer `}
+        className={`aspect-square w-10 flex justify-center items-center icon transition cursor-pointer ${buttonThemeClass}`}
         style={{ borderRadius: "50%" }}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((prev) => !prev)}
       >
-        <MoreIcon style={{ fill: theme === "dark" ? "#c3c5cd" : "#5b5d67 " }} />
+        <MoreIcon style={{ fill: iconFill }} />
       </button>
+
+      {/* Options menu */}
       {isOpen && (
         <ul
-          className={`menu absolute top-[100%] right-0 rounded-xl w-max overflow-hidden z-20 ${
-            theme === "dark" ? "bg-300" : "bg-100"
-          }`}
+          className={`menu absolute top-full right-0 rounded-xl w-max overflow-hidden z-20 ${menuBg}`}
         >
-          {profile &&
-            (profile._id === commentCreatorId ||
-              profile._id === post.creatorId) && (
-              <Delete
-                userId={post.creatorId}
-                postId={post._id}
-                commentId={commentId}
-              />
-            )}
-          <div onClick={() => setIsOpen(!isOpen)}>
-            {profile && profile._id === commentCreatorId && (
-              <Edit setIsModifying={setIsModifying} />
-            )}
+          <div onClick={() => setIsOpen(false)}>
+            {/* Show Delete if the user owns the comment or is post creator */}
+            {(isOwner || isPostCreator) && <Delete commentId={commentId} />}
+
+            {/* Show Edit only if the user owns the comment */}
+            {isOwner && <Edit setIsModifying={setIsModifying} />}
+
+            {/* Show CopyLink for all users */}
             <CopyLink
               commentPath={`${post.creatorId}/${post._id}/${commentId}`}
             />

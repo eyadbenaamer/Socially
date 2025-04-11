@@ -6,10 +6,12 @@ import useCloseWidget from "hooks/useCloseWidget";
 import { useLocation } from "react-router-dom";
 
 const Dialog = (props) => {
-  const { isOpened, setIsOpened, children, preventCloseByClick } = props;
+  const { isOpened, setIsOpened, children } = props;
   const { pathname } = useLocation();
   const prompt = useRef(null);
-  useCloseWidget(prompt, setIsOpened, preventCloseByClick);
+
+  useCloseWidget(prompt, setIsOpened);
+
   useEffect(() => {
     if (isOpened) {
       /*
@@ -35,26 +37,26 @@ const Dialog = (props) => {
     }
   });
 
+  if (!isOpened) return null;
+
   return (
-    isOpened && (
-      <dialog
-        ref={prompt}
-        aria-busy={true}
-        className="text-inherit w-full fixed top-0 bg-[#00000063] h-[100dvh] flex items-center justify-center z-[100]"
-      >
-        <section className="dialog py-2 bg-200 h-fit max-h-[100dvh] rounded-xl">
-          <button
-            className="ms-3 cursor-pointer w-5"
-            onClick={() => setIsOpened(!isOpened)}
-          >
-            <CloseIcon className="icon-hover hover:text-white" />
-          </button>
-          <div className="dialog max-h-[90vh] overflow-y-scroll">
-            {children}
-          </div>
-        </section>
-      </dialog>
-    )
+    <dialog
+      ref={prompt}
+      aria-busy={true}
+      className="p-3 ps-1 text-inherit w-full fixed top-0 bg-[#00000063] h-[100dvh] flex items-center justify-center z-[1150]"
+    >
+      <section className="dialog py-2 bg-200 h-fit max-h-[100dvh] rounded-xl">
+        <button
+          className="ms-3 cursor-pointer w-5"
+          onClick={() => setIsOpened(!isOpened)}
+        >
+          <CloseIcon className="icon-hover hover:text-white" />
+        </button>
+        <div className="dialog max-h-[90vh] overflow-y-scroll ps-2 py-2">
+          {children}
+        </div>
+      </section>
+    </dialog>
   );
 };
 

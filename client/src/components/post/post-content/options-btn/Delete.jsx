@@ -1,7 +1,6 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { useLocation } from "react-router-dom";
 
-import Dialog from "components/dialog";
 import RedBtn from "components/RedBtn";
 import PrimaryBtn from "components/PrimaryBtn";
 import { PostContext } from "components/post";
@@ -10,26 +9,27 @@ import { PostsContext } from "components/posts";
 import axiosClient from "utils/AxiosClient";
 
 import { ReactComponent as TrashIcon } from "assets/icons/trash-basket.svg";
+import { useDialog } from "components/dialog/DialogContext";
+import { setShowMessage } from "state";
+import { useDispatch } from "react-redux";
 
 const Delete = () => {
   const location = useLocation();
-
   const { _id: postId, creatorId } = useContext(PostContext);
   const setPosts = useContext(PostsContext)?.setPosts;
+  const { openDialog, closeDialog } = useDialog();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const deletePost = async () => {
     await axiosClient
       .delete(`post/delete?userId=${creatorId}&postId=${postId}`)
       .then(() => {
         document.body.style = null;
-        setIsOpen(false);
+        closeDialog();
 
-        /*
-          if the post is rendered in post page then go back to the previous page
-          otherwise update the posts list after deleting the post
-        */
+        dispatch(setShowMessage("Post deleted."));
+
         if (location.pathname.startsWith("/post")) {
           window.history.back();
         } else {
@@ -38,29 +38,31 @@ const Delete = () => {
       });
   };
 
+  const handleDeleteClick = () => {
+    openDialog(
+      <div className="p-2">
+        <div className="w-full py-4 ">
+          Are you sure you want to delete this post?
+        </div>
+        <div className="flex justify-between mt-2">
+          <PrimaryBtn onClick={closeDialog}>Cancel</PrimaryBtn>
+          <RedBtn onClick={deletePost}>Delete</RedBtn>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <li>
       <button
         className="flex gap-2 p-3 bg-hovered w-full"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleDeleteClick}
       >
         <span className="w-6">
           <TrashIcon />
         </span>
         Delete the post
       </button>
-
-      <Dialog isOpened={isOpen} setIsOpened={setIsOpen}>
-        <div className="p-2">
-          <div className="w-full py-4 ">
-            Are you sure you want to delete this post?
-          </div>
-          <div className="flex justify-between mt-2">
-            <PrimaryBtn onClick={() => setIsOpen(false)}>Cancel</PrimaryBtn>
-            <RedBtn onClick={deletePost}>Delete</RedBtn>
-          </div>
-        </div>
-      </Dialog>
     </li>
   );
 };

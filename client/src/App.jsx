@@ -22,6 +22,7 @@ import Header from "components/header";
 import Bar from "components/bar";
 import InfoMessage from "components/InfoMessage";
 
+import { DialogProvider } from "components/dialog/DialogContext";
 import useHandleSocket, { connectToSocketServer } from "hooks/useHandleSocket";
 import useUpdate from "hooks/useUpdate";
 import { useWindowWidth } from "hooks/useWindowWidth";
@@ -77,133 +78,146 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className={`App ${theme} bg-100`}>
-        <Header />
-        <motion.main
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "linear" }}
-        >
-          <Routes>
-            <Route
-              path="/"
-              element={
-                isLoggedin && isVerified ? (
-                  <Home />
-                ) : (
-                  <Navigate to={"/login"} replace={true} />
-                )
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                !isLoggedin ? (
-                  <Login />
-                ) : isLoggedin && !isVerified ? (
-                  <Navigate to="/verify-account" />
-                ) : (
-                  <Navigate to="/" replace={true} />
-                )
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                !isLoggedin ? <Signup /> : <Navigate to="/" replace={true} />
-              }
-            />
-            <Route
-              path="/verify-account"
-              element={
-                isLoggedin && !isVerified ? (
-                  <VerifyAccount />
-                ) : isLoggedin && email && isVerified ? (
-                  <Navigate to="/welcome" replace={true} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
-            />
-            <Route
-              path="/verify-account/:token"
-              element={
-                !isLoggedin || (isLoggedin && !isVerified) ? (
-                  <VerifyAccountByLink />
-                ) : isLoggedin && email && isVerified ? (
-                  <Navigate to="/welcome" replace={true} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
-            />
-            <Route
-              path="/reset-password"
-              element={
-                !isLoggedin ? (
-                  <ResetPassword />
-                ) : (
-                  <Navigate to={"/"} replace={true} />
-                )
-              }
-            />
-            <Route
-              path="/reset-password/:token"
-              element={
-                !isLoggedin ? (
-                  <ResetPassword />
-                ) : (
-                  <Navigate to={"/"} replace={true} />
-                )
-              }
-            />
-            <Route
-              path="/welcome"
-              element={
-                isLoggedin && isVerified && email ? (
-                  <Welcome />
-                ) : isLoggedin && !isVerified && email ? (
-                  <Navigate to="/verify-account" replace={true} />
-                ) : (
-                  <Navigate to="/" replace={true} />
-                )
-              }
-            />
-            <Route path="/post/:userId/:postId" element={<Post />} />
-            <Route path="/post/:userId/:postId/:commentId" element={<Post />} />
-            <Route
-              path="/post/:userId/:postId/:commentId/:replyId"
-              element={<Post />}
-            />
-            <Route
-              path="/notifications"
-              element={
-                isLoggedin ? (
-                  <Notifications />
-                ) : (
-                  <Navigate to="/" replace={true} />
-                )
-              }
-            />
-            <Route
-              path="/messages"
-              element={
-                isLoggedin ? <Messaging /> : <Navigate to="/" replace={true} />
-              }
-            >
-              <Route path="/messages/:conversationId" element={<Chat />} />
-            </Route>
-            <Route
-              path="/saved-posts"
-              element={
-                isLoggedin ? <SavedPosts /> : <Navigate to="/" replace={true} />
-              }
-            />
-            <Route path="/profile/:username" element={<Profile />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <InfoMessage />
-        </motion.main>
-        {isLoggedin && !email && windowWidth < 1024 && <Bar />}
+        <DialogProvider>
+          <Header />
+          <motion.main
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "linear" }}
+          >
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  isLoggedin && isVerified ? (
+                    <Home />
+                  ) : (
+                    <Navigate to={"/login"} replace={true} />
+                  )
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  !isLoggedin ? (
+                    <Login />
+                  ) : isLoggedin && !isVerified ? (
+                    <Navigate to="/verify-account" />
+                  ) : (
+                    <Navigate to="/" replace={true} />
+                  )
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  !isLoggedin ? <Signup /> : <Navigate to="/" replace={true} />
+                }
+              />
+              <Route
+                path="/verify-account"
+                element={
+                  isLoggedin && !isVerified ? (
+                    <VerifyAccount />
+                  ) : isLoggedin && email && isVerified ? (
+                    <Navigate to="/welcome" replace={true} />
+                  ) : (
+                    <Navigate to="/" />
+                  )
+                }
+              />
+              <Route
+                path="/verify-account/:token"
+                element={
+                  !isLoggedin || (isLoggedin && !isVerified) ? (
+                    <VerifyAccountByLink />
+                  ) : isLoggedin && email && isVerified ? (
+                    <Navigate to="/welcome" replace={true} />
+                  ) : (
+                    <Navigate to="/" />
+                  )
+                }
+              />
+              <Route
+                path="/reset-password"
+                element={
+                  !isLoggedin ? (
+                    <ResetPassword />
+                  ) : (
+                    <Navigate to={"/"} replace={true} />
+                  )
+                }
+              />
+              <Route
+                path="/reset-password/:token"
+                element={
+                  !isLoggedin ? (
+                    <ResetPassword />
+                  ) : (
+                    <Navigate to={"/"} replace={true} />
+                  )
+                }
+              />
+              <Route
+                path="/welcome"
+                element={
+                  isLoggedin && isVerified && email ? (
+                    <Welcome />
+                  ) : isLoggedin && !isVerified && email ? (
+                    <Navigate to="/verify-account" replace={true} />
+                  ) : (
+                    <Navigate to="/" replace={true} />
+                  )
+                }
+              />
+              <Route path="/post/:userId/:postId" element={<Post />} />
+              <Route
+                path="/post/:userId/:postId/:commentId"
+                element={<Post />}
+              />
+              <Route
+                path="/post/:userId/:postId/:commentId/:replyId"
+                element={<Post />}
+              />
+              <Route
+                path="/notifications"
+                element={
+                  isLoggedin ? (
+                    <Notifications />
+                  ) : (
+                    <Navigate to="/" replace={true} />
+                  )
+                }
+              />
+              <Route
+                path="/messages"
+                element={
+                  isLoggedin ? (
+                    <Messaging />
+                  ) : (
+                    <Navigate to="/" replace={true} />
+                  )
+                }
+              >
+                <Route path="/messages/:conversationId" element={<Chat />} />
+              </Route>
+              <Route
+                path="/saved-posts"
+                element={
+                  isLoggedin ? (
+                    <SavedPosts />
+                  ) : (
+                    <Navigate to="/" replace={true} />
+                  )
+                }
+              />
+              <Route path="/profile/:username" element={<Profile />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <InfoMessage />
+          </motion.main>
+          {isLoggedin && !email && windowWidth < 1024 && <Bar />}
+        </DialogProvider>
       </div>
     </BrowserRouter>
   );
