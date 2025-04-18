@@ -17,79 +17,85 @@ const Posts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [message, setMessage] = useState(null);
   const [posts, setPosts] = useState(null);
+  const [totalPages, setTotalPages] = useState(2);
+  const [isFetching, setIsFetching] = useState(false);
 
   const postsEnd = useRef();
 
-  const [totalPages, setTotalPages] = useState(2);
-
   const fetchPosts = () => {
+    if (isFetching) return;
+
+    setIsFetching(true);
     const requestURL = userId
       ? `posts/user?userId=${userId}&page=${currentPage}`
-      : `posts`;
+      : `posts?page=${currentPage}`;
+
     axiosClient
       .get(requestURL)
       .then((response) => {
         setTotalPages(response.data.totalPages);
-        setCurrentPage(currentPage + 1);
-        setPosts((prev) => {
-          if (prev) {
-            prev = [...prev, ...response.data.posts];
-          } else {
-            prev = [...response.data.posts];
-          }
-          return prev;
-        });
+        setCurrentPage((prevPage) => prevPage + 1);
+        setPosts((prev) =>
+          prev ? [...prev, ...response.data.posts] : [...response.data.posts]
+        );
       })
       .catch(() => {
         setMessage("An error occurred. please try again later.");
+      })
+      .finally(() => {
+        setIsFetching(false);
       });
   };
+
   // fetch posts once after loading the page
   useEffect(() => {
     const requestURL = userId
-      ? `posts/user?userId=${userId}&page=${1}`
-      : `posts`;
+      ? `posts/user?userId=${userId}&page=1`
+      : `posts?page=1`;
+
+    setIsFetching(true);
     axiosClient
       .get(requestURL)
       .then((response) => {
         setTotalPages(response.data.totalPages);
-        setCurrentPage(currentPage + 1);
+        setCurrentPage(2);
         setPosts(response.data.posts);
       })
       .catch(() => {
         setMessage("An error occurred. please try again later.");
+      })
+      .finally(() => {
+        setIsFetching(false);
       });
   }, [username]);
-  /*
-  fetch posts whenever scrolling reaches to the half distance between the 
-  first and the last loaded post, i.e: having 10 posts, when scrolling reaches 
-  to the 5th posts, the new page of posts being requested 
-  */
+
+  // scroll listener to fetch next page
   useEffect(() => {
     const updatePage = () => {
-      const postsEndLocation = Math.floor(postsEnd.current?.offsetTop);
-      const scroll = Math.floor(window.scrollY + window.screen.height);
+      const postsEndLocation = Math.floor(postsEnd.current?.offsetTop || 0);
+      const scroll = Math.floor(window.scrollY + window.innerHeight);
+
       if (scroll >= postsEndLocation / 2) {
-        if (currentPage <= totalPages) {
+        if (currentPage <= totalPages && !isFetching) {
           fetchPosts();
           window.removeEventListener("scrollend", updatePage);
         }
       }
     };
+
     window.addEventListener("scrollend", updatePage);
     return () => window.removeEventListener("scrollend", updatePage);
-  }, [currentPage]);
+  }, [currentPage, totalPages, isFetching]);
 
   return (
     <PostsContext.Provider value={{ posts, setPosts }}>
       <div className="flex flex-col gap-y-4 items-center">
-        {/* post creation area */}
         <CreatePost />
-        {/* posts area */}
+
         {posts?.map((post) => (
           <Post key={post._id} post={post} />
         ))}
-        {/* the loading component appears only when there are more pages */}
+
         {currentPage <= totalPages && (
           <div className="w-full" ref={postsEnd}>
             <LoadingPost />
@@ -98,7 +104,6 @@ const Posts = () => {
 
         {posts?.length === 0 && <>No posts</>}
 
-        {/* message component appears the posts request fails */}
         {message && currentPage <= totalPages && (
           <NoConnectionMessage
             onClick={() => {
@@ -112,4 +117,5 @@ const Posts = () => {
     </PostsContext.Provider>
   );
 };
+
 export default Posts;
