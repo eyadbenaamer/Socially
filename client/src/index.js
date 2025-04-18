@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import slice from "./state/index.js";
 import { configureStore } from "@reduxjs/toolkit";
@@ -24,6 +24,7 @@ const persistedReducer = persistReducer(persistConfig, slice);
 
 const store = configureStore({
   reducer: persistedReducer,
+  devTools: process.env.NODE_ENV !== "production",
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
@@ -42,11 +43,13 @@ at least once, therefore the loading effect won't be applied.
 const isLoaded = sessionStorage.getItem("isLoaded");
 
 root.render(
-  <Provider store={store}>
-    <PersistGate loading={null} persistor={persistStore(store)}>
-      <Suspense fallback={!isLoaded ? <Loading /> : null}>
-        <App />
-      </Suspense>
-    </PersistGate>
-  </Provider>
+  <StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistStore(store)}>
+        <Suspense fallback={!isLoaded ? <Loading /> : null}>
+          <App />
+        </Suspense>
+      </PersistGate>
+    </Provider>
+  </StrictMode>
 );
