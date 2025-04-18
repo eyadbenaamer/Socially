@@ -1,7 +1,10 @@
+import PreloadedImage from "components/PreloadedImage";
+
+import useFetchProfile from "hooks/useFetchProfile";
+
 import { ReactComponent as LikeIcon } from "assets/icons/like.svg";
 import { ReactComponent as CommentIcon } from "assets/icons/comments.svg";
 import { ReactComponent as ShareIcon } from "assets/icons/share.svg";
-import useFetchProfile from "hooks/useFetchProfile";
 
 const Picture = (props) => {
   const { userId, notificationType } = props;
@@ -10,13 +13,7 @@ const Picture = (props) => {
 
   return (
     <div className="relative">
-      <div className="circle w-12 shadow-md border-2">
-        <img
-          className="h-full w-full"
-          loading="lazy"
-          src={profile?.profilePicPath}
-        />
-      </div>
+      <PreloadedImage src={profile?.profilePicPath} />
       {notificationType === "like" && (
         <div className="absolute -right-[7px] bottom-0.5 scale-[3.5] h-5 w-5">
           <LikeIcon color="#e53935" />
