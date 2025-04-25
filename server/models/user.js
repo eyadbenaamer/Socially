@@ -1,4 +1,5 @@
 import { Schema, model, Types } from "mongoose";
+
 const { ObjectId } = Types;
 
 const NotificationSchema = new Schema({

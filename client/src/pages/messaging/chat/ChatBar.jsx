@@ -3,16 +3,16 @@ import { Link } from "react-router-dom";
 
 import UserPicture from "components/UserPicture";
 
-import { ConversationContext } from "..";
+import { SelectedChatContext } from "..";
 import useGetTime from "./messages-area/message/getTime";
 
 import { ReactComponent as ArrowLeftIcon } from "assets/icons/arrow-left.svg";
 
 const ChatBar = () => {
   const { participant, participantProfile, conversation } =
-    useContext(ConversationContext);
+    useContext(SelectedChatContext);
 
-  const lastSeenAt = useGetTime(participant.lastSeenAt);
+  const lastSeenAt = useGetTime(participant?.lastSeenAt);
 
   return (
     <div className="bg-alt flex gap-2 py-2 shadow-lg">
@@ -39,10 +39,10 @@ const ChatBar = () => {
               <span className="text-xs text-primary">Typing...</span>
             ) : (
               <>
-                {participant.isOnline && (
+                {participant?.isOnline && (
                   <span className="text-xs text-primary">Online</span>
                 )}
-                {!participant.isOnline && (
+                {!participant?.isOnline && (
                   <span className="text-xs text-gray-500">
                     Last seen {lastSeenAt}
                   </span>

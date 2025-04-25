@@ -6,7 +6,7 @@ import { addMessages, setConversation, setConversationRead } from "state";
 
 import Message from "./message";
 
-import { ConversationContext } from "pages/messaging";
+import { SelectedChatContext } from "pages/messaging";
 import axiosClient from "utils/AxiosClient";
 import Time from "components/time";
 
@@ -15,7 +15,7 @@ import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 const MessagesArea = (props) => {
   const dispatch = useDispatch();
 
-  const { conversation } = useContext(ConversationContext);
+  const { conversation } = useContext(SelectedChatContext);
 
   const firstUnreadMessageId = useMemo(
     () => conversation.messages[props.unreadMessagesCount - 1]?._id,
@@ -37,7 +37,8 @@ const MessagesArea = (props) => {
   */
   useEffect(() => {
     if (conversation.unreadMessagesCount) {
-      axiosClient(`/conversation/set_read?conversationId=${conversation._id}`)
+      axiosClient
+        .patch(`/conversation/set_read?conversationId=${conversation._id}`)
         .then(() => dispatch(setConversationRead(conversation._id)))
         .catch((err) => {
           // TODO: handle error
@@ -124,7 +125,7 @@ const MessagesArea = (props) => {
       })
       .catch((err) => {});
   };
-  console.log(conversation?.messages);
+
   return (
     <>
       {isClosed && <Navigate to="/messages" replace />}

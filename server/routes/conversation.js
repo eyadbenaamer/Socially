@@ -1,6 +1,12 @@
 import express from "express";
 
-import { clear, getAll, getOne, setRead } from "../controllers/conversation.js";
+import {
+  clear,
+  deleteConversation,
+  getAll,
+  getOne,
+  setRead,
+} from "../controllers/conversation.js";
 
 import { verifyId } from "../middleware/check.js";
 import { verifyToken } from "../middleware/auth.js";
@@ -10,15 +16,25 @@ const router = express.Router();
 
 //root path: /conversation
 
-/*READ*/
-
 router.get("/all", verifyId, verifyToken, getAll);
 router.get("/", verifyId, verifyToken, getOne);
-router.get("/set_read", verifyId, verifyToken, setRead);
-
-/*DELETE*/
-
+router.patch(
+  "/set_read",
+  verifyId,
+  verifyToken,
+  getConversationInfo,
+  isInChat,
+  setRead
+);
 router.delete(
+  "/delete",
+  verifyId,
+  verifyToken,
+  getConversationInfo,
+  isInChat,
+  deleteConversation
+);
+router.patch(
   "/clear",
   verifyId,
   verifyToken,

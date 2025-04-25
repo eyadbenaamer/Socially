@@ -166,11 +166,17 @@ export const login = async (req, res) => {
     for (let i = 0; i < user.contacts.length; i++) {
       const contact = user.contacts[i];
       if (onlineUsers.get(contact.id)) {
-        contacts.push({ _id: contact.id, isOnline: true, lastSeenAt: null });
+        contacts.push({
+          _id: contact.id,
+          conversationId: contact.conversationId,
+          isOnline: true,
+          lastSeenAt: null,
+        });
       } else {
         const contactProfile = await Profile.findById(contact.id);
         contacts.push({
           _id: contact.id,
+          conversationId: contact.conversationId,
           isOnline: false,
           lastSeenAt: contactProfile.lastSeenAt,
         });
@@ -210,11 +216,17 @@ export const loginWithToken = async (req, res) => {
       for (let i = 0; i < user.contacts.length; i++) {
         const contact = user.contacts[i];
         if (onlineUsers.get(contact.id)) {
-          contacts.push({ _id: contact.id, isOnline: true, lastSeenAt: null });
+          contacts.push({
+            _id: contact.id,
+            conversationId: contact.conversationId,
+            isOnline: true,
+            lastSeenAt: null,
+          });
         } else {
           const contactProfile = await Profile.findById(contact.id);
           contacts.push({
             _id: contact.id,
+            conversationId: contact.conversationId,
             isOnline: false,
             lastSeenAt: contactProfile.lastSeenAt,
           });

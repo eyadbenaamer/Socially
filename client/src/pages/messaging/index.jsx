@@ -11,7 +11,7 @@ import Conversations from "./conversations";
 import { useWindowWidth } from "hooks/useWindowWidth";
 import useFetchProfile from "hooks/useFetchProfile";
 
-export const ConversationContext = createContext();
+export const SelectedChatContext = createContext();
 
 const Messaging = () => {
   const { conversationId } = useParams();
@@ -58,7 +58,7 @@ const Messaging = () => {
 
   return (
     <>
-      <ConversationContext.Provider
+      <SelectedChatContext.Provider
         value={{
           conversation,
           participantProfile,
@@ -111,7 +111,7 @@ const Messaging = () => {
             </div>
           </div>
         </>
-      </ConversationContext.Provider>
+      </SelectedChatContext.Provider>
     </>
   );
 };

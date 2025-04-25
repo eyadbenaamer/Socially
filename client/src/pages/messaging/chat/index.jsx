@@ -6,12 +6,13 @@ import ChatBar from "./ChatBar";
 import SendMessage from "./send-message";
 import MessagesArea from "./messages-area";
 
-import { ConversationContext } from "..";
+import { SelectedChatContext } from "..";
 import { useWindowWidth } from "hooks/useWindowWidth";
+import { Navigate } from "react-router-dom";
 
 const Chat = () => {
   const windowWidth = useWindowWidth();
-  const { conversation } = useContext(ConversationContext);
+  const { conversation } = useContext(SelectedChatContext);
 
   const { theme } = useSelector((state) => state.settings);
 
@@ -22,6 +23,10 @@ const Chat = () => {
   };
   const boxShadow =
     theme === "dark" ? "0 0 6px 1px #00000036" : "0 0 5px 0px #00000021";
+
+  if (!conversation) {
+    return <Navigate to={"/messages"} replace />;
+  }
 
   return (
     <motion.div

@@ -12,18 +12,20 @@ export const directChatHistoryHandler = async (socket, receiverUserId) => {
 };
 
 export const notifyTypingHandler = async (socket, io, data) => {
-  const { conversationId, isTyping } = data;
-  const conversation = await Conversation.findById(conversationId);
-  const participants = conversation.participants.filter(
-    (participant) => participant.id !== socket.user.id
-  );
-  participants?.map((participant) => {
-    const socketList = getOnlineUsers().get(participant.id);
-    socketList?.map((id) => {
-      io.to(id).emit("notify-typing", {
-        conversationId,
-        isTyping,
+  try {
+    const { conversationId, isTyping } = data;
+    const conversation = await Conversation.findById(conversationId);
+    const participants = conversation.participants.filter(
+      (participant) => participant.id !== socket.user.id
+    );
+    participants?.map((participant) => {
+      const socketList = getOnlineUsers().get(participant.id);
+      socketList?.map((id) => {
+        io.to(id).emit("notify-typing", {
+          conversationId,
+          isTyping,
+        });
       });
     });
-  });
+  } catch {}
 };

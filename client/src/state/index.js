@@ -107,6 +107,15 @@ export const slice = createSlice({
       });
     },
     /*
+    this function receives the new established conversation and adds
+    in the conversations array
+    */
+    addNewConversation: (state, action) => {
+      const { conversation, contact } = action.payload;
+      state.contacts.unshift(contact);
+      state.conversations.unshift(conversation);
+    },
+    /*
     this fucntion called when a certain conversation's messages status 
     are updated such as (readBy, deliveredTo)
     */
@@ -127,6 +136,30 @@ export const slice = createSlice({
         }
       });
     },
+    // clears a conversation's messages but the conversation remains
+    clearConversation: (state, action) => {
+      const conversation = state.conversations.find(
+        (conv) => conv._id === action.payload.conversationId
+      );
+      if (!conversation) return;
+
+      const unreadMessagesCount = conversation.unreadMessagesCount;
+
+      state.unreadMessagesCount -= unreadMessagesCount;
+      conversation.unreadMessagesCount = 0;
+      conversation.messages = [];
+      conversation.updatedAt = null;
+    },
+    //
+    deleteConversation: (state, action) => {
+      const { conversationId, contactId } = action.payload;
+      state.conversations = state.conversations.filter(
+        (conversation) => conversation._id !== conversationId
+      );
+      state.contacts = state.contacts.filter(
+        (contact) => contact._id !== contactId
+      );
+    },
     // adds the new recieved message to its conversation
     addMessage: (state, action) => {
       const {
@@ -135,7 +168,7 @@ export const slice = createSlice({
         updatedAt,
         unreadMessagesCount,
       } = action.payload;
-      if (newMessage.senderId !== state.profile._id) {
+      if (newMessage?.senderId !== state.profile._id) {
         state.unreadMessagesCount += 1;
       }
       const updatedConversation = state.conversations.find(
@@ -146,7 +179,7 @@ export const slice = createSlice({
       if (!updatedConversation || !updatedConversation.messages) {
         state.conversations.unshift({
           _id: conversationId,
-          messages: [newMessage],
+          messages: newMessage ? [newMessage] : [],
           updatedAt,
           unreadMessagesCount,
         });
@@ -298,7 +331,10 @@ export const {
   setConversation,
   setConversationRead,
   addMessages,
+  addNewConversation,
   updateConversationStatus,
+  clearConversation,
+  deleteConversation,
   addMessage,
   messageLikeToggle,
   deleteMessage,

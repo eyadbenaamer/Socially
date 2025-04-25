@@ -104,6 +104,7 @@ export const getOne = async (req, res) => {
         $project: {
           _id: 1,
           participants: 1,
+          updatedAt: 1,
           messages: {
             $slice: [
               {
@@ -145,9 +146,12 @@ export const getOne = async (req, res) => {
 
 export const setRead = async (req, res) => {
   try {
-    const { conversationId } = req.query;
-    const { user } = req;
-    const conversation = await Conversation.findById(conversationId);
+    const { user, conversation } = req;
+
+    if (!conversation) {
+      return res.status(404).json({ message: "Conversation not found." });
+    }
+
     let index = 0;
     const messagesInfo = [];
     while (true) {
@@ -172,18 +176,56 @@ export const setRead = async (req, res) => {
     await conversation.save();
     conversation.participants.map((participant) => {
       const socketIdsList = getOnlineUsers().get(participant.id);
-      if (socketIdsList) {
-        socketIdsList.map((socketId) => {
-          getServerSocketInstance().to(socketId).emit("update-conversation", {
-            conversationId: conversation.id,
-            messagesInfo,
-          });
+      if (!socketIdsList) return;
+
+      socketIdsList.map((socketId) => {
+        getServerSocketInstance().to(socketId).emit("update-conversation", {
+          conversationId: conversation.id,
+          messagesInfo,
         });
-      }
+      });
     });
     return res.status(200).json(conversation[0]?.messages);
-  } catch (error) {
-    console.log(error);
+  } catch {
+    return res
+      .status(500)
+      .json({ message: "An error occurred. Plaese try again later." });
+  }
+};
+
+export const deleteConversation = async (req, res) => {
+  try {
+    const { conversation } = req;
+
+    // subtract the unread messages count of the conversation from the overall count
+    conversation.participants.map((participant) => {
+      const otherParticipant = conversation.participants.find(
+        (par) => par.id !== participant.id
+      );
+
+      const unreadMessagesCount = participant.unreadMessagesCount;
+      User.findById(participant.id).then((doc) => {
+        doc.unreadMessagesCount -= unreadMessagesCount;
+        doc.contacts.id(otherParticipant.id).deleteOne();
+        doc.save();
+      });
+
+      //send the clearance of the conversations to all participants
+      const socketIdsList = getOnlineUsers().get(participant.id);
+      if (!socketIdsList) return;
+
+      socketIdsList.map((socketId) => {
+        getServerSocketInstance().to(socketId).emit("delete-conversation", {
+          conversationId: conversation.id,
+          contactId: otherParticipant.id,
+        });
+      });
+    });
+
+    conversation.deleteOne();
+
+    return res.status(200).send("success");
+  } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
@@ -192,14 +234,42 @@ export const setRead = async (req, res) => {
 
 export const clear = async (req, res) => {
   try {
-    const { forEveryOne } = req.query;
+    const { forEveryone } = req.query;
     const { user, conversation } = req;
 
-    if (forEveryOne === "true") {
+    if (forEveryone === "true") {
+      conversation.updatedAt = null;
+
+      // subtract the unread messages count of the conversation from the overall count
+      conversation.participants.map((participant) => {
+        const unreadMessagesCount = participant.unreadMessagesCount;
+        User.findById(participant.id).then((doc) => {
+          doc.unreadMessagesCount -= unreadMessagesCount;
+          doc.save();
+        });
+        participant.unreadMessagesCount = 0;
+      });
+      // clrear all messages
       conversation.messages = [];
       await conversation.save();
+
+      //send the clearance of the conversations to all participants
+      conversation.participants.map((participant) => {
+        const socketIdsList = getOnlineUsers().get(participant.id);
+        if (!socketIdsList) return;
+
+        socketIdsList.map((socketId) => {
+          getServerSocketInstance().to(socketId).emit("clear-conversation", {
+            conversationId: conversation.id,
+          });
+        });
+      });
+
       return res.status(200).send("success");
     }
+
+    conversation.participants.id(user.id).unreadMessagesCount = 0;
+
     conversation.messages.map((message) => {
       /*
       if the message is deleted for everyone except this user, then delete the entire 
@@ -212,6 +282,25 @@ export const clear = async (req, res) => {
       }
     });
     await conversation.save();
+
+    /*
+    send the clearance of the conversations only to 
+    the participant who cleared the conversation for themselfe
+    */
+    const otherParticipant = conversation.participants.find(
+      (par) => par.id !== user.id
+    );
+
+    const socketIdsList = getOnlineUsers().get(user.id);
+    if (!socketIdsList) return;
+
+    socketIdsList.map((socketId) => {
+      getServerSocketInstance().to(socketId).emit("clear-conversation", {
+        conversationId: conversation.id,
+        contactId: otherParticipant.id,
+      });
+    });
+
     return res.status(200).send("success");
   } catch {
     return res

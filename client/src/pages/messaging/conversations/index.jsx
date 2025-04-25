@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useUpdate from "hooks/useUpdate";
 
-import Conversation from "./Conversation";
-import { setConversations } from "state";
+import Conversation from "./conversation";
 import axiosClient from "utils/AxiosClient";
+import { setConversations } from "state";
 
 import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
@@ -70,7 +70,7 @@ const Conversations = () => {
   return (
     <ul
       ref={container}
-      className="flex flex-col overflow-y-scroll h-full py-4 px-2"
+      className="flex flex-col overflow-y-scroll h-full pb-4 px-2"
     >
       {conversations?.map((conversation) => (
         <li>

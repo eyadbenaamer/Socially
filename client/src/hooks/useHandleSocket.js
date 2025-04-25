@@ -4,7 +4,10 @@ import { useEffect } from "react";
 
 import {
   addMessage,
+  addNewConversation,
   addNotification,
+  clearConversation,
+  deleteConversation,
   deleteMessage,
   messageLikeToggle,
   removeNotification,
@@ -59,8 +62,17 @@ const useHandleSocket = () => {
     socket.on("send-message", (data) => {
       dispatch(addMessage(data));
     });
+    socket.on("add-new-conversation", (data) => {
+      dispatch(addNewConversation(data));
+    });
     socket.on("update-conversation", (data) => {
       dispatch(updateConversationStatus(data));
+    });
+    socket.on("clear-conversation", (data) => {
+      dispatch(clearConversation(data));
+    });
+    socket.on("delete-conversation", (data) => {
+      dispatch(deleteConversation(data));
     });
     socket.on("message-like-toggle", (data) => {
       dispatch(messageLikeToggle(data));
