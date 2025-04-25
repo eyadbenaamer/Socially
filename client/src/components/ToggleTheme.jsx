@@ -17,7 +17,7 @@ const ToggleTheme = () => {
         marginRight: 10,
         transform: "translateX(1px)",
       }}
-      width={16}
+      width={13}
       fill={theme === "dark" ? "#daa520" : "#5b5d67"}
     />
   );

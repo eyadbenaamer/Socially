@@ -37,8 +37,8 @@ const FollowToggleBtn = (props) => {
       {/* only show "follow toggle" button for loggedin user */}
       {myProfile && accountToFollowId !== myProfileId && (
         <button
-          className={`py-1 px-3 h-fit rounded-xl text-white ${
-            isFollowing ? "bg-red-500" : "bg-primary"
+          className={`py-1 px-3 h-fit rounded-xl shadow-sm border ${
+            isFollowing ? "bg-alt" : "bg-primary text-white"
           }`}
           onClick={followToggle}
         >

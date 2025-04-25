@@ -27,7 +27,7 @@ const RemoveFollowerBtn = (props) => {
       {/* only show "remove follower" button for loggedin user */}
       {profileId === myProfileId && (
         <button
-          className="py-1 px-3 h-fit rounded-xl text-white bg-red-500"
+          className="py-1 px-3 h-fit rounded-xl bg-alt shado border"
           onClick={followToggle}
         >
           Remove follower

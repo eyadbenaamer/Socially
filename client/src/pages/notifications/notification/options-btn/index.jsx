@@ -20,11 +20,11 @@ const OptionsBtn = (props) => {
     <div
       ref={optionsList}
       className="relative flex items-center h-fit self-center"
+      onClick={() => setIsOpen(!isOpen)}
     >
       <button
         aria-label="notification options"
         className={`aspect-square w-8 flex justify-center items-center icon transition cursor-pointer `}
-        onClick={() => setIsOpen(!isOpen)}
       >
         <MoreIcon style={{ fill: theme === "dark" ? "#c3c5cd" : "#5b5d67 " }} />
       </button>

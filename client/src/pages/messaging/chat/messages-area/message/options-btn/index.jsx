@@ -19,6 +19,7 @@ const OptionsBtn = (props) => {
     <div
       ref={optionsList}
       className="relative flex items-center h-fit self-center"
+      onClick={() => setIsOpen((prev) => !prev)}
     >
       <button
         aria-label="comment options"
@@ -28,7 +29,6 @@ const OptionsBtn = (props) => {
             : "hover:bg-[#eaedfb] focus:bg-[#eaedfb]"
         } items-center icon transition cursor-pointer `}
         style={{ borderRadius: "50%" }}
-        onClick={() => setIsOpen(!isOpen)}
       >
         <MoreIcon style={{ fill: theme === "dark" ? "#c3c5cd" : "#5b5d67 " }} />
       </button>
