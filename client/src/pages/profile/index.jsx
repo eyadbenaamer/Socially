@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import Content from "./Content";
 import CoverPicture from "./CoverPicture";
-import FollowingStatus from "./FollowingStatus";
+import MessagingBtn from "./MessagingBtn";
 import AboutUser from "./AboutUser";
 import Bar from "components/bar";
 import FollowToggleBtn from "components/FollowingBtn";
@@ -23,14 +23,14 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    const getUser = () => {
+    const getProfile = () => {
       axiosClient(`profile?username=${username}`)
         .then((response) => {
           setProfile(response.data);
         })
         .catch(() => setProfile("not found"));
     };
-    getUser();
+    getProfile();
   }, [username]);
 
   return (
@@ -43,7 +43,10 @@ const Profile = () => {
               <CoverPicture />
               <div dir="rtl" className="absolute w-[95%] my-5">
                 {myProfile && myProfile.username !== username && (
-                  <FollowToggleBtn id={profile._id} />
+                  <div className="flex gap-2 items-center">
+                    <FollowToggleBtn id={profile._id} />
+                    <MessagingBtn id={profile._id} />
+                  </div>
                 )}
               </div>
             </div>

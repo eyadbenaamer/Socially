@@ -1,16 +1,19 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import UserPicture from "components/UserPicture";
 
 import { SelectedChatContext } from "..";
 import useGetTime from "./messages-area/message/getTime";
+import useFetchProfile from "hooks/useFetchProfile";
 
 import { ReactComponent as ArrowLeftIcon } from "assets/icons/arrow-left.svg";
 
 const ChatBar = () => {
+  const { userId } = useParams();
   const { participant, participantProfile, conversation } =
     useContext(SelectedChatContext);
+  const [nonContactProfile] = useFetchProfile(userId);
 
   const lastSeenAt = useGetTime(participant?.lastSeenAt);
 
@@ -19,7 +22,7 @@ const ChatBar = () => {
       <Link to={"/messages"} className="block w-8 icon py-2">
         <ArrowLeftIcon fill="currentColor" />
       </Link>
-      {!participantProfile && (
+      {!participantProfile && !nonContactProfile && (
         <>
           <div className="circle w-12 loading"></div>
           <div className="flex flex-col justify-center gap-2">
@@ -32,10 +35,13 @@ const ChatBar = () => {
         <>
           <UserPicture profile={participantProfile} />
           <div className="flex flex-col justify-around">
-            <span className="font-bold">
+            <Link
+              to={`/profile/${participantProfile.username}`}
+              className="font-bold hover:underline"
+            >
               {participantProfile.firstName} {participantProfile.lastName}
-            </span>
-            {conversation.isTyping ? (
+            </Link>
+            {conversation?.isTyping ? (
               <span className="text-xs text-primary">Typing...</span>
             ) : (
               <>
@@ -49,6 +55,20 @@ const ChatBar = () => {
                 )}
               </>
             )}
+          </div>
+        </>
+      )}
+
+      {!participantProfile && nonContactProfile && (
+        <>
+          <UserPicture profile={nonContactProfile} />
+          <div className="flex flex-col justify-around">
+            <Link
+              to={`/profile/${nonContactProfile.username}`}
+              className="font-bold hover:underline"
+            >
+              {nonContactProfile.firstName} {nonContactProfile.lastName}
+            </Link>
           </div>
         </>
       )}

@@ -1,13 +1,13 @@
+import { createContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Time from "components/time";
 import UserPicture from "pages/messaging/UserPicture";
 import Status from "pages/messaging/chat/messages-area/message/Status";
+import OptionsBtn from "./options-btn";
 
 import useFetchProfile from "hooks/useFetchProfile";
-import OptionsBtn from "./options-btn";
-import { createContext } from "react";
 
 export const ConversationContext = createContext();
 
@@ -38,12 +38,15 @@ const Conversation = ({ conversation }) => {
         } bg-hovered p-2 rounded-xl transition`}
       >
         <div className="grid grid-cols-12 relative items-center">
-          <Link to={conversation._id} className="col-span-2 lg:col-span-2 ">
+          <Link
+            to={`contact/${conversation._id}`}
+            className="col-span-2 lg:col-span-2 "
+          >
             <UserPicture profile={participantProfile} isOnline={isOnline} />
           </Link>
 
           <Link
-            to={conversation._id}
+            to={`contact/${conversation._id}`}
             className="flex flex-col col-span-8  lg:col-span-8 px-2 justify-around"
           >
             <div className="flex items-center gap-2">

@@ -38,7 +38,12 @@ import { verifyId } from "./middleware/check.js";
 import { compressImages } from "./middleware/media.js";
 import { getPostsInfo } from "./middleware/post.js";
 import { uploadSingleFile } from "./middleware/media.js";
-import { getConversationInfo, isInChat } from "./middleware/conversation.js";
+import {
+  getConversationInfo,
+  isInChat,
+  newConversationByMessaging,
+} from "./middleware/conversation.js";
+
 import connectDB from "./config/db.js";
 
 /*CONFIGURATIONS*/
@@ -107,10 +112,19 @@ app.post(
   sendMessage
 );
 app.post(
+  "/api/message/send_first_time",
+  verifyId,
+  verifyToken,
+  upload.fields([{ name: "media", maxCount: 10 }]),
+  compressImages,
+  newConversationByMessaging,
+  sendMessage
+);
+app.post(
   "/api/message/reply",
   verifyId,
   verifyToken,
-  upload.fields([{ name: "media", maxCount: 5 }]),
+  upload.fields([{ name: "media", maxCount: 10 }]),
   compressImages,
   getConversationInfo,
   isInChat,

@@ -199,7 +199,11 @@ const App = () => {
                   )
                 }
               >
-                <Route path="/messages/:conversationId" element={<Chat />} />
+                <Route
+                  path="/messages/contact/:conversationId"
+                  element={<Chat />}
+                />
+                <Route path="/messages/user/:userId" element={<Chat />} />
               </Route>
               <Route
                 path="/saved-posts"

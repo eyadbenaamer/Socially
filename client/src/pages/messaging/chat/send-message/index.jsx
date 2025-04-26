@@ -1,20 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 import axiosClient from "utils/AxiosClient";
+import { socket } from "hooks/useHandleSocket";
 
 import { ReactComponent as PhotoIcon } from "assets/icons/photo.svg";
 import { ReactComponent as AddCommentIcon } from "assets/icons/create-comment.svg";
 import { ReactComponent as CloseIcon } from "assets/icons/cross.svg";
-import { socket } from "hooks/useHandleSocket";
 
 const SendMessage = () => {
   const { conversationId } = useParams();
+  const { userId } = useParams();
 
   const [text, setText] = useState("");
   const [media, setMedia] = useState(null);
   const [replyTo, setReplyTo] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+
+  // this state determains if the chat is first time or not
+  const [startedConversationId, setStartedConversationId] = useState(null);
 
   const textArea = useRef(null);
   const mediaBtn = useRef(null);
@@ -25,12 +29,20 @@ const SendMessage = () => {
     media && formData.append("media", media);
     textArea.current.value = "";
 
-    axiosClient
-      .post(
-        `message/send?conversationId=${conversationId}&replyTo=${replyTo}`,
-        formData
-      )
-      .catch((err) => {});
+    if (userId) {
+      axiosClient
+        .post(`message/send_first_time?userId=${userId}`, formData)
+        .then((res) => setStartedConversationId(res.data))
+        .catch((err) => {});
+    }
+    if (conversationId) {
+      axiosClient
+        .post(
+          `message/send?conversationId=${conversationId}&replyTo=${replyTo}`,
+          formData
+        )
+        .catch((err) => {});
+    }
   };
 
   const [file, setFile] = useState(null);
@@ -50,6 +62,15 @@ const SendMessage = () => {
       textArea.current.value = "";
     }
   }, [conversationId, textArea.current]);
+
+  /*
+  if the conversation is with non-contact user and the message is sent
+  then the conversation is started and the user is not non-contact anymore
+  so redirect to /messages/contact
+  */
+  if (startedConversationId) {
+    return <Navigate to={`/messages/contact/${startedConversationId}`} />;
+  }
 
   return (
     <div className="w-full py-3">

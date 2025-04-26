@@ -153,6 +153,13 @@ export const slice = createSlice({
     //
     deleteConversation: (state, action) => {
       const { conversationId, contactId } = action.payload;
+      const conversation = state.conversations.find(
+        (conversation) => conversation._id === conversationId
+      );
+
+      const unreadMessagesCount = conversation.unreadMessagesCount;
+      state.unreadMessagesCount -= unreadMessagesCount;
+
       state.conversations = state.conversations.filter(
         (conversation) => conversation._id !== conversationId
       );

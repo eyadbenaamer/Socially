@@ -84,7 +84,7 @@ export const sendMessage = async (req, res) => {
     });
     await conversation.save();
     //
-    return res.status(201).json({ message: "success" });
+    return res.status(201).json(conversation.id);
   } catch {
     return res
       .status(500)

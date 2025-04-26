@@ -12,7 +12,7 @@ const Contact = (props) => {
 
   return (
     <Link
-      to={contact?.conversationId}
+      to={`contact/${contact?.conversationId}`}
       className="flex flex-col gap-2 items-center min-w-[70px]"
     >
       {profile && <UserPicture profile={profile} isOnline={isOnline} />}

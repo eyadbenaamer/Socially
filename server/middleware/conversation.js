@@ -2,7 +2,6 @@ import { Types } from "mongoose";
 
 import Conversation from "../models/conversation.js";
 import User from "../models/user.js";
-// import Profile from "../models/profile.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
@@ -54,6 +53,10 @@ export const newConversationByFollow = async (req, res, next) => {
         (par) => par.id !== participant.id
       );
       const socketIdsList = getOnlineUsers().get(participant.id);
+      const otherParticipantSocketIdsList = getOnlineUsers().get(
+        otherParticipant.id
+      );
+
       if (socketIdsList) {
         /*
         if the user is online send a the new conversation 
@@ -67,7 +70,7 @@ export const newConversationByFollow = async (req, res, next) => {
               contact: {
                 _id: otherParticipant.id,
                 conversationId: conversation.id,
-                isOnline: true,
+                isOnline: otherParticipantSocketIdsList ? true : false,
               },
             });
         });
@@ -122,6 +125,34 @@ export const newConversationByMessaging = async (req, res, next) => {
     userToMessage.conversations.addToSet(conversation);
     await userToMessage.save();
     req.conversation = conversation;
+
+    conversation.participants.map(async (participant) => {
+      const otherParticipant = conversation.participants.find(
+        (par) => par.id !== participant.id
+      );
+      const socketIdsList = getOnlineUsers().get(participant.id);
+      const otherParticipantSocketIdsList = getOnlineUsers().get(
+        otherParticipant.id
+      );
+      if (socketIdsList) {
+        /*
+        if the user is online send a the new conversation 
+        with the new contact by socket
+        */
+        socketIdsList.map((socketId) => {
+          getServerSocketInstance()
+            .to(socketId)
+            .emit("add-new-conversation", {
+              conversation,
+              contact: {
+                _id: otherParticipant.id,
+                conversationId: conversation.id,
+                isOnline: otherParticipantSocketIdsList ? true : false,
+              },
+            });
+        });
+      }
+    });
 
     next();
   } catch {
