@@ -34,6 +34,11 @@ export const connectHandler = async (socket, io) => {
       const conversation = await Conversation.findById(
         undeliveredConversation.id
       );
+      if (!conversation) {
+        undeliveredConversation.deleteOne();
+        await user.save();
+        return;
+      }
       const messagesInfo = [];
       undeliveredConversation.messages.map((item) => {
         const message = conversation.messages.id(item._id);
