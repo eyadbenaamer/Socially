@@ -17,9 +17,6 @@ const SendMessage = () => {
   const [replyTo, setReplyTo] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  // this state determains if the chat is first time or not
-  const [startedConversationId, setStartedConversationId] = useState(null);
-
   const textArea = useRef(null);
   const mediaBtn = useRef(null);
 
@@ -32,7 +29,6 @@ const SendMessage = () => {
     if (userId) {
       axiosClient
         .post(`message/send_first_time?userId=${userId}`, formData)
-        .then((res) => setStartedConversationId(res.data))
         .catch((err) => {});
     }
     if (conversationId) {
@@ -62,15 +58,6 @@ const SendMessage = () => {
       textArea.current.value = "";
     }
   }, [conversationId, textArea.current]);
-
-  /*
-  if the conversation is with non-contact user and the message is sent
-  then the conversation is started and the user is not non-contact anymore
-  so redirect to /messages/contact
-  */
-  if (startedConversationId) {
-    return <Navigate to={`/messages/contact/${startedConversationId}`} />;
-  }
 
   return (
     <div className="w-full py-3">

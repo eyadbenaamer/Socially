@@ -17,7 +17,10 @@ export const newConversationByFollow = async (req, res, next) => {
     // check if the conversation is already existing
     let conversation = await Conversation.findOne({
       participants: {
-        $all: [{ _id: myId }, { _id: accountToMessageId }],
+        $all: [
+          { $elemMatch: { _id: new ObjectId(myId) } },
+          { $elemMatch: { _id: new ObjectId(accountToMessageId) } },
+        ],
       },
     });
 
@@ -94,10 +97,16 @@ export const newConversationByMessaging = async (req, res, next) => {
     // check if the conversation is already existing
     let conversation = await Conversation.findOne({
       participants: {
-        $all: [{ _id: myId }, { _id: accountToMessageId }],
+        $all: [
+          { $elemMatch: { _id: new ObjectId(myId) } },
+          { $elemMatch: { _id: new ObjectId(accountToMessageId) } },
+        ],
       },
     });
 
+    console.log(new ObjectId(myId));
+    console.log(new ObjectId(accountToMessageId));
+    console.log(conversation);
     if (conversation) {
       return res.status(409).json({ message: "Conversation is alrady exist." });
     }

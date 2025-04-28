@@ -6,9 +6,11 @@ const useFetchProfile = (id) => {
   const [profile, setProfile] = useState(null);
   useEffect(() => {
     if (id) {
-      axiosClient(`profile?id=${id}`).then((response) => {
-        setProfile(response.data);
-      });
+      axiosClient(`profile?id=${id}`)
+        .then((response) => {
+          setProfile(response.data);
+        })
+        .catch((err) => setProfile({ notfound: true }));
     }
   }, [id]);
   return [profile, setProfile];

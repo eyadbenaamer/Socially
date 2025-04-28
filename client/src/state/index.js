@@ -156,6 +156,7 @@ export const slice = createSlice({
       const conversation = state.conversations.find(
         (conversation) => conversation._id === conversationId
       );
+      if (!conversation) return;
 
       const unreadMessagesCount = conversation.unreadMessagesCount;
       state.unreadMessagesCount -= unreadMessagesCount;

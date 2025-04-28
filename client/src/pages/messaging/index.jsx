@@ -66,7 +66,7 @@ const Messaging = () => {
         }}
       >
         {/*the chat is taking the entire screen for small screens*/}
-        {windowWidth < 768 && conversationId && (
+        {windowWidth < 768 && (
           <div className="fixed left-0 z-20 w-full">
             <Outlet />
           </div>
