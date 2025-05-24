@@ -16,7 +16,7 @@ router.get("/saved_posts/", verifyId, verifyToken, getSavedPosts);
 router.get("/saved_posts_ids/", verifyId, verifyToken, getSavedIds);
 
 router.get(
-  "/toggle_save_post/:userId/:postId",
+  "/toggle_save_post",
   verifyId,
   verifyToken,
   getPostsInfo,

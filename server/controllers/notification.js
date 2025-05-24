@@ -2,10 +2,10 @@ export const getAll = async (req, res) => {
   try {
     const { user } = req;
     let { page } = req.query;
+
     page = parseInt(page);
-    if (!page) {
-      page = 1;
-    }
+    page = page ? page : 1;
+
     const notifications = user.notifications.slice((page - 1) * 10, page * 10);
     return res.status(200).json(notifications);
   } catch {

@@ -12,7 +12,7 @@ import { ReactComponent as MoreIcon } from "assets/icons/more.svg";
 
 const OptionsBtn = ({ commentId, commentCreatorId, setIsModifying }) => {
   // Get current user ID from Redux store
-  const { _id: profileId } = useSelector((state) => state.profile);
+  const profileId = useSelector((state) => state.profile)?._id;
 
   // Get current theme (dark/light) from Redux store
   const theme = useSelector((state) => state.settings.theme);
@@ -72,9 +72,7 @@ const OptionsBtn = ({ commentId, commentCreatorId, setIsModifying }) => {
             {isOwner && <Edit setIsModifying={setIsModifying} />}
 
             {/* Show CopyLink for all users */}
-            <CopyLink
-              commentPath={`${post.creatorId}/${post._id}/${commentId}`}
-            />
+            <CopyLink commentPath={`_id=${post._id}&commentId=${commentId}`} />
           </div>
         </ul>
       )}

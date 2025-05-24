@@ -4,7 +4,7 @@ const CopyLink = (props) => {
   const { commentPath } = props;
   const copyLink = () => {
     navigator.clipboard.writeText(
-      `${window.location.host}/post/${commentPath}`
+      `${window.location.host}/post?${commentPath}`
     );
   };
   return (

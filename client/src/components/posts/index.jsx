@@ -14,29 +14,30 @@ const Posts = () => {
   const username = useContext(ProfileContext)?.username;
   const userId = useContext(ProfileContext)?._id;
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [message, setMessage] = useState(null);
   const [posts, setPosts] = useState(null);
-  const [totalPages, setTotalPages] = useState(2);
+  const [isPostsFinished, setIsPostsFinished] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
 
   const postsEnd = useRef();
-
   const fetchPosts = () => {
     if (isFetching) return;
 
     setIsFetching(true);
     const requestURL = userId
-      ? `posts/user?userId=${userId}&page=${currentPage}`
-      : `posts?page=${currentPage}`;
+      ? `posts/user?userId=${userId}&cursor=${posts?.at(-1)?.createdAt}`
+      : "posts";
 
     axiosClient
       .get(requestURL)
       .then((response) => {
-        setTotalPages(response.data.totalPages);
-        setCurrentPage((prevPage) => prevPage + 1);
+        // if the response is an empty array then the user's post's are finished
+        if (response.data?.length === 0) {
+          setIsPostsFinished(true);
+        }
+
         setPosts((prev) =>
-          prev ? [...prev, ...response.data.posts] : [...response.data.posts]
+          prev ? [...prev, ...response.data] : [...response.data]
         );
       })
       .catch(() => {
@@ -49,17 +50,18 @@ const Posts = () => {
 
   // fetch posts once after loading the page
   useEffect(() => {
-    const requestURL = userId
-      ? `posts/user?userId=${userId}&page=1`
-      : `posts?page=1`;
+    const requestURL = userId ? `posts/user?userId=${userId}` : "posts";
 
     setIsFetching(true);
     axiosClient
       .get(requestURL)
       .then((response) => {
-        setTotalPages(response.data.totalPages);
-        setCurrentPage(2);
-        setPosts(response.data.posts);
+        // if the response is an empty array then the user's post's are finished
+        if (response.data == []) {
+          setIsPostsFinished(true);
+        }
+
+        setPosts(response.data);
       })
       .catch(() => {
         setMessage("An error occurred. please try again later.");
@@ -76,7 +78,7 @@ const Posts = () => {
       const scroll = Math.floor(window.scrollY + window.innerHeight);
 
       if (scroll >= postsEndLocation / 2) {
-        if (currentPage <= totalPages && !isFetching) {
+        if (!isPostsFinished && !isFetching) {
           fetchPosts();
           window.removeEventListener("scrollend", updatePage);
         }
@@ -85,7 +87,7 @@ const Posts = () => {
 
     window.addEventListener("scrollend", updatePage);
     return () => window.removeEventListener("scrollend", updatePage);
-  }, [currentPage, totalPages, isFetching]);
+  }, [isPostsFinished, isFetching]);
 
   return (
     <PostsContext.Provider value={{ posts, setPosts }}>
@@ -96,7 +98,7 @@ const Posts = () => {
           <Post key={post._id} post={post} />
         ))}
 
-        {currentPage <= totalPages && (
+        {!isPostsFinished && (
           <div className="w-full" ref={postsEnd}>
             <LoadingPost />
           </div>
@@ -104,7 +106,7 @@ const Posts = () => {
 
         {posts?.length === 0 && <>No posts</>}
 
-        {message && currentPage <= totalPages && (
+        {message && !isPostsFinished && (
           <NoConnectionMessage
             onClick={() => {
               setMessage("");

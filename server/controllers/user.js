@@ -1,4 +1,5 @@
-import Posts from "../models/posts.js";
+import Post from "../models/post.js";
+import User from "../models/user.js";
 
 export const getUser = async (req, res) => {
   const { user } = req;
@@ -6,24 +7,27 @@ export const getUser = async (req, res) => {
 };
 
 export const toggleSavePost = async (req, res) => {
-  const { userId, postId } = req.params;
+  const { _id } = req.query;
   const { user } = req;
   try {
-    if (!(userId && postId)) {
+    if (!_id) {
       return res.status(400).send("Bad Request");
     }
-    const post = user.savedPosts.find(
-      (post) => post.postId === postId && post.userId === userId
-    );
-    if (post) {
-      post.deleteOne();
+    const savedPostId = user.savedPosts.id(_id);
+    if (savedPostId) {
+      savedPostId.deleteOne();
       await user.save();
-      return res.status(200).send("post ussaved.");
-    } else {
-      user.savedPosts.addToSet({ userId, postId });
-      await user.save();
-      return res.status(200).send("post saved.");
+      return res.status(200).send("Post unsaved.");
     }
+    const post = await Post.findById(_id);
+
+    if (!post) {
+      return res.status(400).send("Bad Request");
+    }
+
+    user.savedPosts.push(_id);
+    await user.save();
+    return res.status(200).send("post saved.");
   } catch {
     return res
       .status(500)
@@ -33,18 +37,45 @@ export const toggleSavePost = async (req, res) => {
 
 export const getSavedPosts = async (req, res) => {
   try {
-    const { user } = req;
-    let savedPosts = [];
-    for (let i = 0; i < user.savedPosts.length; i++) {
-      let { posts } = await Posts.findById(user.savedPosts[i].userId);
-      if (posts) {
-        let savedPost = posts.id(user.savedPosts[i].postId);
-        if (savedPost) {
-          savedPosts.push(savedPost);
-        }
-      }
-    }
-    return res.status(200).json(savedPosts);
+    let { user, page } = req;
+
+    page = parseInt(page);
+    page = page ? page : 1;
+
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const result = await User.aggregate([
+      { $match: { _id: user._id } },
+
+      // Slice the savedPosts array based on pagination
+      {
+        $project: {
+          savedPosts: { $slice: ["$savedPosts", skip, limit] },
+        },
+      },
+
+      // Unwind the sliced savedPosts to perform $lookup on each
+      { $unwind: "$savedPosts" },
+
+      // Join with Post collection using the _id inside savedPosts
+      {
+        $lookup: {
+          from: "posts",
+          localField: "savedPosts._id",
+          foreignField: "_id",
+          as: "post",
+        },
+      },
+
+      // Flatten the post array (since $lookup returns an array)
+      { $unwind: "$post" },
+
+      // Replace root with post (you now get pure post documents)
+      { $replaceRoot: { newRoot: "$post" } },
+    ]);
+
+    return res.status(200).json(result);
   } catch {
     return res
       .status(500)
@@ -55,9 +86,7 @@ export const getSavedPosts = async (req, res) => {
 export const getSavedIds = async (req, res) => {
   try {
     const { user } = req;
-    let savedPosts = user.savedPosts.map(
-      (item) => `${item.userId}/${item.postId}`
-    );
+    let savedPosts = user.savedPosts.map((item) => item.id);
     return res.status(200).json(savedPosts);
   } catch {
     return res

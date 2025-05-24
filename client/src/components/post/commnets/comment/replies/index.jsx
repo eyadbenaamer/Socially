@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 import Reply from "./reply";
 
@@ -7,14 +7,19 @@ import axiosClient from "utils/AxiosClient";
 
 const Replies = (props) => {
   const { replies } = props;
-  const { userId, postId, commentId, replyId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const postId = searchParams.get("_id");
+  const commentId = searchParams.get("postId");
+  const replyId = searchParams.get("replyId");
+
   const [searchedReply, setSearchedReply] = useState(null);
   useEffect(() => {
     if (replies) {
       // check if the searched reply is renderd, if not then the reply is fetched and rendered
       if (!document.getElementById(replyId) && replyId) {
         axiosClient(
-          `reply?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`
+          `reply?postId=${postId}&commentId=${commentId}&replyId=${replyId}`
         )
           .then((response) => {
             if (response.status === 200) {
@@ -35,7 +40,6 @@ const Replies = (props) => {
 
   return (
     <>
-      {searchedReply === "not found" && <Navigate to={"/not-found"} replace />}
       {replies.length > 0 && (
         <div className="flex flex-col gap-3 mt-4">
           {replies.map((reply) => (

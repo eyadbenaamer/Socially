@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 import { Post as PostComponent } from "components/post";
 import NotFound from "pages/NotFound";
@@ -8,14 +8,14 @@ import axiosClient from "utils/AxiosClient";
 
 const Post = () => {
   const [post, setPost] = useState(null);
-  const { userId, postId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const postId = searchParams.get("_id");
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axiosClient(
-          `post?userId=${userId}&postId=${postId}`
-        );
+        const response = await axiosClient(`post?postId=${postId}`);
         setPost(response.data);
       } catch (error) {
         setPost("not found");
@@ -23,7 +23,7 @@ const Post = () => {
     };
 
     fetchPost();
-  }, [userId, postId]); // Added dependencies for better handling of URL parameter changes
+  }, [postId]);
 
   if (post === "not found") {
     return <NotFound />;

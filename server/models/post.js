@@ -1,4 +1,4 @@
-import { Schema, Types } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 const { ObjectId } = Types;
 
@@ -50,3 +50,9 @@ export const PostSchema = new Schema({
     default: Date.now(),
   },
 });
+
+PostSchema.index({ creatorId: 1 });
+PostSchema.index({ creatorId: 1, createdAt: -1 });
+
+const Post = model("posts", PostSchema);
+export default Post;

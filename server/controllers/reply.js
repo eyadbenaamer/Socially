@@ -6,7 +6,7 @@ import { getServerSocketInstance } from "../socket/socketServer.js";
 
 export const add = async (req, res) => {
   try {
-    const { user, postList, post, comment } = req;
+    const { user, post, comment } = req;
     const { text } = req.body;
     const profile = await Profile.findById(user.id);
     const { fileInfo } = req;
@@ -47,7 +47,7 @@ export const add = async (req, res) => {
           file: fileInfo ? fileInfo : null,
           createdAt: Date.now(),
         });
-        await postList.save();
+        await post.save();
         const reply = comment.replies[comment.replies?.length - 1];
         notification.path = `/post/${post.creatorId}/${post.id}/${comment.id}/${reply.id}`;
         await commentCreator.save();
@@ -74,7 +74,7 @@ export const add = async (req, res) => {
       file: fileInfo ? fileInfo : null,
       createdAt: Date.now(),
     });
-    await postList.save();
+    await post.save();
     return res.status(200).json(post);
   } catch {
     return res
@@ -95,7 +95,7 @@ export const get = async (req, res) => {
 
 export const edit = async (req, res) => {
   try {
-    const { user, postList, reply } = req;
+    const { user, post, reply } = req;
     const { text } = req.body;
 
     if (user.id === reply.creatorId) {
@@ -107,7 +107,7 @@ export const edit = async (req, res) => {
     }
 
     reply.text = text;
-    await postList.save();
+    await post.save();
     return res.status(200).json(reply);
   } catch {
     return res
@@ -118,7 +118,7 @@ export const edit = async (req, res) => {
 
 export const likeToggle = async (req, res) => {
   try {
-    const { postList, post, comment, reply, user } = req;
+    const { post, comment, reply, user } = req;
     const profile = await Profile.findById(user.id);
     const replyCreator = await User.findById(reply.creatorId);
 
@@ -154,7 +154,7 @@ export const likeToggle = async (req, res) => {
         }
       }
       like.deleteOne();
-      await postList.save();
+      await post.save();
       return res.status(200).json({ likes: reply.likes });
     }
     /*
@@ -180,7 +180,7 @@ export const likeToggle = async (req, res) => {
           _id: user.id,
           notificationId: notification.id,
         });
-        await postList.save();
+        await post.save();
 
         const socketIdsList = getOnlineUsers().get(reply.creatorId);
         if (socketIdsList) {
@@ -194,7 +194,7 @@ export const likeToggle = async (req, res) => {
       return res.status(200).json({ likes: reply.likes });
     }
     reply.likes.addToSet({ _id: user.id });
-    await postList.save();
+    await post.save();
     return res.status(200).json({ likes: reply.likes });
   } catch {
     return res
@@ -205,7 +205,7 @@ export const likeToggle = async (req, res) => {
 
 export const deleteReply = async (req, res) => {
   try {
-    const { user, postList, post, comment, reply } = req;
+    const { user, post, comment, reply } = req;
     /*
     the reply can be deleted ether by the reply
     creator or the post creator
@@ -234,7 +234,7 @@ export const deleteReply = async (req, res) => {
     }
 
     reply.deleteOne();
-    await postList.save();
+    await post.save();
     return res.status(200).json(post);
   } catch {
     return res

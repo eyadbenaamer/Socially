@@ -13,7 +13,7 @@ import { ReactComponent as MoreIcon } from "assets/icons/more.svg";
 
 const OptionsBtn = ({ commentId, replyId, replyCreatorId, setIsModifying }) => {
   // Get current logged-in user ID from Redux store
-  const { _id: profileId } = useSelector((state) => state.profile);
+  const profileId = useSelector((state) => state.profile)?._id;
 
   // Get current UI theme (dark or light)
   const theme = useSelector((state) => state.settings.theme);
@@ -69,7 +69,7 @@ const OptionsBtn = ({ commentId, replyId, replyCreatorId, setIsModifying }) => {
 
             {/* Everyone can copy the reply link */}
             <CopyLink
-              commentPath={`${post.creatorId}/${post._id}/${commentId}/${replyId}`}
+              replyPath={`_id=${post._id}&commentId=${commentId}&replyId=${replyId}`}
             />
           </div>
         </ul>

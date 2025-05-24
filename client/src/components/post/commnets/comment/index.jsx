@@ -1,14 +1,13 @@
 import { useContext, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import useFetchProfile from "hooks/useFetchProfile";
+import useGetTime from "hooks/useGetTime";
 
 import Replies from "./replies";
 import OptionsBtn from "./options-btn";
 import Media from "./Media";
-
-import useGetTime from "hooks/useGetTime";
 
 import { PostContext } from "components/post";
 import UserPicture from "components/UserPicture";
@@ -24,7 +23,9 @@ const Comment = (props) => {
   const {
     comment: { _id: id, createdAt, creatorId, likes, replies, file, text },
   } = props;
-  const { replyId } = useParams();
+  const [searchParams] = useSearchParams();
+  const replyId = searchParams.get("replyId");
+
   const post = useContext(PostContext);
   const myProfile = useSelector((state) => state.profile);
   const [postCreatorProfile] = useFetchProfile(creatorId);

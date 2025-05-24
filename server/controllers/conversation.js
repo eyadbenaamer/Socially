@@ -88,10 +88,9 @@ export const getOne = async (req, res) => {
   try {
     let { page, conversationId } = req.query;
     const { user } = req;
-    if (!page) {
-      page = 1;
-    }
+
     page = parseInt(page);
+    page = page ? page : 1;
 
     const conversation = await Conversation.aggregate([
       {

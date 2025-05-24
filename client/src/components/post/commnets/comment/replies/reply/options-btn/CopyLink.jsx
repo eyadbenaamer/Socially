@@ -1,11 +1,9 @@
 import { ReactComponent as TrashIcon } from "assets/icons/copy.svg";
 
 const CopyLink = (props) => {
-  const { commentPath } = props;
+  const { replyPath } = props;
   const copyLink = () => {
-    navigator.clipboard.writeText(
-      `${window.location.host}/post/${commentPath}`
-    );
+    navigator.clipboard.writeText(`${window.location.host}/post?${replyPath}`);
   };
   return (
     <li>

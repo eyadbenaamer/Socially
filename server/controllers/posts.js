@@ -1,9 +1,11 @@
-import Posts from "../models/posts.js";
+import Post from "../models/post.js";
 import Profile from "../models/profile.js";
 
 export const getFeedPosts = async (req, res) => {
   try {
     const { user } = req;
+    const posts = await Post.find().limit(10);
+    return res.status(200).json(posts);
     const profile = await Profile.findById(user?.id);
     const finalPostsCollection = [];
     // if there the requester is a logged in user, then the feed will be customized
@@ -50,23 +52,19 @@ export const getFeedPosts = async (req, res) => {
 };
 export const getUserPosts = async (req, res) => {
   try {
-    const { postList } = req;
-    const page = req.query.page ?? 1;
-    if (!postList.posts) {
-      return res
-        .status(500)
-        .json({ message: "An error occurred. Plaese try again later." });
-    }
-    const pagesCount = Math.ceil(postList.posts.length / 10);
-    const startingPost = (page - 1) * 10;
-    const endingPost = (page - 1) * 10 + 10;
-    const result = [];
-    for (let i = startingPost; i < endingPost; i++) {
-      if (postList.posts[i]) {
-        result.push(postList.posts[i]);
-      }
-    }
-    return res.status(200).json({ posts: result, totalPages: pagesCount });
+    let { userId, cursor: cursorDate } = req.query;
+
+    cursorDate = parseInt(cursorDate);
+    cursorDate = cursorDate ? cursorDate : Date.now();
+
+    const posts = await Post.find({
+      creatorId: userId,
+      createdAt: { $lt: cursorDate },
+    })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    return res.status(200).json(posts);
   } catch {
     return res
       .status(500)

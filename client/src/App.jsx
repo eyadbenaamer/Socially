@@ -170,15 +170,7 @@ const App = () => {
                   )
                 }
               />
-              <Route path="/post/:userId/:postId" element={<Post />} />
-              <Route
-                path="/post/:userId/:postId/:commentId"
-                element={<Post />}
-              />
-              <Route
-                path="/post/:userId/:postId/:commentId/:replyId"
-                element={<Post />}
-              />
+              <Route path="/post" element={<Post />} />
               <Route
                 path="/notifications"
                 element={

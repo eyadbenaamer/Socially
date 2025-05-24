@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
-import Posts from "../models/posts.js";
 
 import { generateCode } from "../utils/generateCode.js";
 
@@ -61,9 +60,6 @@ export const signup = async (req, res) => {
     });
     newProfile.save();
 
-    // create a posts document for the new user with the user's ID
-    const newPostList = new Posts({ id: newUser.id });
-    await newPostList.save();
     return res.status(201).send("user created.");
   } catch {
     return res

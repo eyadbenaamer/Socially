@@ -9,13 +9,13 @@ import { ReactComponent as SaveIcon } from "assets/icons/save.svg";
 import { ReactComponent as UnsaveIcon } from "assets/icons/unsave.svg";
 
 const SavePost = (props) => {
-  const { path } = props;
+  const { id } = props;
   const [savedPosts, setSavedPosts] = useState([]);
   const dispatch = useDispatch();
 
   const savePost = () => {
-    axiosClient(`toggle_save_post/${path}/`).then(() => {
-      if (!savedPosts.includes(path)) {
+    axiosClient(`toggle_save_post?_id=${id}`).then(() => {
+      if (!savedPosts.includes(id)) {
         dispatch(setShowMessage("Post saved."));
       } else {
         dispatch(setShowMessage("Post unsaved."));
@@ -35,7 +35,7 @@ const SavePost = (props) => {
         className="flex w-full gap-2 p-3 bg-hovered"
         onClick={() => savePost()}
       >
-        {!savedPosts.includes(path) ? (
+        {!savedPosts.includes(id) ? (
           <>
             <span className="w-6">
               <SaveIcon />

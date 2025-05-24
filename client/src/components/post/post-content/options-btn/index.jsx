@@ -33,7 +33,7 @@ const OptionsBtn = ({ setIsModifying }) => {
   useCloseWidget(optionsList, setIsOpen);
 
   // Determine ownership of the post
-  const isOwner = profile._id === creatorId;
+  const isOwner = profile?._id === creatorId;
 
   // Theme-based styling
   const buttonThemeClasses =
@@ -77,10 +77,8 @@ const OptionsBtn = ({ setIsModifying }) => {
 
           {/* Public options */}
           <div onClick={() => setIsOpen(false)}>
-            <SavePost path={`${creatorId}/${postId}`} />{" "}
-            {/* Save post feature */}
-            <CopyLink postPath={`${creatorId}/${postId}`} />{" "}
-            {/* Copy post link */}
+            <SavePost id={postId} /> {/* Save post feature */}
+            <CopyLink id={postId} /> {/* Copy post link */}
           </div>
         </ul>
       )}

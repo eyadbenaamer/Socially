@@ -1,19 +1,12 @@
-import Posts from "../models/posts.js";
+import Post from "../models/post.js";
 
 export const getPostsInfo = async (req, res, next) => {
   try {
-    const { userId, postId, commentId, replyId } = req.query;
-    let postList, post, comment, reply;
-    if (userId) {
-      postList = await Posts.findById(userId);
-      if (postList) {
-        req.postList = postList;
-      } else {
-        return res.status(404).json({ message: "user doesn't exist" });
-      }
-    }
+    const { postId, commentId, replyId } = req.query;
+    let post, comment, reply;
+
     if (postId) {
-      post = postList.posts.id(postId);
+      post = await Post.findById(postId);
       if (post) {
         req.post = post;
       } else {

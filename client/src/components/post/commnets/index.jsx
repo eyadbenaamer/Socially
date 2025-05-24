@@ -1,6 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { useEffect } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 import Comment from "./comment";
 
@@ -10,14 +10,19 @@ import axiosClient from "utils/AxiosClient";
 
 const Comments = () => {
   const { comments, _id: postId } = useContext(PostContext);
-  const { userId, commentId, replyId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const commentId = searchParams.get("commentId");
+  const replyId = searchParams.get("replyId");
+
   const [searchedComment, setSearchedComment] = useState(null);
+
+  const focusedComment = useRef();
+
   useEffect(() => {
     if (comments) {
       if (!document.getElementById(commentId) && commentId) {
-        axiosClient(
-          `comment?userId=${userId}&postId=${postId}&commentId=${commentId}`
-        )
+        axiosClient(`comment?postId=${postId}&commentId=${commentId}`)
           .then((response) => {
             if (response.status === 200) {
               setSearchedComment(response.data);
@@ -27,7 +32,7 @@ const Comments = () => {
       }
     }
   }, [comments]);
-  const focusedComment = useRef();
+
   useEffect(() => {
     if (commentId && !replyId) {
       if (focusedComment.current && !replyId) {
@@ -39,9 +44,6 @@ const Comments = () => {
 
   return (
     <>
-      {searchedComment === "not found" && (
-        <Navigate to={"/not-found"} replace />
-      )}
       <div className={`flex flex-col gap-5`}>
         {comments.length > 0 ? (
           <>

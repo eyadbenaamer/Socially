@@ -56,12 +56,7 @@ const UserSchema = new Schema(
       verificationToken: String,
     },
     resetPasswordToken: String,
-    savedPosts: [
-      new Schema({
-        userId: String,
-        postId: String,
-      }),
-    ],
+    savedPosts: { type: [{ _id: ObjectId }], default: [] },
   },
   { timestamps: true }
 );

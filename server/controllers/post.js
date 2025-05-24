@@ -2,7 +2,7 @@ import fs from "fs";
 
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
-import Posts from "../models/posts.js";
+import Post from "../models/post.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
@@ -15,17 +15,16 @@ export const create = async (req, res) => {
     const { text, location } = req.body;
     const { filesInfo } = req;
 
-    const newPost = {
+    const post = await Post.create({
       creatorId: id.trim(),
       text: text?.trim(),
       files: filesInfo,
       createdAt: Date.now(),
       location: location?.trim(),
-    };
-    const postList = await Posts.findById(id);
-    postList.posts.unshift(newPost);
-    await postList.save();
-    return res.status(201).json(postList.posts[0]);
+    });
+
+    await post.save();
+    return res.status(201).json(post);
   } catch {
     return res
       .status(500)
@@ -37,10 +36,9 @@ export const share = async (req, res) => {
   const uploadsFolder = `${process.env.API_URL}/storage/`;
   try {
     const { user } = req;
-    const postList = await Posts.findById(user.id);
     const profile = await Profile.findById(user.id);
     let { text, location } = req.body;
-    let { userId, postId } = req.query;
+    let { postId } = req.query;
     const { media } = req.files;
     let filesInfo = [];
     if (media) {
@@ -58,10 +56,7 @@ export const share = async (req, res) => {
         }
       });
     }
-    const sharedPost = await Posts.findById(userId).then((user) => {
-      const post = user.posts.id(postId);
-      return post;
-    });
+    const sharedPost = await Post.findById(postId);
     if (!sharedPost) {
       return res.status(404).json({ message: "Post not found." });
     }
@@ -85,7 +80,7 @@ export const share = async (req, res) => {
 
         const notification = postCreator.notifications[0];
 
-        const newPost = {
+        const post = await Post.create({
           creatorId: user.id,
           text: text.trim(),
           createdAt: Date.now(),
@@ -97,10 +92,8 @@ export const share = async (req, res) => {
             creatorId: sharedPost.creatorId,
             notificationId: notification.id,
           },
-        };
-        postList.posts.unshift(newPost);
-        await postList.save();
-        const post = postList.posts[0];
+        });
+        await post.save();
         notification.path = `/post/${user.id}/${post.id}`;
         await postCreator.save();
         // sending the notification by web socket
@@ -115,7 +108,7 @@ export const share = async (req, res) => {
         return res.status(201).json(post);
       }
     }
-    const newPost = {
+    const post = await Post.create({
       creatorId: user.id,
       text: text.trim(),
       createdAt: Date.now(),
@@ -126,10 +119,10 @@ export const share = async (req, res) => {
         _id: sharedPost._id,
         creatorId: sharedPost.creatorId,
       },
-    };
-    postList.posts.unshift(newPost);
-    await postList.save();
-    return res.status(201).json(postList.posts[0]);
+    });
+    post.posts.unshift(newPost);
+    await post.save();
+    return res.status(201).json(post);
   } catch {
     return res
       .status(500)
@@ -154,7 +147,7 @@ export const getPost = async (req, res) => {
 
 export const edit = async (req, res) => {
   try {
-    const { user, postList, post } = req;
+    const { user, post } = req;
     const { text, location } = req.body;
     if (post.creatorId !== user.id) {
       return res.status(401).send("Unauthorized");
@@ -162,7 +155,7 @@ export const edit = async (req, res) => {
 
     text ? (post.text = text) : null;
     location ? (post.location = location) : null;
-    await postList.save();
+    await post.save();
     return res.status(200).json(post);
   } catch {
     return res
@@ -173,9 +166,9 @@ export const edit = async (req, res) => {
 
 export const toggleComments = async (req, res) => {
   try {
-    const { postList, post } = req;
+    const { post } = req;
     post.isCommentsDisabled = !post.isCommentsDisabled;
-    await postList.save();
+    await post.save();
     const message = post.isCommentsDisabled
       ? "comments disabled"
       : "comments enabled";
@@ -188,7 +181,7 @@ export const toggleComments = async (req, res) => {
 };
 export const likeToggle = async (req, res) => {
   try {
-    const { user, postList, post } = req;
+    const { user, post } = req;
     const profile = await Profile.findById(user.id);
     const postCreator = await User.findById(post.creatorId);
     const like = post.likes.id(user.id);
@@ -222,7 +215,7 @@ export const likeToggle = async (req, res) => {
         }
       }
       like.deleteOne();
-      await postList.save();
+      await post.save();
       return res.status(200).json({ likes: post.likes });
     }
     /*
@@ -249,7 +242,7 @@ export const likeToggle = async (req, res) => {
         await postCreator.save();
         const notification = postCreator.notifications[0];
         post.likes.addToSet({ _id: user.id, notificationId: notification.id });
-        await postList.save();
+        await post.save();
 
         const socketIdsList = getOnlineUsers().get(post.creatorId);
         if (socketIdsList) {
@@ -263,7 +256,7 @@ export const likeToggle = async (req, res) => {
       return res.status(200).json({ likes: post.likes });
     }
     post.likes.addToSet({ _id: user.id });
-    await postList.save();
+    await post.save();
     return res.status(200).json({ likes: post.likes });
   } catch {
     return res
@@ -274,15 +267,14 @@ export const likeToggle = async (req, res) => {
 
 export const setViewed = async (req, res) => {
   try {
-    const { user } = req;
-    const { userId, postId } = req.query;
-    const postList = await Posts.findById(userId);
-    const post = postList.posts.id(postId);
+    const { user, post } = req;
+
     if (post.views.id(user.id)) {
       return res.status(409).json({ message: "Already viewed." });
     }
+
     post.views.addToSet(user.id);
-    await postList.updateOne(postList);
+    await post.updateOne(post);
     return res.status(200).json(post);
   } catch {
     return res
@@ -295,7 +287,7 @@ export const setViewed = async (req, res) => {
 
 export const deletePost = async (req, res) => {
   try {
-    const { user, postList, post } = req;
+    const { user, post } = req;
 
     if (post.creatorId !== user.id) {
       return res.status(401).send("Unauthorized");
@@ -341,8 +333,7 @@ export const deletePost = async (req, res) => {
         }
       }
     }
-    postList.posts.id(post.id).deleteOne();
-    await postList.save();
+    post.deleteOne();
     return res.status(200).json({ message: "post deleted successfully" });
   } catch {
     return res
