@@ -71,7 +71,7 @@ Follow these steps to set up the project:
      GMAIL_PASSWORD=<your email password>
      COOKIE_SECRET=<your cookie secret key>
      JWT_SECRET=<your JWT secret key>
-     DATABASE_URL=<your MongoDB URL>
+     MONGO_URI=<your MongoDB URL>
      PORT=5000
      TOKEN_EXPIRATION=10d
      ```

@@ -57,6 +57,13 @@ const UserSchema = new Schema(
     },
     resetPasswordToken: String,
     savedPosts: { type: [{ _id: ObjectId }], default: [] },
+    favoriteTopics: {
+      type: Map,
+      of: new Schema({
+        count: { type: Number, default: 1 },
+      }),
+      default: {},
+    },
   },
   { timestamps: true }
 );

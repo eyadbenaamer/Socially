@@ -44,35 +44,45 @@ export const add = async (req, res) => {
         isRead: false,
       };
       const postCreator = await User.findById(post.creatorId);
-      if (postCreator) {
-        postCreator.notifications.unshift(newNotification);
-        postCreator.unreadNotificationsCount += 1;
-        await postCreator.save();
-
-        const notification = postCreator.notifications[0];
-
-        post.comments.addToSet({
-          creatorId: user.id,
-          text: text.trim(),
-          notificationId: notification?.id,
-          file: fileInfo ? fileInfo : null,
-          createdAt: Date.now(),
-        });
-        await post.save();
-        const comment = post.comments[post.comments?.length - 1];
-        notification.path = `/post/${post.creatorId}/${post.id}/${comment.id}`;
-        await postCreator.save();
-        // sending the notification by web socket
-        const socketIdsList = getOnlineUsers().get(post.creatorId);
-        if (socketIdsList) {
-          socketIdsList.map((socketId) => {
-            getServerSocketInstance()
-              .to(socketId)
-              .emit("push-notification", notification);
-          });
-        }
-        return res.status(200).json(post);
+      if (!postCreator) {
+        return res
+          .status(500)
+          .json({ message: "An error occurred. Plaese try again later." });
       }
+      postCreator.notifications.unshift(newNotification);
+      postCreator.unreadNotificationsCount += 1;
+      await postCreator.save();
+
+      const notification = postCreator.notifications[0];
+
+      post.comments.addToSet({
+        creatorId: user.id,
+        text: text.trim(),
+        notificationId: notification?.id,
+        file: fileInfo ? fileInfo : null,
+        createdAt: Date.now(),
+      });
+      await post.save();
+      const comment = post.comments[post.comments?.length - 1];
+      notification.path = `/post?_id=${post.id}&commentId=${comment.id}`;
+      await postCreator.save();
+      // sending the notification by web socket
+      const socketIdsList = getOnlineUsers().get(post.creatorId);
+      if (socketIdsList) {
+        socketIdsList.map((socketId) => {
+          getServerSocketInstance()
+            .to(socketId)
+            .emit("push-notification", notification);
+        });
+      }
+
+      // adding the post's category to the user's favorite topics
+      const updateObj = {};
+      post.keywords.forEach((keyword) => {
+        updateObj[`favoriteTopics.${keyword}.count`] = 1;
+      });
+      await user.updateOne({ $inc: updateObj }, { new: true });
+      return res.status(200).json(post);
     }
     /*
     if who commented is the same as the post creator 
@@ -85,6 +95,7 @@ export const add = async (req, res) => {
       createdAt: Date.now(),
     });
     await post.save();
+
     return res.status(200).json(post);
   } catch {
     return res
@@ -172,7 +183,7 @@ export const likeToggle = async (req, res) => {
         content: `${profile.firstName} liked your comment.`,
         userId: profile.id,
         type: "like",
-        path: `/post/${post.creatorId}/${post.id}/${comment.id}`,
+        path: `/post?_id=${post.id}&commentId${comment.id}`,
         createdAt: Date.now(),
         isRead: false,
       };

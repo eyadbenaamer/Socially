@@ -26,6 +26,7 @@ export const PostSchema = new Schema({
   creatorId: String,
   location: String,
   text: String,
+  keywords: { type: [String], default: [] },
   isCommentsDisabled: { type: Boolean, default: false },
   files: [
     {
@@ -52,6 +53,7 @@ export const PostSchema = new Schema({
 });
 
 PostSchema.index({ creatorId: 1 });
+PostSchema.index({ createdAt: -1 });
 PostSchema.index({ creatorId: 1, createdAt: -1 });
 
 const Post = model("posts", PostSchema);

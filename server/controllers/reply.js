@@ -19,6 +19,13 @@ export const add = async (req, res) => {
       return res.status(409).json({ message: "reply cannot be empty" });
     }
 
+    // adding the post's category to the user's favorite topics
+    const updateObj = {};
+    post.keywords.forEach((keyword) => {
+      updateObj[`favoriteTopics.${keyword}.count`] = 1;
+    });
+
+    await user.updateOne({ $inc: updateObj }, { new: true });
     /*
     if who replied is NOT the same as the comment creator 
     then a notification will be created.
@@ -32,36 +39,39 @@ export const add = async (req, res) => {
         isRead: false,
       };
       const commentCreator = await User.findById(comment.creatorId);
-      if (commentCreator) {
-        commentCreator.notifications.unshift(newNotification);
-        commentCreator.unreadNotificationsCount += 1;
-        await commentCreator.save();
-
-        const notification = commentCreator.notifications[0];
-
-        comment.replies.addToSet({
-          creatorId: user.id,
-          rootCommentId: comment.id,
-          text: text.trim(),
-          notificationId: notification?.id,
-          file: fileInfo ? fileInfo : null,
-          createdAt: Date.now(),
-        });
-        await post.save();
-        const reply = comment.replies[comment.replies?.length - 1];
-        notification.path = `/post/${post.creatorId}/${post.id}/${comment.id}/${reply.id}`;
-        await commentCreator.save();
-        // sending the notification by web socket
-        const socketIdsList = getOnlineUsers().get(comment.creatorId);
-        if (socketIdsList) {
-          socketIdsList.map((socketId) => {
-            getServerSocketInstance()
-              .to(socketId)
-              .emit("push-notification", notification);
-          });
-        }
-        return res.status(200).json(post);
+      if (!commentCreator) {
+        return res
+          .status(500)
+          .json({ message: "An error occurred. Plaese try again later." });
       }
+      commentCreator.notifications.unshift(newNotification);
+      commentCreator.unreadNotificationsCount += 1;
+      await commentCreator.save();
+
+      const notification = commentCreator.notifications[0];
+
+      comment.replies.addToSet({
+        creatorId: user.id,
+        rootCommentId: comment.id,
+        text: text.trim(),
+        notificationId: notification?.id,
+        file: fileInfo ? fileInfo : null,
+        createdAt: Date.now(),
+      });
+      await post.save();
+      const reply = comment.replies[comment.replies?.length - 1];
+      notification.path = `/post?_id=${post.id}&commentId${comment.id}&replyId${reply.id}`;
+      await commentCreator.save();
+      // sending the notification by web socket
+      const socketIdsList = getOnlineUsers().get(comment.creatorId);
+      if (socketIdsList) {
+        socketIdsList.map((socketId) => {
+          getServerSocketInstance()
+            .to(socketId)
+            .emit("push-notification", notification);
+        });
+      }
+      return res.status(200).json(post);
     }
     /*
     if who commented is the same as the post creator 
@@ -75,6 +85,7 @@ export const add = async (req, res) => {
       createdAt: Date.now(),
     });
     await post.save();
+
     return res.status(200).json(post);
   } catch {
     return res
@@ -166,7 +177,7 @@ export const likeToggle = async (req, res) => {
         content: `${profile.firstName} liked your reply.`,
         userId: profile.id,
         type: "like",
-        path: `/post/${post.creatorId}/${post.id}/${comment.id}/${reply.id}`,
+        path: `/post?_id=${post.id}&commentId${comment.id}&replyId${reply.id}`,
         createdAt: Date.now(),
         isRead: false,
       };

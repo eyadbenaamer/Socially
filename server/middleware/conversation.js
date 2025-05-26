@@ -104,9 +104,6 @@ export const newConversationByMessaging = async (req, res, next) => {
       },
     });
 
-    console.log(new ObjectId(myId));
-    console.log(new ObjectId(accountToMessageId));
-    console.log(conversation);
     if (conversation) {
       return res.status(409).json({ message: "Conversation is alrady exist." });
     }

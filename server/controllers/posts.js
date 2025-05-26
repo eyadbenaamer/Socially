@@ -1,55 +1,74 @@
+import { Types } from "mongoose";
+
 import Post from "../models/post.js";
 import Profile from "../models/profile.js";
 
 export const getFeedPosts = async (req, res) => {
   try {
     const { user } = req;
-    const posts = await Post.find().limit(10);
-    return res.status(200).json(posts);
-    const profile = await Profile.findById(user?.id);
-    const finalPostsCollection = [];
-    // if there the requester is a logged in user, then the feed will be customized
-    if (profile) {
-      profile.following.map((id) => {
-        Posts.findById(id).then((account) => {
-          // including one post for each following account
-          account.posts?.map((post) => {
-            // if the user haven't seen the post it will be included in the feed
-            // otherwise it will be moved to the next post to check if it's not seen
-            if (!post.views.includes(profile.id)) {
-              finalPostsCollection.push(post);
-              return;
-            }
-          });
-        });
-      });
-    }
-    let usersPostsCollection;
-    // while (finalPostsCollection.length < 10) {
-    usersPostsCollection = await Posts.aggregate([{ $sample: { size: 10 } }]);
-    // and for logged in users fill the feed to reach 10 posts
-    usersPostsCollection.map((account) => {
-      if (profile) {
-        account.posts.map((post) => {
-          /*
-            if the user haven't seen the post it will be included in the feed
-            otherwise it will be moved to the next post to check if it's not seen
-            */
-          if (!post.views.find((view) => view._id.toString() == profile.id)) {
-            finalPostsCollection.push(post);
-            return;
-          }
-        });
-      }
+    const profile = await Profile.findById(user.id);
+
+    const userId = req.user._id;
+    const limit = 3;
+    // Prepare aggregation pipelines
+    const followingIds = profile.following.map((f) => f.id);
+    const followedUsersPipeline = [
+      {
+        $match: {
+          creatorId: {
+            $in: followingIds, // Extract just the _id values
+          },
+          "views._id": { $ne: userId }, // Not viewed yet
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $limit: 1 },
+    ];
+    const favoriteTopicsPipeline = [
+      {
+        $match: {
+          keywords: { $in: user.favoriteTopics.keys().toArray() },
+          "views._id": { $ne: userId }, // Not viewed yet
+          creatorId: { $nin: followingIds }, // Don't duplicate followed content
+        },
+      },
+
+      { $sort: { topicScore: -1, createdAt: -1 } },
+      { $limit: 2 },
+    ];
+
+    // 3. Execute parallel queries
+    const [followedPosts, topicPosts] = await Promise.all([
+      Post.aggregate(followedUsersPipeline),
+      Post.aggregate(favoriteTopicsPipeline),
+    ]);
+
+    // 6. Shuffle to avoid obvious patterns
+    const combinedPosts = [...followedPosts, ...topicPosts];
+    const shuffledPosts = combinedPosts
+      .sort(() => 0.5 - Math.random())
+      .slice(0, limit);
+
+    // 7. Mark posts as viewed (optimistic update)
+    await Post.updateMany(
+      {
+        _id: { $in: shuffledPosts.map((p) => new Types.ObjectId(p._id)) },
+        "views._id": { $ne: userId },
+      },
+      { $addToSet: { views: { _id: userId } } }
+    );
+    shuffledPosts.map((p) => {
+      p.views.push({ _id: userId });
     });
-    // }
-    return res.status(200).json({ posts: finalPostsCollection });
+
+    return res.json(shuffledPosts);
   } catch {
     return res
       .status(500)
       .json({ message: "An error occurred. Plaese try again later." });
   }
 };
+
 export const getUserPosts = async (req, res) => {
   try {
     let { userId, cursor: cursorDate } = req.query;

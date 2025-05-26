@@ -1,4 +1,5 @@
 import fs from "fs";
+import axios from "axios";
 
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
@@ -24,6 +25,18 @@ export const create = async (req, res) => {
     });
 
     await post.save();
+
+    // Send to Flask API in background (don't await)
+    if (text) {
+      axios
+        .post(`${process.env.NLP_SERVER}/analyze`, {
+          postId: post._id,
+          text: text.trim(),
+        })
+        .catch((err) => {
+          console.error("Background analysis failed:", err.message);
+        });
+    }
     return res.status(201).json(post);
   } catch {
     return res
@@ -94,7 +107,7 @@ export const share = async (req, res) => {
           },
         });
         await post.save();
-        notification.path = `/post/${user.id}/${post.id}`;
+        notification.path = `/post?_id=${post.id}`;
         await postCreator.save();
         // sending the notification by web socket
         const socketIdsList = getOnlineUsers().get(sharedPost.creatorId);
@@ -120,8 +133,15 @@ export const share = async (req, res) => {
         creatorId: sharedPost.creatorId,
       },
     });
-    post.posts.unshift(newPost);
     await post.save();
+
+    // adding the post's category to the user's favorite topics
+    const updateObj = {};
+    sharedPost.keywords.forEach((keyword) => {
+      updateObj[`favoriteTopics.${keyword}.count`] = 1;
+    });
+
+    await user.updateOne({ $inc: updateObj }, { new: true });
     return res.status(201).json(post);
   } catch {
     return res
@@ -232,7 +252,7 @@ export const likeToggle = async (req, res) => {
         userId: profile._id,
         content: `${profile.firstName} liked your post.`,
         type: "like",
-        path: `/post/${post.creatorId}/${post.id}`,
+        path: `/post?_id=${post.id}`,
         createdAt: Date.now(),
         isRead: false,
       };
@@ -253,6 +273,14 @@ export const likeToggle = async (req, res) => {
           });
         }
       }
+
+      // adding the post's category to the user's favorite topics
+      const updateObj = {};
+      post.keywords.forEach((keyword) => {
+        updateObj[`favoriteTopics.${keyword}.count`] = 1;
+      });
+
+      await user.updateOne({ $inc: updateObj }, { new: true });
       return res.status(200).json({ likes: post.likes });
     }
     post.likes.addToSet({ _id: user.id });
