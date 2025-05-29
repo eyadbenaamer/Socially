@@ -15,27 +15,25 @@ import { useDispatch } from "react-redux";
 
 const Delete = () => {
   const location = useLocation();
-  const { _id: postId, creatorId } = useContext(PostContext);
+  const { _id: postId } = useContext(PostContext);
   const setPosts = useContext(PostsContext)?.setPosts;
   const { openDialog, closeDialog } = useDialog();
 
   const dispatch = useDispatch();
 
   const deletePost = async () => {
-    await axiosClient
-      .delete(`post/delete?userId=${creatorId}&postId=${postId}`)
-      .then(() => {
-        document.body.style = null;
-        closeDialog();
+    await axiosClient.delete(`post/delete?postId=${postId}`).then(() => {
+      document.body.style = null;
+      closeDialog();
 
-        dispatch(setShowMessage("Post deleted."));
+      dispatch(setShowMessage("Post deleted."));
 
-        if (location.pathname.startsWith("/post")) {
-          window.history.back();
-        } else {
-          setPosts((prev) => prev?.filter((post) => post._id !== postId));
-        }
-      });
+      if (location.pathname.startsWith("/post")) {
+        window.history.back();
+      } else {
+        setPosts((prev) => prev?.filter((post) => post._id !== postId));
+      }
+    });
   };
 
   const handleDeleteClick = () => {

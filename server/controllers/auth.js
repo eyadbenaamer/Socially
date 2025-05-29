@@ -49,7 +49,7 @@ export const signup = async (req, res) => {
     newUser.verificationStatus.verificationToken = verificationToken;
     await newUser.save();
     // create a profile document for the new user with the user's ID
-    const profilesCount = await Profile.count();
+    const profilesCount = await Profile.countDocuments();
     const newProfile = new Profile({
       _id: newUser.id,
       firstName,

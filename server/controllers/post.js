@@ -1,5 +1,5 @@
 import fs from "fs";
-import axios from "axios";
+import { fork } from "child_process";
 
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
@@ -24,24 +24,18 @@ export const create = async (req, res) => {
       location: location?.trim(),
     });
 
-    await post.save();
+    /*
+    Run the classification and analysis of the post's text
+    in a separate process
+    */
+    const child = fork("./workers/classifyText.js");
+    child.send({ postId: post._id, text });
 
-    // Send to Flask API in background (don't await)
-    if (text) {
-      axios
-        .post(`${process.env.NLP_SERVER}/analyze`, {
-          postId: post._id,
-          text: text.trim(),
-        })
-        .catch((err) => {
-          console.error("Background analysis failed:", err.message);
-        });
-    }
     return res.status(201).json(post);
   } catch {
     return res
       .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+      .json({ message: "An error occurred. Please try again later." });
   }
 };
 
@@ -361,7 +355,7 @@ export const deletePost = async (req, res) => {
         }
       }
     }
-    post.deleteOne();
+    await post.deleteOne();
     return res.status(200).json({ message: "post deleted successfully" });
   } catch {
     return res

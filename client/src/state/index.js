@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { disconnectFromSocketServer } from "hooks/useHandleSocket";
 
 const initialState = {
-  settings: { theme: "light" },
+  settings: { theme: "dark" },
   profile: null,
   authStatus: {
     email: null,
