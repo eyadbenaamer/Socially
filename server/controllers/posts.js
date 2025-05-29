@@ -29,7 +29,7 @@ export const getFeedPosts = async (req, res) => {
     const favoriteTopicsPipeline = [
       {
         $match: {
-          keywords: { $in: user.favoriteTopics.keys().toArray() },
+          keywords: { $in: [...user.favoriteTopics.keys()] },
           "views._id": { $ne: userId }, // Not viewed yet
           creatorId: { $nin: followingIds }, // Don't duplicate followed content
         },
