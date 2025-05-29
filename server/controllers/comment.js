@@ -1,6 +1,7 @@
 import Profile from "../models/profile.js";
 import User from "../models/user.js";
 
+import { handleError } from "../utils/errorHandler.js";
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
 //TODO: find a way to send comments on patches
@@ -10,10 +11,8 @@ import { getServerSocketInstance } from "../socket/socketServer.js";
 export const get = async (req, res) => {
   try {
     return res.status(200).json(req.comment);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -97,10 +96,8 @@ export const add = async (req, res) => {
     await post.save();
 
     return res.status(200).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -121,10 +118,8 @@ export const edit = async (req, res) => {
     } else {
       return res.status(409).json({ error: "comment cannot be empty" });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -214,10 +209,8 @@ export const likeToggle = async (req, res) => {
     await post.save();
 
     return res.status(200).json({ likes: comment.likes });
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -255,9 +248,7 @@ export const deleteComment = async (req, res) => {
     comment.deleteOne();
     await post.save();
     return res.status(200).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

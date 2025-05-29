@@ -2,6 +2,7 @@ import User from "../models/user.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
+import { handleError } from "../utils/errorHandler.js";
 
 export const sendMessage = async (req, res) => {
   try {
@@ -85,10 +86,8 @@ export const sendMessage = async (req, res) => {
     await conversation.save();
     //
     return res.status(201).send("success");
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -128,10 +127,8 @@ export const likeToggle = async (req, res) => {
 
     await conversation.save();
     return res.status(200).json(message);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -237,9 +234,7 @@ export const deleteMessage = async (req, res) => {
     }
 
     return res.status(200).send("success");
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

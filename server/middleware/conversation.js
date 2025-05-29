@@ -5,6 +5,7 @@ import User from "../models/user.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
+import { handleError } from "../utils/errorHandler.js";
 
 const { ObjectId } = Types;
 
@@ -81,10 +82,8 @@ export const newConversationByFollow = async (req, res, next) => {
     });
 
     next();
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -161,10 +160,8 @@ export const newConversationByMessaging = async (req, res, next) => {
     });
 
     next();
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -189,10 +186,8 @@ export const getConversationInfo = async (req, res, next) => {
       req.message = message;
     }
     next();
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -204,9 +199,7 @@ export const isInChat = (req, res, next) => {
     } else {
       return res.status(403).json({ message: "You're not in this chat." });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

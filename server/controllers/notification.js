@@ -1,3 +1,5 @@
+import { handleError } from "../utils/errorHandler.js";
+
 export const getAll = async (req, res) => {
   try {
     const { user } = req;
@@ -8,10 +10,8 @@ export const getAll = async (req, res) => {
 
     const notifications = user.notifications.slice((page - 1) * 10, page * 10);
     return res.status(200).json(notifications);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -30,10 +30,8 @@ export const setRead = async (req, res) => {
     user.unreadNotificationsCount--;
     await user.save();
     return res.status(200).json(notification);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -47,10 +45,8 @@ export const setAllRead = async (req, res) => {
     user.unreadNotificationsCount = 0;
     await user.save();
     return res.status(200).send("success");
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -70,10 +66,8 @@ export const deleteOne = async (req, res) => {
     notification.deleteOne();
     await user.save();
     return res.status(200).send("success");
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -84,9 +78,7 @@ export const clear = async (req, res) => {
     user.unreadNotificationsCount = 0;
     await user.save();
     return res.status(200).send("success");
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

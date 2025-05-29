@@ -1,6 +1,8 @@
 import fs from "fs";
 import sharp from "sharp";
 
+import { handleError } from "../utils/errorHandler.js";
+
 const uploadsFolder = `/storage/`;
 
 export const compressImages = async (req, res, next) => {
@@ -80,9 +82,7 @@ export const uploadSingleFile = (req, res, next) => {
       }
     }
     next();
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

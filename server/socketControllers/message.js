@@ -1,13 +1,13 @@
 import Conversation from "../models/conversation.js";
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 
+import { handleError } from "../utils/errorHandler.js";
+
 export const directChatHistoryHandler = async (socket, receiverUserId) => {
   try {
     const senderUserId = socket.user.userId;
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -27,5 +27,7 @@ export const notifyTypingHandler = async (socket, io, data) => {
         });
       });
     });
-  } catch {}
+  } catch (err) {
+    return handleError(err, res);
+  }
 };

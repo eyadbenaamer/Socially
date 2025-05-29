@@ -11,6 +11,7 @@ import {
   sendResetPasswordCode,
 } from "../utils/sendEmail.js";
 import { getOnlineUsers } from "../socket/onlineUsers.js";
+import { handleError } from "../utils/errorHandler.js";
 
 /*REGISTER USER*/
 
@@ -431,10 +432,8 @@ export const verifyResetPasswordCode = async (req, res) => {
     } catch {
       return res.status(401).json({ message: "jwt expired" });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -454,9 +453,7 @@ export const verifyResetPasswordToken = async (req, res) => {
         .status(401)
         .json({ message: "Link is not valid or expired. Please try again." });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

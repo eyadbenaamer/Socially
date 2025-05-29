@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken";
+
 import User from "../models/user.js";
+
+import { handleError } from "../utils/errorHandler.js";
 
 export const verifyToken = async (req, res, next) => {
   let token = req.header("Authorization");
@@ -18,10 +21,8 @@ export const verifyToken = async (req, res, next) => {
     } else {
       return res.status(403).json("invalid token or user doesn't exist");
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 

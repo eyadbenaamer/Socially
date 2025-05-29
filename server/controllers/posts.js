@@ -3,6 +3,8 @@ import { Types } from "mongoose";
 import Post from "../models/post.js";
 import Profile from "../models/profile.js";
 
+import { handleError } from "../utils/errorHandler.js";
+
 export const getFeedPosts = async (req, res) => {
   try {
     const { user } = req;
@@ -62,10 +64,8 @@ export const getFeedPosts = async (req, res) => {
     });
 
     return res.json(shuffledPosts);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -84,9 +84,7 @@ export const getUserPosts = async (req, res) => {
       .limit(10);
 
     return res.status(200).json(posts);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

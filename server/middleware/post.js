@@ -1,5 +1,7 @@
 import Post from "../models/post.js";
 
+import { handleError } from "../utils/errorHandler.js";
+
 export const getPostsInfo = async (req, res, next) => {
   try {
     const { postId, commentId, replyId } = req.query;
@@ -30,9 +32,7 @@ export const getPostsInfo = async (req, res, next) => {
       }
     }
     next();
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

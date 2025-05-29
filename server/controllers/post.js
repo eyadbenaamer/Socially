@@ -7,6 +7,7 @@ import Post from "../models/post.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
+import { handleError } from "../utils/errorHandler.js";
 
 /*CREATE*/
 
@@ -137,10 +138,8 @@ export const share = async (req, res) => {
 
     await user.updateOne({ $inc: updateObj }, { new: true });
     return res.status(201).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -150,10 +149,8 @@ export const getPost = async (req, res) => {
   try {
     const { post } = req;
     return res.status(200).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -171,10 +168,8 @@ export const edit = async (req, res) => {
     location ? (post.location = location) : null;
     await post.save();
     return res.status(200).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -187,10 +182,8 @@ export const toggleComments = async (req, res) => {
       ? "comments disabled"
       : "comments enabled";
     return res.status(200).json({ message });
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 export const likeToggle = async (req, res) => {
@@ -280,10 +273,8 @@ export const likeToggle = async (req, res) => {
     post.likes.addToSet({ _id: user.id });
     await post.save();
     return res.status(200).json({ likes: post.likes });
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -298,10 +289,8 @@ export const setViewed = async (req, res) => {
     post.views.addToSet(user.id);
     await post.updateOne(post);
     return res.status(200).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -357,9 +346,7 @@ export const deletePost = async (req, res) => {
     }
     await post.deleteOne();
     return res.status(200).json({ message: "post deleted successfully" });
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

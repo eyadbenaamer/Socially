@@ -33,7 +33,6 @@ const classifyText = async (text) => {
 
     const result = response.data.choices[0].message.content;
     const topics = result.split(", ").slice(0, 3);
-    console.log(topics);
     return topics;
   } catch (error) {
     console.error("Mistral API error:", error.response?.data || error.message);

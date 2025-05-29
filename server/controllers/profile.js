@@ -3,6 +3,7 @@ import User from "../models/user.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
+import { handleError } from "../utils/errorHandler.js";
 
 /*READ*/
 
@@ -31,10 +32,8 @@ export const getProfile = async (req, res) => {
     if ((!id && !username) || (id && username)) {
       return res.status(400).send("bad request");
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -44,10 +43,8 @@ export const getFollowers = async (req, res) => {
     const user = await User.findById(id);
     const followers = user.followers;
     return res.status(200).json(followers);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -57,10 +54,8 @@ export const getFollowing = async (req, res) => {
     const user = await User.findById(id);
     const following = user.following;
     return res.status(200).json(following);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -72,10 +67,8 @@ export const checkUsernameAvailability = async (req, res) => {
       return res.status(409).json({ message: "This username is taken." });
     }
     return res.status(200).json({ message: "username is available." });
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -114,10 +107,8 @@ export const setProfile = async (req, res) => {
     }
     await profile.save();
     return res.status(200).json(profile);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -172,10 +163,8 @@ export const follow = async (req, res) => {
     await myProfile.save();
     await profileToFollow.save();
     return res.status(200).json(myProfile);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -221,10 +210,8 @@ export const unfollow = async (req, res) => {
     await myProfile.save();
     await accountToUnfollow.save();
     return res.status(200).json(myProfile);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -269,9 +256,7 @@ export const removeFollower = async (req, res) => {
     await myProfile.save();
     await followerToRemove.save();
     return res.status(200).json(myProfile);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

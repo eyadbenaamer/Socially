@@ -1,3 +1,5 @@
+import { handleError } from "../utils/errorHandler.js";
+
 export const verifyId = async (req, res, next) => {
   try {
     const { id, userId, creatorId, postId, commentId, accountId, replyId } =
@@ -39,10 +41,8 @@ export const verifyId = async (req, res, next) => {
     }
 
     next();
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -87,9 +87,7 @@ export const verifyFields = async (req, res, next) => {
       }
     }
     next();
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

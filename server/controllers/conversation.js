@@ -1,8 +1,10 @@
 import { Types } from "mongoose";
 import Conversation from "../models/conversation.js";
-import { getOnlineUsers } from "../socket/onlineUsers.js";
-import { getServerSocketInstance } from "../socket/socketServer.js";
 import User from "../models/user.js";
+
+import { getServerSocketInstance } from "../socket/socketServer.js";
+import { getOnlineUsers } from "../socket/onlineUsers.js";
+import { handleError } from "../utils/errorHandler.js";
 
 const { ObjectId } = Types;
 
@@ -77,10 +79,8 @@ export const getAll = async (req, res) => {
 
     conversations = conversations.slice((page - 1) * 10, page * 10);
     return res.status(200).json(conversations);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -136,10 +136,8 @@ export const getOne = async (req, res) => {
       },
     ]);
     return res.status(200).json(...conversation);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -185,10 +183,8 @@ export const setRead = async (req, res) => {
       });
     });
     return res.status(200).json(conversation[0]?.messages);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -224,10 +220,8 @@ export const deleteConversation = async (req, res) => {
     conversation.deleteOne();
 
     return res.status(200).send("success");
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -301,9 +295,7 @@ export const clear = async (req, res) => {
     });
 
     return res.status(200).send("success");
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };

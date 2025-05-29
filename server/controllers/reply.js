@@ -3,6 +3,7 @@ import User from "../models/user.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
+import { handleError } from "../utils/errorHandler.js";
 
 export const add = async (req, res) => {
   try {
@@ -87,20 +88,16 @@ export const add = async (req, res) => {
     await post.save();
 
     return res.status(200).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
 export const get = async (req, res) => {
   try {
     return res.status(200).json(req.reply);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -120,10 +117,8 @@ export const edit = async (req, res) => {
     reply.text = text;
     await post.save();
     return res.status(200).json(reply);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -207,10 +202,8 @@ export const likeToggle = async (req, res) => {
     reply.likes.addToSet({ _id: user.id });
     await post.save();
     return res.status(200).json({ likes: reply.likes });
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -247,9 +240,7 @@ export const deleteReply = async (req, res) => {
     reply.deleteOne();
     await post.save();
     return res.status(200).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Plaese try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
