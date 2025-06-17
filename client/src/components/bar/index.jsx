@@ -7,6 +7,7 @@ import { ReactComponent as HomeIcon } from "assets/icons/home.svg";
 import { ReactComponent as NotificationsIcon } from "assets/icons/notifications.svg";
 import { ReactComponent as MessagesIcon } from "assets/icons/message-text.svg";
 import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
+import { ReactComponent as SearchIcon } from "assets/icons/search.svg";
 
 const Bar = () => {
   const profile = useSelector((state) => state.profile);
@@ -32,6 +33,14 @@ const Bar = () => {
           <span className="circle w-9 border-[1px]">
             <img className="h-full w-full" src={profile.profilePicPath} />
           </span>
+        </BarItem>
+
+        <BarItem to={"/search"}>
+          <SearchIcon
+            className={`icon ${
+              location.pathname === "/search" ? "text-primary" : ""
+            }`}
+          />
         </BarItem>
 
         <BarItem to={"/notifications"}>

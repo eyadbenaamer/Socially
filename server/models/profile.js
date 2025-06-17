@@ -1,4 +1,5 @@
 import { Schema, model, Types } from "mongoose";
+import { client } from "../services/elasticsearch.js";
 const { ObjectId } = Types;
 
 const ProfileSchema = new Schema({
@@ -47,5 +48,27 @@ const ProfileSchema = new Schema({
   lastSeenAt: Number,
   joinedAt: { type: Number, default: Date.now() },
 });
+
+// indexing the profile in elasticsearch
+ProfileSchema.post("save", async function (doc) {
+  try {
+    await client.index({
+      index: "profiles",
+      id: doc._id.toString(),
+      document: {
+        firstName: doc.firstName,
+        lastName: doc.lastName,
+        username: doc.username,
+        suggest: {
+          input: [doc.username, doc.firstName, doc.lastName],
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error indexing document in Elasticsearch:", error);
+  }
+});
+
 const Profile = model("Profiles", ProfileSchema);
+
 export default Profile;

@@ -320,7 +320,7 @@ export const slice = createSlice({
       state.authStatus.email = null;
       state.authStatus.isLoggedin = false;
       state.authStatus.isVerified = false;
-      state.settings.theme = "light";
+      state.settings.theme = "dark";
       state.infoMessage = "";
     },
   },

@@ -6,6 +6,7 @@ import { ReactComponent as HomeIcon } from "assets/icons/home.svg";
 import { ReactComponent as NotificationsIcon } from "assets/icons/notifications.svg";
 import { ReactComponent as MessagesIcon } from "assets/icons/message-text.svg";
 import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
+import { ReactComponent as SearchIcon } from "assets/icons/search.svg";
 
 import SidebarItem from "./SidebarItem";
 
@@ -33,6 +34,16 @@ const Sidebar = () => {
           <span className="circle w-9 border-2">
             <img className="h-full w-full" src={profile.profilePicPath} />
           </span>
+        </SidebarItem>
+
+        <SidebarItem to={"/search"} name={"Search"}>
+          <div className="relative">
+            <SearchIcon
+              className={`${
+                location.pathname === "/search" ? "text-primary" : ""
+              }`}
+            />
+          </div>
         </SidebarItem>
 
         <SidebarItem to={"/notifications"} name={"Notifications"}>

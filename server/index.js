@@ -22,6 +22,7 @@ import replyRoute from "./routes/reply.js";
 import conversationRoute from "./routes/conversation.js";
 import notificationRoute from "./routes/notification.js";
 import messageRoute from "./routes/message.js";
+import searchRoute from "./routes/search.js";
 
 import { setProfile } from "./controllers/profile.js";
 import { getFeedPosts } from "./controllers/posts.js";
@@ -160,6 +161,7 @@ app.use("/api/reply", replyRoute);
 app.use("/api/notifications", notificationRoute);
 app.use("/api/conversation", conversationRoute);
 app.use("/api/message", messageRoute);
+app.use("/api/search", searchRoute);
 
 /*MONGOOSE SETUP*/
 connectDB();

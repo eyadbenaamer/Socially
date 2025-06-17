@@ -12,7 +12,10 @@ const FollowToggleBtn = (props) => {
   const myProfile = useSelector((state) => state.profile);
   const following = myProfile?.following;
   const myProfileId = myProfile?._id;
-  const { _id: profileId, setProfile } = useContext(ProfileContext);
+  const context = useContext(ProfileContext);
+  const profileId = context?._id;
+  const setProfile = context?.setProfile;
+
   const isFollowing = following?.find((acc) => acc._id === accountToFollowId);
   const dispatch = useDispatch();
 
@@ -37,7 +40,7 @@ const FollowToggleBtn = (props) => {
       {/* only show "follow toggle" button for loggedin user */}
       {myProfile && accountToFollowId !== myProfileId && (
         <button
-          className={`py-1 px-3 h-fit rounded-xl shadow-sm border ${
+          className={`py-1 px-3 text-sm h-fit rounded-xl shadow-sm border ${
             isFollowing ? "bg-alt" : "bg-primary text-white"
           }`}
           onClick={followToggle}

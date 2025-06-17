@@ -17,6 +17,7 @@ import Post from "pages/post";
 import NotFound from "pages/NotFound";
 import VerifyAccountByLink from "pages/VerifyAccountByLink";
 import Welcome from "pages/welcome";
+import Search from "pages/search";
 
 import Header from "components/header";
 import Bar from "components/bar";
@@ -174,7 +175,7 @@ const App = () => {
               <Route
                 path="/notifications"
                 element={
-                  isLoggedin ? (
+                  isLoggedin && isVerified ? (
                     <Notifications />
                   ) : (
                     <Navigate to="/" replace={true} />
@@ -184,7 +185,7 @@ const App = () => {
               <Route
                 path="/messages"
                 element={
-                  isLoggedin ? (
+                  isLoggedin && isVerified ? (
                     <Messaging />
                   ) : (
                     <Navigate to="/" replace={true} />
@@ -200,7 +201,7 @@ const App = () => {
               <Route
                 path="/saved-posts"
                 element={
-                  isLoggedin ? (
+                  isLoggedin && isVerified ? (
                     <SavedPosts />
                   ) : (
                     <Navigate to="/" replace={true} />
@@ -208,6 +209,12 @@ const App = () => {
                 }
               />
               <Route path="/profile/:username" element={<Profile />} />
+              <Route
+                path="/search"
+                element={
+                  isLoggedin && isVerified ? <Search /> : <Navigate to="/" />
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <InfoMessage />

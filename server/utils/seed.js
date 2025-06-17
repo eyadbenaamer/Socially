@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
+import { Types } from "mongoose";
+
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
 import Post from "../models/post.js";
-import { Types } from "mongoose";
+
+import { client } from "../services/elasticsearch.js";
 
 // Configuration
 const TOTAL_USERS = 1000; // Reduce to 10 for testing, increase for production seed
@@ -390,9 +393,24 @@ async function createMockUser(index) {
     following: [],
   });
 
+  await client.indices.create({
+    index: "profiles",
+    body: {
+      mappings: {
+        properties: {
+          username: { type: "keyword" },
+          firstName: { type: "text" },
+          lastName: { type: "text" },
+          suggest: {
+            type: "completion",
+          },
+        },
+      },
+    },
+  });
+
   return { user, profile };
 }
-
 // Generate random favorite topics
 function generateFavoriteTopics() {
   const topics = new Map();
