@@ -3,55 +3,53 @@ import { Client } from "@elastic/elasticsearch";
 
 import Profile from "../models/profile.js";
 
+const ENV = process.env.NODE_ENV;
+const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL;
+const ELASTICSEARCH_USER = process.env.ELASTICSEARCH_USER;
+const ELASTICSEARCH_PASSWORD = process.env.ELASTICSEARCH_PASSWORD;
+const ELASTICSEARCH_API_KEY = process.env.ELASTICSEARCH_API_KEY;
+
 const MONGO_URI = process.env.MONGO_URI;
-await mongoose.connect(MONGO_URI);
 
-const client = new Client({
-  node: process.env.ELASTICSEARCH_URL, // Adjust as needed
-  auth: {
-    username: process.env.ELASTICSEARCH_USER,
-    password: process.env.ELASTICSEARCH_PASSWORD,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
-
-const deleteAllIndices = async () => {
-  try {
-    const indices = await client.cat.indices({ format: "json" });
-    const indexNames = indices.body.map((index) => index.index);
-    for (const name of indexNames) {
-      await client.indices.delete({ index: name });
-      console.log(`Deleted index: ${name}`);
-    }
-  } catch (err) {
-    console.error("Error deleting indices:", err.meta?.body?.error || err);
-  }
-};
-
-const createProfilesIndex = async () => {
-  try {
-    await client.indices.create({
-      index: "profiles",
-      body: {
-        mappings: {
-          properties: {
-            username: { type: "keyword" },
-            firstName: { type: "text" },
-            lastName: { type: "text" },
-            suggest: {
-              type: "completion",
-            },
-          },
-        },
+// Elasticsearch index configuration
+const INDEX_CONFIG = {
+  mappings: {
+    properties: {
+      username: { type: "text" },
+      firstName: { type: "text" },
+      lastName: { type: "text" },
+      suggest: {
+        type: "completion",
+        analyzer: "simple",
+        preserve_separators: true,
+        preserve_position_increments: true,
+        max_input_length: 50,
       },
-    });
-    console.log("Created 'profiles' index with mapping.");
-  } catch (err) {
-    console.error("Error creating index:", err.meta?.body?.error || err);
-  }
+    },
+  },
 };
+
+let clientData;
+
+if (ENV === "production") {
+  clientData = {
+    node: ELASTICSEARCH_URL,
+    auth: {
+      apiKey: ELASTICSEARCH_API_KEY,
+    },
+    serverMode: "serverless",
+  };
+} else {
+  clientData = {
+    node: ELASTICSEARCH_URL,
+    auth: {
+      username: ELASTICSEARCH_USER,
+      password: ELASTICSEARCH_PASSWORD,
+    },
+  };
+}
+
+const client = new Client(clientData);
 
 const indexProfiles = async () => {
   const profiles = await Profile.find({});
@@ -84,10 +82,42 @@ const indexProfiles = async () => {
   console.log("Refreshed index.");
 };
 
-(async () => {
-  await deleteAllIndices();
-  await createProfilesIndex();
-  await indexProfiles();
-  console.log("✅ Done reindexing.");
-  process.exit();
-})();
+// Initialize Elasticsearch
+export const initializeElasticsearch = async () => {
+  try {
+    const indexExists = await client.indices.exists({ index: "profiles" });
+
+    if (indexExists) {
+      console.log("Elasticsearch index already exists.");
+      return;
+    }
+
+    console.log("Creating Elasticsearch index...");
+    await client.indices.create({
+      index: "profiles",
+      body: INDEX_CONFIG,
+    });
+    console.log("Created 'profiles' index with mapping.");
+
+    await indexProfiles();
+    console.log("Elasticsearch initialization complete.");
+  } catch (error) {
+    console.error("Failed to initialize Elasticsearch:", error);
+    throw error;
+  }
+};
+
+// Only run the full reindex if this file is run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  (async () => {
+    try {
+      await mongoose.connect(MONGO_URI);
+      await initializeElasticsearch();
+      console.log("Done reindexing.");
+      process.exit(0);
+    } catch (error) {
+      console.error("Reindexing failed:", error);
+      process.exit(1);
+    }
+  })();
+}

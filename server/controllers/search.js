@@ -1,38 +1,8 @@
 import Profile from "../models/profile.js";
-
 import { client } from "../services/elasticsearch.js";
 import { handleError } from "../utils/errorHandler.js";
 
 const INDEX_NAME = "profiles";
-
-// Elasticsearch index configuration
-const INDEX_CONFIG = {
-  mappings: {
-    properties: {
-      username: { type: "text" },
-      firstName: { type: "text" },
-      lastName: { type: "text" },
-      suggest: {
-        type: "completion",
-        analyzer: "simple",
-        preserve_separators: true,
-        preserve_position_increments: true,
-        max_input_length: 50,
-      },
-    },
-  },
-};
-
-// Ensure the Elasticsearch index exists with proper configuration
-const ensureIndexExists = async () => {
-  const indexExists = await client.indices.exists({ index: INDEX_NAME });
-  if (!indexExists) {
-    await client.indices.create({
-      index: INDEX_NAME,
-      body: INDEX_CONFIG,
-    });
-  }
-};
 
 // Build search query for partial and fuzzy matching
 const buildSearchQuery = (searchTerm) => {
@@ -174,8 +144,6 @@ export const search = async (req, res) => {
       return res.status(400).json({ error: "Search query is required" });
     }
 
-    await ensureIndexExists();
-
     const searchResults = await client.search({
       index: INDEX_NAME,
       query: buildSearchQuery(query),
@@ -197,12 +165,10 @@ export const autocomplete = async (req, res) => {
       return res.json([]);
     }
 
-    await ensureIndexExists();
-
     const searchResults = await client.search({
       index: INDEX_NAME,
       query: buildPrefixQuery(text),
-      size: 20, // Increased size to account for deduplication
+      size: 20,
       sort: [{ _score: { order: "desc" } }],
     });
 

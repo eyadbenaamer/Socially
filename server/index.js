@@ -11,6 +11,7 @@ import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 
 import createSocketServer from "./socket/socketServer.js";
+import { initializeElasticsearch } from "./utils/reindexProfiles.js";
 
 import authRoute from "./routes/auth.js";
 import profileRoute from "./routes/profile.js";
@@ -170,8 +171,17 @@ const PORT = process.env.PORT;
 const server = createServer(app);
 createSocketServer(server);
 
-try {
-  server.listen(PORT, () => console.log(`Server Connected on Port: ${PORT}`));
-} catch (error) {
-  console.error(error);
-}
+const startServer = async () => {
+  try {
+    // Initialize Elasticsearch
+    await initializeElasticsearch();
+
+    // Start the server
+    server.listen(PORT, () => console.log(`Server Connected on Port: ${PORT}`));
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
