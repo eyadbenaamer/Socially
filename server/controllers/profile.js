@@ -77,8 +77,8 @@ export const checkUsernameAvailability = async (req, res) => {
 export const setProfile = async (req, res) => {
   try {
     const { id } = req.user;
-    const coverPic = req.files.coverPic ? req.files.coverPic[0] : null;
-    const profilePic = req.files.profilePic ? req.files.profilePic[0] : null;
+    const coverPic = req.files?.coverPic ? req.files.coverPic[0] : null;
+    const profilePic = req.files?.profilePic ? req.files.profilePic[0] : null;
     const { username, bio, location } = req.body;
     const profile = await Profile.findById(id);
     // setting user name is optional because is has a default value.

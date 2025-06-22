@@ -9,8 +9,6 @@ import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
 import { handleError } from "../utils/errorHandler.js";
 
-/*CREATE*/
-
 export const create = async (req, res) => {
   try {
     const { id } = req.user;
@@ -143,8 +141,6 @@ export const share = async (req, res) => {
   }
 };
 
-/*READ*/
-
 export const getPost = async (req, res) => {
   try {
     const { post } = req;
@@ -153,8 +149,6 @@ export const getPost = async (req, res) => {
     return handleError(err, res);
   }
 };
-
-/*UPDATE*/
 
 export const edit = async (req, res) => {
   try {
@@ -277,24 +271,6 @@ export const likeToggle = async (req, res) => {
     return handleError(err, res);
   }
 };
-
-export const setViewed = async (req, res) => {
-  try {
-    const { user, post } = req;
-
-    if (post.views.id(user.id)) {
-      return res.status(409).json({ message: "Already viewed." });
-    }
-
-    post.views.addToSet(user.id);
-    await post.updateOne(post);
-    return res.status(200).json(post);
-  } catch (err) {
-    return handleError(err, res);
-  }
-};
-
-/*DELETE*/
 
 export const deletePost = async (req, res) => {
   try {
