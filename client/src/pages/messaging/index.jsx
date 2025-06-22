@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setUnreadMessagesCount } from "state";
 
-import Sidebar from "components/sidebar";
+import Sidebar from "layout/sidebar";
+import Bar from "layout/bar";
 import Contact from "./contact";
 import Conversations from "./conversations";
 
@@ -85,18 +86,23 @@ const Messaging = () => {
                     ? "calc(100vh - 45px)"
                     : "calc(100vh - 95px)",
               }}
-              className="content bg-200 col-span-10 lg:col-span-8 md:mx-0 grid grid-rows-6 grid-cols-3 overflow-x-hidden"
+              className="content messaging bg-200 col-span-10 lg:col-span-8 md:mx-0 grid grid-rows-6 lg:grid-rows-4 grid-cols-3 overflow-x-hidden"
             >
-              <div
-                className="contacts flex items-center gap-2 px-2 w-full col-span-3 md:col-span-1 overflow-x-scroll"
-                style={{ scrollbarWidth: "none" }}
-              >
-                {onlineContactsIds.map((contact) => (
-                  <Contact id={contact._id} isOnline={contact.isOnline} />
-                ))}
-                {offlineContactsIds.map((contact) => (
-                  <Contact id={contact._id} isOnline={contact.isOnline} />
-                ))}
+              <div className="contacts w-full col-span-3 md:col-span-1">
+                <div className="w-full pt-2 pb-4 lg:pt-6 px-4 lg:pb-5 text-2xl">
+                  Messages
+                </div>
+                <div
+                  className="contacts flex items-center gap-2 w-full overflow-x-scroll"
+                  style={{ scrollbarWidth: "none" }}
+                >
+                  {onlineContactsIds.map((contact) => (
+                    <Contact id={contact._id} isOnline={contact.isOnline} />
+                  ))}
+                  {offlineContactsIds.map((contact) => (
+                    <Contact id={contact._id} isOnline={contact.isOnline} />
+                  ))}
+                </div>
               </div>
               <div className="col-span-3 sm:col-span-2 md:col-span-1 row-span-6 row-start-2">
                 <Conversations />
@@ -110,6 +116,7 @@ const Messaging = () => {
               )}
             </div>
           </div>
+          {windowWidth < 1024 && <Bar />}
         </>
       </SelectedChatContext.Provider>
     </>

@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 
+import Layout from "layout";
 import SearchBar from "./SearchBar";
 import SearchResults from "./SearchResults";
-import { useWindowWidth } from "hooks/useWindowWidth";
-import Sidebar from "components/sidebar";
+
 import axiosClient from "utils/AxiosClient";
 
 const Search = () => {
@@ -19,7 +19,6 @@ const Search = () => {
   const [lastHoveredIndex, setLastHoveredIndex] = useState(-1);
   const suggestionsRef = useRef(null);
   const searchBarRef = useRef(null);
-  const windowWidth = useWindowWidth();
 
   const query = searchParams.get("query") || "";
 
@@ -173,71 +172,59 @@ const Search = () => {
   };
 
   return (
-    <>
-      <div className="grid grid-cols-10 pt-5 pb-28">
-        {windowWidth >= 1024 && (
-          <div className="sidebar flex justify-center col-span-2">
-            <Sidebar />
-          </div>
-        )}
-        <div className="content sm:col-span-10 md:mx-0 lg:col-span-6 col-span-10">
-          <h1 className="text-2xl p-4 sticky top-[45px] bg-100 z-30">Search</h1>
-          <div className="my-0 mx-auto">
-            <div className="flex flex-col gap-4 mx-2">
-              <div className="relative" ref={searchBarRef}>
-                <SearchBar
-                  value={inputValue}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  onSubmit={handleSearchSubmit}
-                  onClear={() => {
-                    setInputValue("");
-                    setShowSuggestions(false);
-                    setSelectedIndex(-1);
-                    setLastHoveredIndex(-1);
-                    setHasSearched(false);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  onFocus={handleFocus}
-                />
-                {showSuggestions && suggestions.length > 0 && (
-                  <div
-                    ref={suggestionsRef}
-                    className="absolute top-full left-0 right-0 mt-1 bg-300 rounded-lg shadow-lg z-50"
-                    role="listbox"
+    <Layout>
+      <h1 className="text-2xl p-4 sticky top-[45px] bg-100 z-30">Search</h1>
+      <div className="my-0 mx-auto">
+        <div className="flex flex-col gap-4 mx-2">
+          <div className="relative" ref={searchBarRef}>
+            <SearchBar
+              value={inputValue}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onSubmit={handleSearchSubmit}
+              onClear={() => {
+                setInputValue("");
+                setShowSuggestions(false);
+                setSelectedIndex(-1);
+                setLastHoveredIndex(-1);
+                setHasSearched(false);
+              }}
+              onKeyDown={handleKeyDown}
+              onFocus={handleFocus}
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <div
+                ref={suggestionsRef}
+                className="absolute top-full left-0 right-0 mt-1 bg-300 rounded-lg shadow-lg z-50"
+                role="listbox"
+              >
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    onMouseEnter={() => handleSuggestionHover(index)}
+                    className={`w-full px-4 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                      index === selectedIndex ? "bg-alt" : ""
+                    }`}
+                    role="option"
+                    aria-selected={index === selectedIndex}
                   >
-                    {suggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSuggestionClick(suggestion)}
-                        onMouseEnter={() => handleSuggestionHover(index)}
-                        className={`w-full px-4 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                          index === selectedIndex ? "bg-alt" : ""
-                        }`}
-                        role="option"
-                        aria-selected={index === selectedIndex}
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                    {suggestion}
+                  </button>
+                ))}
               </div>
-
-              {isLoading ? (
-                <div className="flex justify-center items-center h-40">
-                  Loading...
-                </div>
-              ) : (
-                <SearchResults
-                  results={searchResults}
-                  hasSearched={hasSearched}
-                />
-              )}
-            </div>
+            )}
           </div>
+
+          {isLoading ? (
+            <div className="flex justify-center items-center h-40">
+              Loading...
+            </div>
+          ) : (
+            <SearchResults results={searchResults} hasSearched={hasSearched} />
+          )}
         </div>
       </div>
-    </>
+    </Layout>
   );
 };
 

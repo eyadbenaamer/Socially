@@ -19,8 +19,7 @@ import VerifyAccountByLink from "pages/VerifyAccountByLink";
 import Welcome from "pages/welcome";
 import Search from "pages/search";
 
-import Header from "components/header";
-import Bar from "components/bar";
+import Header from "layout/header";
 import InfoMessage from "components/InfoMessage";
 
 import { DialogProvider } from "components/dialog/DialogContext";
@@ -219,7 +218,6 @@ const App = () => {
             </Routes>
             <InfoMessage />
           </motion.main>
-          {isLoggedin && !email && windowWidth < 1024 && <Bar />}
         </DialogProvider>
       </div>
     </BrowserRouter>

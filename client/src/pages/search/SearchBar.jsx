@@ -37,6 +37,7 @@ const SearchBar = ({
         <SearchIcon className="w-6" />
       </div>
       <input
+        autoFocus
         type="text"
         value={value}
         onChange={onChange}

@@ -255,7 +255,7 @@ const POST_TEXTS = [
   "Good vibes only ✌️",
   "Sunshine and good times ☀️",
   "Another day, another adventure 🗺️",
-  "Food coma achieved �",
+  "Food coma achieved 🍴",
   "Just because I can 🌸",
   "Making memories every day 📅",
   "Do what makes your soul shine ✨",
@@ -362,6 +362,22 @@ await mongoose.connect("mongodb://localhost:27017/Socially");
 // Clean existing data
 await Promise.all([User.deleteMany(), Profile.deleteMany(), Post.deleteMany()]);
 
+// Generate unique username
+async function generateUniqueUsername(firstName, lastName) {
+  let username = `${firstName.toLowerCase()}${lastName.toLowerCase()}`;
+  let counter = 1;
+
+  // Check if username exists and keep trying until we find a unique one
+  while (true) {
+    const existingProfile = await Profile.findOne({ username });
+    if (!existingProfile) {
+      return username;
+    }
+    username = `${firstName.toLowerCase()}${lastName.toLowerCase()}${counter}`;
+    counter++;
+  }
+}
+
 // User creation function
 async function createMockUser(index) {
   const userId = new Types.ObjectId();
@@ -380,37 +396,23 @@ async function createMockUser(index) {
     favoriteTopics: generateFavoriteTopics(),
   });
 
+  // Generate unique username
+  const username = await generateUniqueUsername(firstName, lastName);
+
   // Create Profile
   const profile = await Profile.create({
     _id: userId,
     firstName,
     lastName,
-    username: `${firstName.toLowerCase()}${lastName.toLowerCase()}${Math.floor(
-      Math.random() * 100
-    )}`,
+    username,
     profilePicPath: `https://picsum.photos/200?random=${index}`,
     followers: [],
     following: [],
   });
 
-  await client.indices.create({
-    index: "profiles",
-    body: {
-      mappings: {
-        properties: {
-          username: { type: "keyword" },
-          firstName: { type: "text" },
-          lastName: { type: "text" },
-          suggest: {
-            type: "completion",
-          },
-        },
-      },
-    },
-  });
-
   return { user, profile };
 }
+
 // Generate random favorite topics
 function generateFavoriteTopics() {
   const topics = new Map();
@@ -483,53 +485,88 @@ async function createUserPosts(userId, allUserIds) {
 
 // Main seeding function
 async function seedDatabase() {
-  // Create users and profiles
-  const users = [];
-  for (let i = 0; i < TOTAL_USERS; i++) {
-    const { user, profile } = await createMockUser(i);
-    users.push({ user, profile });
-    console.log(`Created user ${i + 1}/${TOTAL_USERS}`);
-  }
-
-  // Create follow relationships
-  const allUserIds = users.map((u) => u.user._id.toString());
-  for (const currentUser of users) {
-    const followersCount = Math.floor(Math.random() * MAX_FOLLOWERS);
-    const followers = [];
-
-    // Get random followers (excluding self)
-    const potentialFollowers = allUserIds.filter(
-      (id) => id !== currentUser.user._id.toString()
-    );
-    const selectedFollowers = potentialFollowers
-      .sort(() => 0.5 - Math.random())
-      .slice(0, followersCount);
-
-    // Update follower's following and current user's followers
-    for (const followerId of selectedFollowers) {
-      // Add to current user's followers
-      currentUser.profile.followers.push({
-        _id: followerId,
-        notificationId: new Types.ObjectId().toString(),
+  try {
+    // Create Elasticsearch index once at the beginning
+    try {
+      await client.indices.create({
+        index: "profiles",
+        body: {
+          mappings: {
+            properties: {
+              username: { type: "keyword" },
+              firstName: { type: "text" },
+              lastName: { type: "text" },
+              suggest: {
+                type: "completion",
+              },
+            },
+          },
+        },
       });
-
-      // Add to follower's following
-      const followerProfile = await Profile.findOne({ _id: followerId });
-      followerProfile.following.push({ _id: currentUser.user._id.toString() });
-      await followerProfile.save();
+      console.log("Elasticsearch index 'profiles' created successfully");
+    } catch (error) {
+      if (error.message.includes("resource_already_exists_exception")) {
+        console.log(
+          "Elasticsearch index 'profiles' already exists, skipping creation"
+        );
+      } else {
+        throw error;
+      }
     }
 
-    await currentUser.profile.save();
-  }
+    // Create users and profiles
+    const users = [];
+    for (let i = 0; i < TOTAL_USERS; i++) {
+      const { user, profile } = await createMockUser(i);
+      users.push({ user, profile });
+      console.log(`Created user ${i + 1}/${TOTAL_USERS}`);
+    }
 
-  // Create posts for all users
-  for (const user of users) {
-    await createUserPosts(user.user._id, allUserIds);
-    console.log(`Created posts for user ${user.profile.username}`);
-  }
+    // Create follow relationships
+    const allUserIds = users.map((u) => u.user._id.toString());
+    for (const currentUser of users) {
+      const followersCount = Math.floor(Math.random() * MAX_FOLLOWERS);
+      const followers = [];
 
-  console.log("Database seeding completed!");
-  process.exit(0);
+      // Get random followers (excluding self)
+      const potentialFollowers = allUserIds.filter(
+        (id) => id !== currentUser.user._id.toString()
+      );
+      const selectedFollowers = potentialFollowers
+        .sort(() => 0.5 - Math.random())
+        .slice(0, followersCount);
+
+      // Update follower's following and current user's followers
+      for (const followerId of selectedFollowers) {
+        // Add to current user's followers
+        currentUser.profile.followers.push({
+          _id: followerId,
+          notificationId: new Types.ObjectId().toString(),
+        });
+
+        // Add to follower's following
+        const followerProfile = await Profile.findOne({ _id: followerId });
+        followerProfile.following.push({
+          _id: currentUser.user._id.toString(),
+        });
+        await followerProfile.save();
+      }
+
+      await currentUser.profile.save();
+    }
+
+    // Create posts for all users
+    for (const user of users) {
+      await createUserPosts(user.user._id, allUserIds);
+      console.log(`Created posts for user ${user.profile.username}`);
+    }
+
+    console.log("Database seeding completed!");
+    process.exit(0);
+  } catch (error) {
+    console.error("Seeding error:", error);
+    process.exit(1);
+  }
 }
 
 // Run the seeder

@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 
-import Sidebar from "components/sidebar";
+import Layout from "layout";
 import Notification from "./notification";
 import LoadingNotification from "./LoadingNotification";
 
@@ -12,11 +12,9 @@ import {
   setUnreadNotificationsCount,
 } from "state";
 
-import { useWindowWidth } from "hooks/useWindowWidth";
 import axiosClient from "utils/AxiosClient";
 
 const Notifications = () => {
-  const windowWidth = useWindowWidth();
   const [page, setPage] = useState(1);
 
   const notifications = useSelector((state) => state.notifications);
@@ -106,49 +104,42 @@ it changes in /notifications route
   };
 
   return (
-    <div className="grid grid-cols-8 pt-5 pb-28">
-      {windowWidth > 1024 && (
-        <div className="sidebar flex justify-center col-span-2">
-          <Sidebar />
-        </div>
-      )}
-      <div className="content px-2 sm:col-span-5 md:mx-0 md:col-span-4 lg:col-span-3 col-span-8">
-        <div className="flex justify-between items-center py-4 sticky top-[45px] bg-100 z-30">
-          <h1 className="text-2xl">Notifications</h1>
-          <div className="flex gap-5">
-            {!isAllRead() && (
-              <div
-                className="hover:underline text-primary transition cursor-pointer"
-                onClick={setAllRead}
-              >
-                Set all read
-              </div>
-            )}
-            {notifications?.length > 0 && (
-              <div
-                className="hover:underline text-primary transition cursor-pointer"
-                onClick={clear}
-              >
-                Clear
-              </div>
-            )}
-          </div>
-        </div>
-        {notifications?.length === 0 && <>No notifications</>}
-        <ul ref={container} className="flex flex-col gap-2 pt-4">
-          {notifications.map((notification) => (
-            <li>
-              <Notification {...notification} />
-            </li>
-          ))}
-          {notifications?.length >= 10 && (
-            <div ref={loading}>
-              <LoadingNotification />
+    <Layout>
+      <div className="flex justify-between items-center py-4 sticky top-[45px] bg-100 z-30">
+        <h1 className="text-2xl">Notifications</h1>
+        <div className="flex gap-5">
+          {!isAllRead() && (
+            <div
+              className="hover:underline text-primary transition cursor-pointer"
+              onClick={setAllRead}
+            >
+              Set all read
             </div>
           )}
-        </ul>
+          {notifications?.length > 0 && (
+            <div
+              className="hover:underline text-primary transition cursor-pointer"
+              onClick={clear}
+            >
+              Clear
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      {notifications?.length === 0 && <>No notifications</>}
+      <ul ref={container} className="flex flex-col gap-2 pt-4">
+        {notifications.map((notification) => (
+          <li>
+            <Notification {...notification} />
+          </li>
+        ))}
+        {notifications?.length >= 10 && (
+          <div ref={loading}>
+            <LoadingNotification />
+          </div>
+        )}
+      </ul>
+    </Layout>
   );
 };
 export default Notifications;

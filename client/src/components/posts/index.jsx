@@ -102,7 +102,7 @@ const Posts = () => {
 
   return (
     <PostsContext.Provider value={{ posts, setPosts }}>
-      <div className="flex flex-col gap-y-4 items-center">
+      <div className="flex flex-col gap-y-4 items-center pb-20">
         <CreatePost />
 
         {posts?.map((post) => (

@@ -2,11 +2,11 @@ import { createContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
+import Bar from "layout/bar";
 import Content from "./Content";
 import CoverPicture from "./CoverPicture";
 import MessagingBtn from "./MessagingBtn";
 import AboutUser from "./AboutUser";
-import Bar from "components/bar";
 import FollowToggleBtn from "components/FollowingBtn";
 import NotFound from "pages/NotFound";
 

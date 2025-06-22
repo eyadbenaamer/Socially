@@ -11,7 +11,7 @@ const BarItem = (props) => {
         to={to}
       >
         <div className="bg-hovered flex gap-3 items-center px-3 py-1 rounded-xl">
-          <span className="w-9 flex justify-center">{children}</span>
+          <span className="w-7 flex justify-center">{children}</span>
         </div>
       </Link>
     </li>
