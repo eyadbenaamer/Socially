@@ -28,6 +28,6 @@ export const notifyTypingHandler = async (socket, io, data) => {
       });
     });
   } catch (err) {
-    return handleError(err, res);
+    console.error(err);
   }
 };

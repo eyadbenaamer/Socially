@@ -74,7 +74,10 @@ Follow these steps to set up the project:
      MONGO_URI=<your MongoDB URL>
      PORT=5000
      TOKEN_EXPIRATION=10d
+     PEXELS_API_KEY=<your Pexels API key>
      ```
+
+   > **Note:** To get a Pexels API key, visit [Pexels API](https://www.pexels.com/api/) and sign up for a free account. The API key is used for generating contextual images in the seed script.
 
 3. **Install dependencies:**
 
@@ -95,6 +98,17 @@ Follow these steps to set up the project:
      $ npm i
      $ npm start
      ```
+
+4. **Seed the database (optional):**
+
+   To populate the database with sample data, run the seed script:
+
+   ```bash
+   $ cd server
+   $ node utils/seed.js
+   ```
+
+   This will create sample users, posts, and relationships. The script uses the Pexels API to generate contextual images for posts.
 
 ### Usage
 

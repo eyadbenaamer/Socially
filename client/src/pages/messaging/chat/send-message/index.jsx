@@ -44,10 +44,10 @@ const SendMessage = () => {
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    if (socket) {
+    if (socket && conversationId) {
       socket.emit("notify-typing", { conversationId, isTyping });
     }
-  }, [isTyping, socket]);
+  }, [isTyping, conversationId]);
 
   useEffect(() => {
     // this refocuses on the text area once the conversation changes

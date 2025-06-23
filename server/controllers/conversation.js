@@ -201,7 +201,7 @@ export const deleteConversation = async (req, res) => {
       const unreadMessagesCount = participant.unreadMessagesCount;
       User.findById(participant.id).then((doc) => {
         doc.unreadMessagesCount -= unreadMessagesCount;
-        doc.contacts.id(otherParticipant.id).deleteOne();
+        doc.contacts.id(otherParticipant.id)?.deleteOne();
         doc.save();
       });
 
@@ -217,7 +217,7 @@ export const deleteConversation = async (req, res) => {
       });
     });
 
-    conversation.deleteOne();
+    await conversation.deleteOne();
 
     return res.status(200).send("success");
   } catch (err) {

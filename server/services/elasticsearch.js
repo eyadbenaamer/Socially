@@ -3,7 +3,7 @@ import { config } from "dotenv";
 
 config();
 
-const ENV = process.env.NODE_ENV;
+const ENV = process.env.ENV;
 const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL;
 const ELASTICSEARCH_USER = process.env.ELASTICSEARCH_USER;
 const ELASTICSEARCH_PASSWORD = process.env.ELASTICSEARCH_PASSWORD;

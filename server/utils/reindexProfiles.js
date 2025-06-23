@@ -3,7 +3,7 @@ import { Client } from "@elastic/elasticsearch";
 
 import Profile from "../models/profile.js";
 
-const ENV = process.env.NODE_ENV;
+const ENV = process.env.ENV;
 const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL;
 const ELASTICSEARCH_USER = process.env.ELASTICSEARCH_USER;
 const ELASTICSEARCH_PASSWORD = process.env.ELASTICSEARCH_PASSWORD;
@@ -50,7 +50,6 @@ if (ENV === "production") {
 }
 
 const client = new Client(clientData);
-
 const indexProfiles = async () => {
   const profiles = await Profile.find({});
   console.log(`Found ${profiles.length} profiles.`);

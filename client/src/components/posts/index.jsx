@@ -66,7 +66,6 @@ const Posts = () => {
         setPosts(response.data);
       })
       .catch((error) => {
-        console.log(error);
         // Don't set error message if request was aborted
         if (error.name !== "CanceledError") {
           setMessage("An error occurred. please try again later.");
@@ -88,7 +87,7 @@ const Posts = () => {
       const postsEndLocation = Math.floor(postsEnd.current?.offsetTop || 0);
       const scroll = Math.floor(window.scrollY + window.innerHeight);
 
-      if (scroll >= postsEndLocation / 2) {
+      if (scroll >= postsEndLocation * 0.8) {
         if (!isPostsFinished && !isFetching) {
           fetchPosts();
           window.removeEventListener("scrollend", updatePage);
