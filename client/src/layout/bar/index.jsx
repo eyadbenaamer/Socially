@@ -8,6 +8,7 @@ import { ReactComponent as NotificationsIcon } from "assets/icons/notifications.
 import { ReactComponent as MessagesIcon } from "assets/icons/message-text.svg";
 import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
 import { ReactComponent as SearchIcon } from "assets/icons/search.svg";
+import UserPicture from "components/UserPicture";
 
 const Bar = () => {
   const profile = useSelector((state) => state.profile);
@@ -30,8 +31,8 @@ const Bar = () => {
         </BarItem>
 
         <BarItem to={`/profile/${profile.username}`}>
-          <span className="circle w-9 border-[1px]">
-            <img className="h-full w-full" src={profile.profilePicPath} />
+          <span className="w-[36px]">
+            <UserPicture profile={profile} noLink={true} />
           </span>
         </BarItem>
 

@@ -17,7 +17,7 @@ const AboutUser = () => {
   });
   const joinedAtYear = new Date(joinedAt).getFullYear();
   return (
-    <div className="flex flex-col mx-2 gap-2">
+    <div className="flex flex-col mx-2 gap-3">
       {/* contains name and username */}
       <div>
         <div className="name text-2xl">
@@ -37,7 +37,7 @@ const AboutUser = () => {
             {location}
           </div>
         )}
-        <div className="text-50 flex gap-1 items-center">
+        <div className="text-50 flex gap-1 items-center text-sm">
           <CalenderIcon />
           Joined at {joinedAtMonth} {joinedAtYear}
         </div>

@@ -15,12 +15,14 @@ const SearchResults = ({ results, hasSearched }) => {
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="flex flex-col gap-10">
       {results.map((profile) => (
-        <div className="flex items-start gap-4 p-3 transition-all rounded-xl xl:w-3/4">
-          <UserPicture profile={profile} />
+        <div className="flex items-start gap-4 transition-all rounded-xl xl:w-3/4">
+          <span className="w-12">
+            <UserPicture profile={profile} />
+          </span>
           <div className="flex-1 min-w-0">
-            <div className="flex justify-s gap-24">
+            <div className="flex justify-between gap-24">
               <Link key={profile._id} to={`/profile/${profile.username}`}>
                 <h3 className="font-bold text-md hover:underline">
                   {profile.firstName} {profile.lastName}

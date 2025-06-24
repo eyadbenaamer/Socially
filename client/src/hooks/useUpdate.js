@@ -13,12 +13,12 @@ import {
 import axiosClient from "utils/AxiosClient";
 
 const useUpdate = () => {
-  const { isLoggedin } = useSelector((state) => state.authStatus);
+  const { isLoggedin, isVerified } = useSelector((state) => state.authStatus);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!isLoggedin) {
+    if (!isLoggedin || !isVerified) {
       return;
     }
     axiosClient(`/login`)
@@ -40,7 +40,7 @@ const useUpdate = () => {
       .catch(() => {
         dispatch(logout());
       });
-  }, [isLoggedin]);
+  }, [dispatch, isLoggedin, isVerified]);
 };
 
 export default useUpdate;

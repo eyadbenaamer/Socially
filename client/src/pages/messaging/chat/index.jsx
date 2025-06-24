@@ -5,10 +5,7 @@ import ContactChat from "./ContactChat";
 import NonContactChat from "./NonContactChat";
 import ChatBar from "./ChatBar";
 
-import { useWindowWidth } from "hooks/useWindowWidth";
-
 const Chat = () => {
-  const windowWidth = useWindowWidth();
   const { pathname } = useLocation();
 
   const { theme } = useSelector((state) => state.settings);
@@ -18,9 +15,8 @@ const Chat = () => {
 
   return (
     <div
-      className="relative h-full bg-alt"
+      className="chat h-full bg-alt flex flex-col"
       style={{
-        height: windowWidth < 1024 ? "calc(100vh - 95px)" : "",
         boxShadow,
       }}
     >

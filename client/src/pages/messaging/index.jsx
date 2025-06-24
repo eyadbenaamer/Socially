@@ -67,8 +67,13 @@ const Messaging = () => {
         }}
       >
         {/*the chat is taking the entire screen for small screens*/}
-        {windowWidth < 768 && (
-          <div className="fixed left-0 z-20 w-full">
+        {windowWidth < 768 && conversationId && (
+          <div
+            className="fixed left-0 z-20 w-full"
+            style={{
+              height: "calc(100vh - 95px)",
+            }}
+          >
             <Outlet />
           </div>
         )}
@@ -86,31 +91,38 @@ const Messaging = () => {
                     ? "calc(100vh - 45px)"
                     : "calc(100vh - 95px)",
               }}
-              className="content messaging bg-200 col-span-10 lg:col-span-8 md:mx-0 grid grid-rows-6 lg:grid-rows-4 grid-cols-3 overflow-x-hidden"
+              className="content messaging bg-200 col-span-10 lg:col-span-8 md:mx-0 grid grid-cols-3 h-[calc(100vh - 45px)] overflow-hidden"
             >
-              <div className="contacts w-full col-span-3 md:col-span-1">
-                <div className="w-full pt-2 pb-4 lg:pt-6 px-4 lg:pb-5 text-2xl">
-                  Messages
+              <div
+                className="col-span-3 md:col-span-1 md:col-start-1 flex flex-col "
+                style={{
+                  height: "calc(100vh - 45px)",
+                }}
+              >
+                <div className="contacts">
+                  <div className="w-full pt-2 pb-4 lg:pt-6 px-4 lg:pb-5 text-2xl">
+                    Messages
+                  </div>
+                  <div
+                    className="contacts flex items-center w-full overflow-x-scroll"
+                    style={{ scrollbarWidth: "none" }}
+                  >
+                    {onlineContactsIds.map((contact) => (
+                      <Contact id={contact._id} isOnline={contact.isOnline} />
+                    ))}
+                    {offlineContactsIds.map((contact) => (
+                      <Contact id={contact._id} isOnline={contact.isOnline} />
+                    ))}
+                  </div>
                 </div>
-                <div
-                  className="contacts flex items-center gap-2 w-full overflow-x-scroll"
-                  style={{ scrollbarWidth: "none" }}
-                >
-                  {onlineContactsIds.map((contact) => (
-                    <Contact id={contact._id} isOnline={contact.isOnline} />
-                  ))}
-                  {offlineContactsIds.map((contact) => (
-                    <Contact id={contact._id} isOnline={contact.isOnline} />
-                  ))}
+                <div className="flex-1 min-h-0 overflow-y-scroll">
+                  <Conversations />
                 </div>
-              </div>
-              <div className="col-span-3 sm:col-span-2 md:col-span-1 row-span-6 row-start-2">
-                <Conversations />
               </div>
               {/* for large screens the chat will take a part of 
                 the screen rather than the entire screen */}
               {windowWidth >= 768 && (
-                <div className="chat overflow-hidden md:col-span-2 bg-200 row-span-6">
+                <div className="overflow-hidden col-span-3 md:col-span-2 md:col-start-2 bg-200 h-full">
                   <Outlet />
                 </div>
               )}

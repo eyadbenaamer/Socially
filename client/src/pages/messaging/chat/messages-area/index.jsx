@@ -1,5 +1,12 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import {
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { addMessages, setConversation, setConversationRead } from "state";
@@ -9,60 +16,71 @@ import Message from "./message";
 import { SelectedChatContext } from "pages/messaging";
 import axiosClient from "utils/AxiosClient";
 import Time from "components/time";
+import useInfiniteScroll from "hooks/useInfiniteScroll";
 
 import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const MessagesArea = (props) => {
   const dispatch = useDispatch();
-
   const { conversation } = useContext(SelectedChatContext);
+  const navigate = useNavigate();
+  const { conversationId } = useParams();
+
+  // Pagination state
+  const [page, setPage] = useState(2);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMessagesFinished, setIsMessagesFinished] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
+
+  // Refs
+  const container = useRef(null);
 
   const firstUnreadMessageId = useMemo(
     () => conversation.messages[props.unreadMessagesCount - 1]?._id,
-    []
+    [conversation.messages, props.unreadMessagesCount]
   );
-  const { conversationId } = useParams();
-  const [page, setPage] = useState(2);
-  // this indicates wether if the chat is closed or not
-  const [isClosed, setIsClosed] = useState(false);
-  // this indicates wether if there is more messages to fetch or not
-  const [isMessagesFinished, setIsMessagesFinished] = useState(false);
 
-  const container = useRef(null);
-  const loading = useRef(null);
-
-  /*
-  if there is unread messages then the whole conversation 
-  will be set as read once the component loads
-  */
+  // Reset pagination state when conversation changes
   useEffect(() => {
-    if (conversation.unreadMessagesCount) {
+    setPage(2);
+    setIsMessagesFinished(false);
+    setIsLoading(false);
+
+    // Reset scroll position
+    if (container.current) {
+      container.current.scrollTop = 0;
+    }
+  }, [conversationId]);
+
+  // Mark conversation as read
+  useEffect(() => {
+    if (conversation?.unreadMessagesCount) {
       axiosClient
         .patch(`/conversation/set_read?conversationId=${conversation._id}`)
         .then(() => dispatch(setConversationRead(conversation._id)))
         .catch((err) => {
-          // TODO: handle error
+          console.error("Failed to mark conversation as read:", err);
         });
     }
-  }, [conversation, conversationId]);
+  }, [conversation?._id, conversation?.unreadMessagesCount, dispatch]);
 
-  // closing the chat by Esc button
+  // Close chat with Escape key
   useEffect(() => {
-    const eventHandler = (e) => {
+    const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         setIsClosed(true);
       }
     };
-    window.addEventListener("keydown", eventHandler);
-    return () => window.removeEventListener("keydown", eventHandler);
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  /*
-  fetching the first page of messages if there is not unread meassages, next pages will be
-  fetched on "conversations" component, each page is fetched 
-  when the screen renders the last message of the previous page.
-  */
+  // Fetch initial messages
   useEffect(() => {
+    if (!conversation?._id) return;
+
+    setIsLoading(true);
     axiosClient(`/conversation/?conversationId=${conversation._id}&page=1`)
       .then((response) => {
         const { messages } = response?.data;
@@ -72,99 +90,96 @@ const MessagesArea = (props) => {
         dispatch(setConversation(response.data));
       })
       .catch((err) => {
-        // TODO: handle error
+        console.error("Failed to fetch initial messages:", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-    // resting states once the conversation changes
-    setIsMessagesFinished(false);
-    setPage(2);
-    // this to reset the messages container scroll every time the conversation changes
-    if (container.current) {
-      container.current.scroll({ top: 0 });
-    }
-  }, [conversationId, container.current]);
+  }, [conversationId, conversation?._id, dispatch]);
 
-  /*
-  fetch the next page of messages whenever scrolling 
-  reaches the end of the messages list 
-  */
-  useEffect(() => {
-    const updatePage = () => {
-      const conversationsEndLocation =
-        Math.floor(loading.current?.offsetTop) * -1;
-      const scroll = Math.floor(container.current.scrollTop) * -1;
+  // Fetch next page of messages
+  const fetchNextPage = useCallback(async () => {
+    if (isLoading || isMessagesFinished || !conversation?._id) return;
 
-      if (scroll >= conversationsEndLocation / 2) {
-        fetchNextPage();
-        container.current?.removeEventListener("scrollend", updatePage);
-      }
-    };
-    container.current?.addEventListener("scrollend", updatePage);
-    return () =>
-      container.current?.removeEventListener("scrollend", updatePage);
-  }, [page, conversationId]);
+    setIsLoading(true);
+    try {
+      const response = await axiosClient(
+        `/conversation/?conversationId=${conversation._id}&page=${page}`
+      );
 
-  const fetchNextPage = () => {
-    axiosClient(
-      `/conversation/?conversationId=${conversation._id}&page=${page}`
-    )
-      .then((response) => {
-        const { _id: id, messages } = response?.data;
-        /*
-        if the conversations count is less than 10 or equal to 0 then it's the 
-        end of the conversations list and loading elements will be removed
-        */
-        if (messages?.length > 0) {
-          dispatch(addMessages({ id, messages }));
-          setPage(page + 1);
-          if (messages?.length < 10) {
-            setIsMessagesFinished(true);
-          }
-        } else {
+      const { _id: id, messages } = response?.data;
+
+      if (messages?.length > 0) {
+        dispatch(addMessages({ id, messages }));
+        setPage((prev) => prev + 1);
+
+        if (messages.length < 10) {
           setIsMessagesFinished(true);
         }
-      })
-      .catch((err) => {});
-  };
+      } else {
+        setIsMessagesFinished(true);
+      }
+    } catch (err) {
+      console.error("Failed to fetch next page:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page, isLoading, isMessagesFinished, conversation?._id, dispatch]);
+
+  // Use infinite scroll hook
+  const { loadingRef } = useInfiniteScroll(
+    fetchNextPage,
+    !isMessagesFinished,
+    isLoading,
+    {
+      rootMargin: "100px",
+      threshold: 0.1,
+    }
+  );
+
+  if (isClosed) {
+    navigate("/messages", { replace: true });
+    return null;
+  }
 
   return (
-    <>
-      {isClosed && <Navigate to="/messages" replace />}
-      <div
-        ref={container}
-        className="containera overflow-y-scroll h-full flex flex-col-reverse gap-4 py-5 px-1"
-      >
-        {conversation?.messages.map((message, i) => {
-          const thisMessageDate = new Date(message.createdAt);
-          const nextMessageDate = new Date(
-            conversation.messages[i + 1]?.createdAt
-          );
-          const isToday =
-            thisMessageDate.getDate() === nextMessageDate.getDate() &&
-            thisMessageDate.getMonth() === nextMessageDate.getMonth() &&
-            thisMessageDate.getFullYear() === thisMessageDate.getFullYear();
-          return (
-            <>
-              <Message message={message} />
-              {!isToday && (
-                <div className="self-center bg-200 px-3 p-1 rounded-xl">
-                  <Time date={message.createdAt} withDate forChat />
-                </div>
-              )}
-              {firstUnreadMessageId === message._id && (
-                <div className="self-center bg-300 px-3 p-1 rounded-xl shadow-sm">
-                  Unread Messages
-                </div>
-              )}
-            </>
-          );
-        })}
-        {!isMessagesFinished && (
-          <div ref={loading} className="w-8 center py-2">
-            <LoadingIcon className="icon" />
-          </div>
-        )}
-      </div>
-    </>
+    <div
+      ref={container}
+      className="overflow-y-scroll flex flex-col-reverse gap-4 py-10 px-2 h-full"
+    >
+      {conversation?.messages?.map((message, i) => {
+        const thisMessageDate = new Date(message.createdAt);
+        const nextMessageDate = new Date(
+          conversation.messages[i + 1]?.createdAt
+        );
+        const isToday =
+          thisMessageDate.getDate() === nextMessageDate.getDate() &&
+          thisMessageDate.getMonth() === nextMessageDate.getMonth() &&
+          thisMessageDate.getFullYear() === nextMessageDate.getFullYear();
+
+        return (
+          <>
+            <Message message={message} />
+            {!isToday && (
+              <div className="self-center bg-200 px-3 p-1 rounded-xl w-fit">
+                <Time date={message.createdAt} withDate forChat />
+              </div>
+            )}
+            {firstUnreadMessageId === message._id && (
+              <div className="self-center bg-300 px-3 p-1 rounded-xl shadow-sm">
+                Unread Messages
+              </div>
+            )}
+          </>
+        );
+      })}
+
+      {!isMessagesFinished && (
+        <div ref={loadingRef} className="w-8 center py-2">
+          <LoadingIcon className={`icon ${isLoading ? "animate-spin" : ""}`} />
+        </div>
+      )}
+    </div>
   );
 };
 

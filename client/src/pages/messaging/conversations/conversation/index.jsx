@@ -35,62 +35,77 @@ const Conversation = ({ conversation }) => {
       <div
         className={`group block ${
           conversationId === conversation._id ? "bg-alt" : ""
-        } bg-hovered p-2 rounded-xl transition`}
+        } bg-hovered p-2 sm:p-3 rounded-xl transition-all duration-200 hover:shadow-sm`}
       >
-        <div className="grid grid-cols-12 relative items-center">
-          <Link
-            to={`contact/${conversation._id}`}
-            className="col-span-2 lg:col-span-2 "
-          >
+        <div className="flex items-center gap-2 relative">
+          {/* User Picture - Fixed width on all screens */}
+          <Link to={`contact/${conversation._id}`} className="flex-shrink-0">
             <UserPicture profile={participantProfile} isOnline={isOnline} />
           </Link>
 
+          {/* Main Content - Flexible width */}
           <Link
             to={`contact/${conversation._id}`}
-            className="flex flex-col col-span-8  lg:col-span-8 px-2 justify-around"
+            className="flex-1 min-w-0 flex flex-col justify-center"
           >
-            <div className="flex items-center gap-2">
+            {/* Top row: Name and unread count */}
+            <div className="flex items-center gap-2 mb-1">
               <div
-                className={`${unreadMessagesCount > 0 ? "font-bold" : ""} `}
-                style={{
-                  textWrap: "nowrap",
-                  maxWidth: "85%",
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                }}
+                className={`truncate ${
+                  unreadMessagesCount > 0 ? "font-semibold" : "font-medium"
+                } text-sm sm:text-base`}
               >
                 {participantProfile.firstName} {participantProfile.lastName}
               </div>
               {unreadMessagesCount > 0 && (
-                <div className="circle w-5 h-5 bg-primary text-xs text-white">
-                  {unreadMessagesCount}
+                <div className="flex-shrink-0 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium">
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
                 </div>
               )}
             </div>
-            <div className="flex justify-between items-center">
+
+            {/* Bottom row: Message preview and time */}
+            <div className="flex items-center justify-between gap-2">
               <div
-                className={`flex w-full text-xs ${
-                  theme === "dark" ? "text-gray-500" : "text-gray-800"
+                className={`flex-1 min-w-0 text-xs sm:text-sm ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                <div className="h-4 overflow-hidden">
+                <div className="truncate">
                   {!lastMessage && "No Messages."}
-                  {lastMessage?.senderId === myProfile._id && "You: "}
-                  {lastMessage?.text.slice(0, 20)}
-                  {lastMessage?.text.length > 20 ? "..." : ""}
+                  {lastMessage?.senderId === myProfile._id && (
+                    <span className="font-medium">You: </span>
+                  )}
+                  {lastMessage?.text && (
+                    <span className="truncate">
+                      {lastMessage.text.length > 30
+                        ? `${lastMessage.text.slice(0, 30)}...`
+                        : lastMessage.text}
+                    </span>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center h-fit self-end text-xs text-gray-500">
+
+              <div className="flex items-center gap-1 flex-shrink-0">
                 {lastMessage?.senderId === myProfile._id && (
                   <Status info={lastMessage.info} />
                 )}
-                <Time date={conversation.updatedAt} withDate />
+                <Time
+                  date={conversation.updatedAt}
+                  withDate
+                  className="text-xs text-gray-500"
+                />
               </div>
             </div>
           </Link>
 
-          {/* OptionsBtn, only visible on hover */}
-          <div className="col-span-2 sopacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Options Button - Hidden on mobile, visible on hover for larger screens */}
+          <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:block">
+            <OptionsBtn conversationId={conversation._id} />
+          </div>
+
+          {/* Mobile options button - always visible on small screens */}
+          <div className="flex-shrink-0 sm:hidden">
             <OptionsBtn conversationId={conversation._id} />
           </div>
         </div>

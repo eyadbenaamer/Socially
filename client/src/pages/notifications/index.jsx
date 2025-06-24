@@ -15,9 +15,11 @@ import {
 import axiosClient from "utils/AxiosClient";
 
 const Notifications = () => {
-  const [page, setPage] = useState(1);
-
   const notifications = useSelector((state) => state.notifications);
+
+  const [page, setPage] = useState(1);
+  const [isFetching, setIsFetching] = useState(false);
+
   const unreadNotificationsCount = useSelector(
     (state) => state.unreadNotificationsCount
   );
@@ -45,9 +47,15 @@ it changes in /notifications route
   }, [unreadNotificationsCount]);
 
   useEffect(() => {
+    setIsFetching(true);
     axiosClient("notifications?page=1")
-      .then((response) => dispatch(setNotifications(response.data)))
-      .catch((err) => {});
+      .then((response) => {
+        dispatch(setNotifications(response.data));
+        setIsFetching(false);
+      })
+      .catch((err) => {
+        setIsFetching(false);
+      });
   }, []);
 
   /*
@@ -126,7 +134,8 @@ it changes in /notifications route
           )}
         </div>
       </div>
-      {notifications?.length === 0 && <>No notifications</>}
+      {notifications?.length === 0 && !isFetching && <>No notifications</>}
+      {isFetching && notifications?.length === 0 && <LoadingNotification />}
       <ul ref={container} className="flex flex-col gap-2 pt-4">
         {notifications.map((notification) => (
           <li>

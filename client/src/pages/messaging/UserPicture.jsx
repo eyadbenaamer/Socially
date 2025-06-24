@@ -1,21 +1,47 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
-const UserPicture = (props) => {
-  const { firstName, lastName, profilePicPath } = props.profile;
-  const { isOnline } = props;
+const UserPicture = ({ profile, isOnline }) => {
+  const { _id: id, username, firstName, lastName, profilePicPath } = profile;
+
+  const myProfile = useSelector((state) => state.profile);
+
+  const [loadedSrc, setLoadedSrc] = useState(null);
+
+  useEffect(() => {
+    if (!profilePicPath) return;
+
+    const img = new Image();
+    img.src = profilePicPath;
+
+    img
+      .decode()
+      .then(() => setLoadedSrc(profilePicPath))
+      .catch(() => setLoadedSrc(null));
+  }, [profilePicPath]);
 
   return (
-    <div className="relative h-fit">
-      <div className="circle max-w-[3rem] shadow-md border-2">
-        <img
-          className="h-full w-full"
-          loading="lazy"
-          src={profilePicPath}
-          alt={`${firstName} ${lastName}`}
-        />
+    <div className="relative">
+      <div className="circle w-12 h-12 shadow-md border-2">
+        {loadedSrc ? (
+          <img
+            src={loadedSrc}
+            alt={`${firstName} ${lastName}`}
+            width={48}
+            height={48}
+            className="h-full w-full object-cover rounded-full transition-opacity duration-200 ease-in"
+          />
+        ) : (
+          <div
+            className="h-full w-full bg-gray-300 animate-pulse rounded-full"
+            style={{ width: 48, height: 48 }}
+          />
+        )}
       </div>
-      {isOnline && (
-        <div className="green-dot h-2.5 w-2.5 circle bg-green-700 absolute left-1 bottom-0.5"></div>
+
+      {(isOnline || myProfile?._id === id) && (
+        <div className="green-dot h-3 w-3 circle bg-green-700 absolute left-0 bottom-0.5"></div>
       )}
     </div>
   );

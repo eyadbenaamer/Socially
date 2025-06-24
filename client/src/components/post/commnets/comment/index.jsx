@@ -40,9 +40,9 @@ const Comment = (props) => {
         <div className="flex flex-col gap-2 rounded-xl items-start justify-start">
           <div className="flex items-center gap-2">
             <div className="flex gap-2 items-start">
-              <div className="flex">
+              <span className="w-12">
                 <UserPicture profile={postCreatorProfile} />
-              </div>
+              </span>
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
                   <div className="flex flex-col gap-2">

@@ -54,7 +54,9 @@ const Followers = () => {
               return (
                 <li className="flex items-center justify-between">
                   <div className="account flex gap-2 items-center">
-                    <UserPicture profile={user} />
+                    <span className="w-12">
+                      <UserPicture profile={user} />
+                    </span>
                     <Link to={`/profile/${username}`} className="link">
                       {firstName} {lastName}
                     </Link>

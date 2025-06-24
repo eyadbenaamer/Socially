@@ -25,7 +25,9 @@ const Reply = (props) => {
       {props.reply && profile && (
         <div className="flex items-start">
           <div className="flex scale-75">
-            <UserPicture profile={profile} />
+            <span className="w-12">
+              <UserPicture profile={profile} />
+            </span>
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center">

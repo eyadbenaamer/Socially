@@ -93,7 +93,12 @@ const Form = () => {
     <section className="flex flex-col gap-4 w-fit center">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="col-span-1">
-          <label htmlFor="email">Email</label>
+          <label
+            htmlFor="email"
+            className="text-primary text-sm font-semibold m-1"
+          >
+            Email
+          </label>
           <input
             style={{
               border: "2px solid transparent",
@@ -106,7 +111,6 @@ const Form = () => {
             type="text"
             name="email"
             autoFocus
-            placeholder="email"
             value={data.email}
             onChange={(e) => {
               if (e.target.value) {
@@ -120,10 +124,15 @@ const Form = () => {
             }}
             onKeyDown={handleEnterSubmit}
           />
-          <div className="text-[red]">{inputError.email}</div>
+          <div className="text-[red] text-xs h-3 p-1">{inputError.email}</div>
         </div>
         <div className="col-span-1">
-          <label htmlFor="password">Password</label>
+          <label
+            htmlFor="password"
+            className="text-primary text-sm font-semibold m-1"
+          >
+            Password
+          </label>
           <div className="relative w-full">
             <input
               style={{
@@ -137,7 +146,6 @@ const Form = () => {
               autoComplete="false"
               type={passwordInputType}
               name="password"
-              placeholder="Password"
               value={data.password}
               onChange={(e) => {
                 if (e.target.value) {
@@ -166,7 +174,9 @@ const Form = () => {
               )}
             </button>
           </div>
-          <div className="text-[red]">{inputError.password}</div>
+          <div className="text-[red] text-xs h-3 p-1">
+            {inputError.password}
+          </div>
         </div>
       </div>
       {message && <div className="text-[red]">{message}</div>}
@@ -176,7 +186,7 @@ const Form = () => {
       >
         Forgot password?
       </Link>
-      <div className="self-center sm:self-start">
+      <div className="self-center ">
         <SubmitBtn
           ref={submitButton}
           onClick={async () => {

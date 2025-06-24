@@ -47,7 +47,9 @@ const AddComment = (props) => {
   return (
     <div className="w-full py-3">
       <div className={`flex gap-2 ${media ? "items-start" : "items-center"}`}>
-        <UserPicture profile={profile} />
+        <span className="w-12">
+          <UserPicture profile={profile} />
+        </span>
         <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center gap-2 bg-300 py-2 px-2 rounded-xl shadow-md">
             <textarea

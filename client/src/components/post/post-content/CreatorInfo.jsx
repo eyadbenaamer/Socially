@@ -14,7 +14,9 @@ const CreatorInfo = (props) => {
     <>
       {profile && (
         <div className="flex gap-3">
-          <UserPicture profile={profile} />
+          <span className="w-12">
+            <UserPicture profile={profile} />
+          </span>
           <div className="flex flex-col">
             <Link to={`/profile/${profile.username}`}>
               <span className=" hover:underline cursor-pointer">

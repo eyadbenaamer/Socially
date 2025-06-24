@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-const UserPicture = ({ profile }) => {
+const UserPicture = ({ profile, noLink = false }) => {
   const { _id: id, username, firstName, lastName, profilePicPath } = profile;
 
   const myProfile = useSelector((state) => state.profile);
@@ -24,29 +24,39 @@ const UserPicture = ({ profile }) => {
       .catch(() => setLoadedSrc(null));
   }, [profilePicPath]);
 
+  const imageContent = (
+    <>
+      {loadedSrc ? (
+        <img
+          src={loadedSrc}
+          alt={`${firstName} ${lastName}`}
+          width={48}
+          height={48}
+          className="h-full w-full object-cover rounded-full transition-opacity duration-200 ease-in"
+        />
+      ) : (
+        <div
+          className="h-full w-full bg-gray-300 animate-pulse rounded-full"
+          style={{ width: 48, height: 48 }}
+        />
+      )}
+    </>
+  );
+
   return (
     <div className="relative">
-      <Link
-        to={`/profile/${username}`}
-        className="circle w-12 h-12 shadow-md border-2 block"
-      >
-        {loadedSrc ? (
-          <img
-            src={loadedSrc}
-            alt={`${firstName} ${lastName}`}
-            width={48}
-            height={48}
-            className="h-full w-full object-cover rounded-full transition-opacity duration-200 ease-in"
-          />
-        ) : (
-          <div
-            className="h-full w-full bg-gray-300 animate-pulse rounded-full"
-            style={{ width: 48, height: 48 }}
-          />
-        )}
-      </Link>
+      {noLink ? (
+        <div className="circle shadow-md border-2 block">{imageContent}</div>
+      ) : (
+        <Link
+          to={`/profile/${username}`}
+          className="circle shadow-md border-2 block"
+        >
+          {imageContent}
+        </Link>
+      )}
 
-      {(isOnline || myProfile?._id === id) && (
+      {isOnline && myProfile?._id !== id && (
         <div className="green-dot h-3 w-3 circle bg-green-700 absolute left-0 bottom-0.5"></div>
       )}
     </div>

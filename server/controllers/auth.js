@@ -46,7 +46,11 @@ export const signup = async (req, res) => {
       }
     );
     // sends the verification code to the user's email address
-    await sendResetPasswordCode(email, verificationCode, verificationToken);
+    await sendAccountVerificationCode(
+      email,
+      verificationCode,
+      verificationToken
+    );
     newUser.verificationStatus.verificationToken = verificationToken;
     await newUser.save();
     // create a profile document for the new user with the user's ID
@@ -139,7 +143,11 @@ export const login = async (req, res) => {
       );
       user.verificationStatus.verificationToken = verificationToken;
       // send email with verification code if the email isn't verified
-      await sendResetPasswordCode(email, verificationCode, verificationToken);
+      await sendAccountVerificationCode(
+        email,
+        verificationCode,
+        verificationToken
+      );
       await user.save();
       return res.status(401).json({
         isVerified,

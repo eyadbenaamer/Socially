@@ -18,10 +18,10 @@ const ContactChat = () => {
   // otherwise the conversation is with a contact user
   return (
     <>
-      <div className="px-2 h-[80%]">
+      <div className="flex-1 overflow-y-scroll">
         <MessagesArea unreadMessagesCount={conversation.unreadMessagesCount} />
       </div>
-      <div className="absolute bottom-0 px-4 w-full">
+      <div className=" px-4 w-full">
         <SendMessage />
       </div>
     </>

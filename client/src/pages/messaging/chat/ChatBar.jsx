@@ -33,7 +33,9 @@ const ChatBar = () => {
       )}
       {participantProfile && (
         <>
-          <UserPicture profile={participantProfile} />
+          <span className="w-12">
+            <UserPicture profile={participantProfile} />
+          </span>
           <div className="flex flex-col justify-around">
             <Link
               to={`/profile/${participantProfile.username}`}
@@ -61,7 +63,9 @@ const ChatBar = () => {
 
       {!participantProfile && nonContactProfile && (
         <>
-          <UserPicture profile={nonContactProfile} />
+          <span className="w-12">
+            <UserPicture profile={nonContactProfile} />
+          </span>
           <div className="flex flex-col justify-around">
             <Link
               to={`/profile/${nonContactProfile.username}`}

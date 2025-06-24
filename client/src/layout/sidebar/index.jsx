@@ -8,6 +8,7 @@ import { ReactComponent as SavedPostsIcon } from "assets/icons/saved-posts.svg";
 import { ReactComponent as SearchIcon } from "assets/icons/search.svg";
 
 import SidebarItem from "./SidebarItem";
+import UserPicture from "components/UserPicture";
 
 const Sidebar = () => {
   const profile = useSelector((state) => state.profile);
@@ -30,8 +31,8 @@ const Sidebar = () => {
           to={`/profile/${profile.username}`}
           name={`${profile.firstName} ${profile.lastName}`}
         >
-          <span className="circle w-9 border-2">
-            <img className="h-full w-full" src={profile.profilePicPath} />
+          <span className="">
+            <UserPicture profile={profile} noLink={true} />
           </span>
         </SidebarItem>
 

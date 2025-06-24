@@ -1,88 +1,89 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const Time = (props) => {
   const { date, withDate, forChat } = props;
   const [literalTime, setLiteralTime] = useState("");
-  const getLiteralTime = () => {
-    const day = new Date(date).getDate();
-    const month = new Date(date).getMonth();
-    const year = new Date(date).getFullYear();
 
-    const currentDay = new Date().getDate();
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+  const getLiteralTime = useCallback(() => {
+    if (!date) {
+      setLiteralTime("");
+      return;
+    }
 
-    /*
-    if the passed date is not today so the returned string will be 
-    formatted by either if the passed date is at the same week or 
-    the same year or not in the same year, so it will be like the following:
-    at the same week: Sun 
-    at the year:Oct 15  
-    not at the same year:15/10/22  
-    */
-    const isToday =
-      year === currentYear && month === currentMonth && day === currentDay;
+    const targetDate = new Date(date);
+    const currentDate = new Date();
 
-    const isYesterday =
-      year === currentYear && month === currentMonth && day === currentDay - 1;
-    const isAtSameWeek =
-      year === currentYear &&
-      month === currentMonth &&
-      day !== currentDay &&
-      currentDay - day < 7;
-    const isAtSameYear = year === currentYear;
-    const isNotAtSameYear = year !== currentYear;
+    // Reset time to compare only dates
+    const targetDay = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate()
+    );
+    const currentDay = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate()
+    );
 
-    /*
-    if the passed date is today or the wanted value is 
-    just the time then return the time only
-    */
-    if (!withDate || isToday) {
+    // Calculate difference in days
+    const timeDiff = currentDay.getTime() - targetDay.getTime();
+    const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+
+    // If just time is needed or it's today
+    if (!withDate || daysDiff === 0) {
       if (forChat) {
         setLiteralTime("Today");
         return;
       }
-      let time = new Date(date).toLocaleString("default", {
+
+      let time = targetDate.toLocaleTimeString("default", {
         hourCycle: "h24",
         hour: "2-digit",
         minute: "2-digit",
       });
+
+      // Fix 24:00 issue (should be 00:00)
       if (time.startsWith("24")) {
         time = time.replace("24", "00");
       }
+
       setLiteralTime(time);
       return;
     }
-    if (isYesterday) {
+
+    // Yesterday
+    if (daysDiff === 1) {
       setLiteralTime("Yesterday");
       return;
     }
-    if (isAtSameWeek) {
+
+    // Within the same week (but not today or yesterday)
+    if (daysDiff > 1 && daysDiff < 7) {
       const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      const dayName = daysOfWeek[new Date(date).getDay()];
+      const dayName = daysOfWeek[targetDate.getDay()];
       setLiteralTime(dayName);
       return;
     }
-    if (isAtSameYear) {
-      const month = new Date(date).toLocaleString("default", {
+
+    // Same year but not within the same week
+    if (targetDate.getFullYear() === currentDate.getFullYear()) {
+      const month = targetDate.toLocaleDateString("default", {
         month: "short",
       });
-      setLiteralTime(`${day} ${month}`);
+      setLiteralTime(`${targetDate.getDate()} ${month}`);
       return;
     }
-    if (isNotAtSameYear) {
-      setLiteralTime(`${day}/${month}/${String(year).slice(2, 4)}`);
-      return;
-    }
-  };
+
+    // Different year
+    const day = targetDate.getDate().toString().padStart(2, "0");
+    const month = (targetDate.getMonth() + 1).toString().padStart(2, "0"); // Fix: add 1 to month
+    const year = targetDate.getFullYear().toString().slice(2, 4);
+    setLiteralTime(`${day}/${month}/${year}`);
+  }, [date, withDate, forChat]);
 
   useEffect(() => {
-    if (date) {
-      getLiteralTime();
-    } else {
-      setLiteralTime("");
-    }
-  }, [date]);
+    getLiteralTime();
+  }, [getLiteralTime]);
 
   return <div className="text-xs whitespace-nowrap">{literalTime}</div>;
 };

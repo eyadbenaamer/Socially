@@ -33,6 +33,10 @@ const EmailInput = (props) => {
         email: fieldValue.trim().toLowerCase(),
       }));
 
+      // Clear previous validation state before making new request
+      setCheck({ state: "", message: "" });
+      setIsEmailChecked(false);
+
       // checking of email availability
       axiosClient(`check_email_availability/${type}/${fieldValue}`)
         .then((response) => {
@@ -102,6 +106,13 @@ const EmailInput = (props) => {
             const value = e.target.value.trim();
             setData((prev) => ({ ...prev, email: value }));
             window.sessionStorage.setItem("email", value);
+
+            // Clear previous validation state when user types
+            if (check.state !== "" || check.message !== "") {
+              setCheck({ state: "", message: "" });
+              setIsEmailChecked(false);
+            }
+
             if (!focused && changed) {
               verifyValue(e.target);
             }

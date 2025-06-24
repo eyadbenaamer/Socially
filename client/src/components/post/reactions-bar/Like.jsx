@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Lottie from "react-lottie";
 
 import WhoLiked from "./WhoLiked";
@@ -21,6 +22,8 @@ const Like = (props) => {
     Boolean(likes.find((like) => like._id === profile?._id))
   );
   const [showLikes, setShowLikes] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const options = {
     loop: false,
     ariaRole: "icon-hover",
@@ -29,50 +32,50 @@ const Like = (props) => {
   };
 
   const likeToggle = async () => {
+    if (!profile || isLoading) return;
+
+    setIsLoading(true);
     setFirstLoad(false);
-    if (profile) {
-      //updating likes for user before making a request
-      setIsliked((prev) => !prev);
-      if (!isLiked) {
-        setLikes((prev) => {
-          prev.push(profile._id);
-          return prev;
-        });
-      } else {
-        setLikes((prev) => {
-          prev.filter((item) => item != profile._id);
-          return prev;
-        });
-      }
-      // makeing a request to update like status, if it failed then the likes will be restored
-      let url;
-      if (type === "post") {
-        url = `post/like-toggle?userId=${userId}&postId=${postId}`;
-      } else if (type === "comment") {
-        url = `comment/like-toggle?userId=${userId}&postId=${postId}&commentId=${commentId}`;
-      } else {
-        url = `reply/like-toggle?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
-      }
-      axiosClient
-        .patch(url)
-        .then((response) => {
-          setLikes(response.data.likes);
-        })
-        .catch(() => {
-          //if error eccoured restores likes
-          setIsliked((prev) => !prev);
-          if (!isLiked) {
-            setLikes((prev) => {
-              prev.push(profile._id);
-              return prev;
-            });
-          } else {
-            setLikes((prev) => {
-              prev.filter((item) => item != profile._id);
-              return prev;
-            });
-          }
-        });
+
+    // Store original state for potential rollback
+    const originalLikes = [...likes];
+    const originalIsLiked = isLiked;
+
+    // Optimistic update
+    const newIsLiked = !isLiked;
+    setIsliked(newIsLiked);
+
+    if (newIsLiked) {
+      // Adding like
+      setLikes((prev) => [...prev, profile._id]);
+    } else {
+      // Removing like
+      setLikes((prev) => prev.filter((id) => id !== profile._id));
+    }
+
+    // Make API request
+    let url;
+    if (type === "post") {
+      url = `post/like-toggle?userId=${userId}&postId=${postId}`;
+    } else if (type === "comment") {
+      url = `comment/like-toggle?userId=${userId}&postId=${postId}&commentId=${commentId}`;
+    } else {
+      url = `reply/like-toggle?userId=${userId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
+    }
+
+    try {
+      const response = await axiosClient.patch(url);
+      // Update with server response
+      setLikes(response.data.likes);
+      setIsliked(
+        Boolean(response.data.likes.find((like) => like._id === profile._id))
+      );
+    } catch (error) {
+      // Rollback on error
+      setLikes(originalLikes);
+      setIsliked(originalIsLiked);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,7 +89,13 @@ const Like = (props) => {
         <div className="relative">
           <div
             className="md:cursor-pointer absolute top-0 left-0 z-10 h-full w-full"
-            onClick={likeToggle}
+            onClick={() => {
+              if (profile) {
+                likeToggle();
+              } else {
+                navigate("/login");
+              }
+            }}
           ></div>
           <div className="w-8 scale-[3]">
             {isLiked && !firstLoad ? (
@@ -96,7 +105,7 @@ const Like = (props) => {
             )}
           </div>
         </div>
-        <div className="w-12">
+        <div className="w-18">
           {likes.length > 0 ? (
             <button
               className={"relative z-10 link"}

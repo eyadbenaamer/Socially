@@ -23,26 +23,29 @@ const PasswordInput = (props) => {
   const input = useRef(null);
 
   const verifyValue = () => {
+    // Get the actual input value, which might be different from fieldValue
+    const currentValue = input.current ? input.current.value : fieldValue;
+
     if (name === "password") {
-      if (!fieldValue) {
-        input.current.style.border = "solid 2px red";
-        setData((prev) => ({ ...prev, password: fieldValue }));
+      if (!currentValue) {
+        if (input.current) input.current.style.border = "solid 2px red";
+        setData((prev) => ({ ...prev, password: currentValue }));
         setCheck({ state: "fail", message: "Required" });
         return;
       }
-      const isValid = regex.test(fieldValue);
+      const isValid = regex.test(currentValue);
       if (isValid) {
         setData((prev) => ({
           ...prev,
-          [name]: fieldValue.trim(),
+          [name]: currentValue.trim(),
         }));
-        input.current.style.border = "solid 2px green";
+        if (input.current) input.current.style.border = "solid 2px green";
         setCheck({ state: "success" });
         return;
       }
       if (!isValid) {
-        input.current.style.border = "solid 2px red";
-        setData((prev) => ({ ...prev, [name]: fieldValue }));
+        if (input.current) input.current.style.border = "solid 2px red";
+        setData((prev) => ({ ...prev, [name]: currentValue }));
         setCheck({
           state: "fail",
           message: "Invalid password",
@@ -51,16 +54,16 @@ const PasswordInput = (props) => {
       return;
     }
     if (name === "confirmPassword") {
-      if (!input.current.value) {
-        input.current.style.border = "solid 2px red";
+      if (!currentValue) {
+        if (input.current) input.current.style.border = "solid 2px red";
         setCheck({ state: "fail", message: "Required" });
         return;
       }
-      if (input.current.value === data.password) {
-        input.current.style.border = "solid 2px green";
+      if (currentValue === data.password) {
+        if (input.current) input.current.style.border = "solid 2px green";
         setCheck({ state: "success" });
       } else {
-        input.current.style.border = "solid 2px red";
+        if (input.current) input.current.style.border = "solid 2px red";
         setCheck({ state: "fail", message: "Passwords don't match" });
       }
     }
@@ -71,17 +74,39 @@ const PasswordInput = (props) => {
     [check]
   );
 
+  // Initialize validation when component mounts and fieldValue is available
   useEffect(() => {
-    if (!focused && fieldValue && input.current) {
-      verifyValue(input.current);
+    if (fieldValue && input.current) {
+      // Wait for the next tick to ensure the input value is properly set
+      const timer = setTimeout(() => {
+        if (input.current && input.current.value === fieldValue) {
+          verifyValue();
+        }
+      }, 10);
+
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [fieldValue]); // Run when fieldValue changes (including initial load)
+
+  useEffect(() => {
+    // Only validate if we have a fieldValue and the input is not focused
+    // This ensures validation runs when fieldValue is restored from session storage
+    if (!focused && fieldValue && input.current) {
+      verifyValue();
+    }
+  }, [fieldValue, focused]); // Add fieldValue and focused as dependencies
 
   return (
     <>
       <label htmlFor={name}>{placeholder}</label>
       <div className="flex gap-2 items-center">
         <div className="relative w-full">
+          {/* Hidden dummy field to trick browser autofill */}
+          <input
+            type="text"
+            style={{ display: "none" }}
+            autoComplete="username"
+          />
           <input
             tabIndex={1}
             ref={input}
@@ -96,8 +121,12 @@ const PasswordInput = (props) => {
             type={inputType}
             name={name}
             placeholder={placeholder}
+            autoComplete="new-password"
+            readOnly={!focused}
             defaultValue={name === "password" ? data.password : ""}
             onFocus={(e) => {
+              // Remove readonly attribute when focused
+              e.target.removeAttribute("readonly");
               e.target.style.border = "solid 2px transparent";
               if (name === "password") {
                 setShowPasswordForm(true);
@@ -116,6 +145,8 @@ const PasswordInput = (props) => {
               }
             }}
             onBlur={(e) => {
+              // Add readonly attribute back when blurred
+              e.target.setAttribute("readonly", true);
               verifyValue(e.target);
               setFocused(false);
               setShowPasswordForm(false);

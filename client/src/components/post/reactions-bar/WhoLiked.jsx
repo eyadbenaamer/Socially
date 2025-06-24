@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import UserPicture from "components/UserPicture";
 
 import axiosClient from "utils/AxiosClient";
+import FollowToggleBtn from "components/FollowingBtn";
 
 const WhoLiked = (props) => {
   const { setIsOpened, likes } = props;
@@ -27,18 +28,19 @@ const WhoLiked = (props) => {
       <h1 className="py-2 text-lg">People Who Liked</h1>
       <ul className="flex flex-col gap-3">
         {profiles?.map((profile) => (
-          <li
-            onClick={() => setIsOpened(false)}
-            key={profile._id}
-            className="flex gap-2 items-center"
-          >
-            <UserPicture profile={profile} />
-            <Link
-              to={`/profile/${profile.username}`}
-              className="hover:underline"
-            >
-              {profile.firstName} {profile.lastName}
-            </Link>
+          <li key={profile._id} className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-12">
+                <UserPicture profile={profile} />
+              </span>
+              <Link
+                to={`/profile/${profile.username}`}
+                className="hover:underline"
+              >
+                {profile.firstName} {profile.lastName}
+              </Link>
+            </div>
+            <FollowToggleBtn id={profile._id} />
           </li>
         ))}
       </ul>

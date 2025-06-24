@@ -22,14 +22,16 @@ const CreatePost = () => {
   return (
     <>
       {/* the component will be rendered only on home page and the user's profile */}
-      {(!usernameParam || profile?.username == usernameParam) && (
+      {(!usernameParam || profile?.username === usernameParam) && (
         <section
           className={`create-post bg-200 w-full px-4 pt-5 pb-1 rounded-xl flex flex-col gap-3 shadow-md ${
             theme === "light" ? "border" : ""
           }`}
         >
           <div className="flex gap-3 items-center">
-            <UserPicture profile={profile} />
+            <span className="w-12">
+              <UserPicture profile={profile} />
+            </span>
             <div
               onClick={() => setIsOpened(!isOpened)}
               className="cursor-pointer h-[2.75rem] text-ellipsis overflow-clip rounded-xl bg-300 p-2 w-full shadow-md"
@@ -52,7 +54,11 @@ const CreatePost = () => {
             >
               <VideoIcon className="w-7" /> Video
             </div>
-            <Dialog isOpened={isOpened} setIsOpened={setIsOpened}>
+            <Dialog
+              isOpened={isOpened}
+              setIsOpened={setIsOpened}
+              preventClickOutside={true}
+            >
               <Form setIsOpened={setIsOpened} data={data} setData={setData} />
             </Dialog>
           </div>
