@@ -20,21 +20,19 @@ import Welcome from "pages/welcome";
 import Search from "pages/search";
 
 import Header from "layout/header";
-import InfoMessage from "components/InfoMessage";
+import InfoMessage from "components/popup-message";
 
 import { DialogProvider } from "components/dialog/DialogContext";
 import useHandleSocket, { connectToSocketServer } from "hooks/useHandleSocket";
 import useUpdate from "hooks/useUpdate";
-import { useWindowWidth } from "hooks/useWindowWidth";
 import { setConversations } from "state";
 
 const App = () => {
   //if user is stored in redux state, then the user is logged in
-  const { isLoggedin, isVerified, email } = useSelector(
+  const { isLoggedin, isVerified, email, token } = useSelector(
     (state) => state.authStatus
   );
   const theme = useSelector((state) => state.settings.theme);
-  const windowWidth = useWindowWidth();
   const dispatch = useDispatch();
 
   /*
@@ -119,7 +117,7 @@ const App = () => {
                 element={
                   isLoggedin && !isVerified ? (
                     <VerifyAccount />
-                  ) : isLoggedin && email && isVerified ? (
+                  ) : isLoggedin && (email || token) && isVerified ? (
                     <Navigate to="/welcome" replace={true} />
                   ) : (
                     <Navigate to="/" />
@@ -131,7 +129,7 @@ const App = () => {
                 element={
                   !isLoggedin || (isLoggedin && !isVerified) ? (
                     <VerifyAccountByLink />
-                  ) : isLoggedin && email && isVerified ? (
+                  ) : isLoggedin && (email || token) && isVerified ? (
                     <Navigate to="/welcome" replace={true} />
                   ) : (
                     <Navigate to="/" />

@@ -6,6 +6,7 @@ const initialState = {
   profile: null,
   authStatus: {
     email: null,
+    token: "",
     isLoggedin: false,
     isVerified: false,
   },

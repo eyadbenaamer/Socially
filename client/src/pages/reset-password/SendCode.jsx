@@ -10,34 +10,49 @@ import EmailInput from "components/EmailInput";
 const SendCode = () => {
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [data, setData] = useState({ email: "" });
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const submit = async () => {
-    await axiosClient
-      .post(`send_verification_code`, {
+    setLoading(true);
+
+    // Clear any existing reset password state before starting new process
+    dispatch(
+      setResetPasswordInfo({
+        email: null,
+        token: null,
+        message: "",
+        isCodeSent: false,
+        isPasswordReset: false,
+      })
+    );
+
+    try {
+      await axiosClient.post(`send_verification_code`, {
         type: "reset_password",
         email: data.email,
-      })
-      .then(() => {
-        dispatch(
-          setResetPasswordInfo({
-            email: data.email,
-            isCodeSent: true,
-            message: "",
-          })
-        );
-      })
-      .catch((error) => {
-        const { message } = error.response?.data;
-        dispatch(setResetPasswordInfo({ message }));
       });
+
+      dispatch(
+        setResetPasswordInfo({
+          email: data.email,
+          isCodeSent: true,
+          message: "",
+        })
+      );
+    } catch (error) {
+      const { message } = error.response?.data || {};
+      dispatch(setResetPasswordInfo({ message }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       <h1 className="font-bold text-2xl text-primary">Find your account</h1>
       <h2 className="mb-6">
-        Enter your email address to recieve a verification code
+        Enter your email address to receive a verification code
       </h2>
       <EmailInput
         placeholder=""
@@ -47,11 +62,11 @@ const SendCode = () => {
         setData={setData}
       />
       <SubmitBtn
-        disabled={!isValidEmail}
+        disabled={!isValidEmail || loading}
         tabIndex={1}
-        onClick={async () => await submit()}
+        onClick={submit}
       >
-        Send
+        {loading ? "Sending..." : "Send"}
       </SubmitBtn>
     </>
   );

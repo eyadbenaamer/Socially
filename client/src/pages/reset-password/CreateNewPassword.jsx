@@ -20,6 +20,7 @@ const CreateNewPassword = () => {
   const [data, setData] = useState({ password: "" });
   const dispatch = useDispatch();
   const [authInfo, setAuthInfo] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const isDisabled = () => {
     for (const key in isValidInputs) {
@@ -31,25 +32,34 @@ const CreateNewPassword = () => {
   };
 
   const resetPassword = async () => {
-    return await axiosClient
-      .post(`reset_password/${token}`, { password: data.password })
-      .then((response) => {
-        setAuthInfo(response.data);
-        dispatch(setResetPasswordInfo({ isPasswordReset: true }));
-      })
-      .catch((error) => {
-        const { message, isExpired } = error.response.data;
-        if (isExpired) {
-          /*
-          if token is expired then all reset password information will be reset
-          which will redirect back to searh account wizard
-          */
-          dispatch(
-            setResetPasswordInfo({ isCodeSent: false, token: null, message })
-          );
-        }
-        dispatch(setResetPasswordInfo({ message }));
+    setLoading(true);
+    try {
+      const response = await axiosClient.post(`reset_password/${token}`, {
+        password: data.password,
       });
+      setAuthInfo(response.data);
+      dispatch(setResetPasswordInfo({ isPasswordReset: true }));
+    } catch (error) {
+      const { message, isExpired } = error.response?.data || {};
+      if (isExpired) {
+        /*
+        if token is expired then all reset password information will be reset
+        which will redirect back to search account wizard
+        */
+        dispatch(
+          setResetPasswordInfo({
+            isCodeSent: false,
+            token: null,
+            email: null,
+            message: "Your reset link has expired. Please request a new one.",
+          })
+        );
+      } else {
+        dispatch(setResetPasswordInfo({ message }));
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const authenticateAfterReset = () => {
@@ -59,6 +69,7 @@ const CreateNewPassword = () => {
     dispatch(setProfile(profile));
     dispatch(setResetPasswordInfo(null));
   };
+
   return (
     <>
       {!isPasswordReset && (
@@ -87,11 +98,11 @@ const CreateNewPassword = () => {
             placeholder={"Confirm new password"}
           />
           <SubmitBtn
-            disabled={isDisabled()}
+            disabled={isDisabled() || loading}
             tabIndex={1}
-            onClick={async () => await resetPassword()}
+            onClick={resetPassword}
           >
-            Send
+            {loading ? "Resetting..." : "Reset Password"}
           </SubmitBtn>
         </>
       )}

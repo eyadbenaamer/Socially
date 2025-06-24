@@ -16,37 +16,62 @@ const VerifyCode = () => {
   const [resent, setResent] = useState(false);
 
   const verifyCode = async () => {
-    await axiosClient
-      .post(`verify_reset_password`, { code, email })
-      .then((response) => {
-        const { token } = response.data;
-        dispatch(setResetPasswordInfo({ token, message: "" }));
-      })
-      .catch(async (error) => {
-        let { message } = error.response.data;
-        if (message === "jwt expired") {
-          axiosClient.post(`send_verification_code`, {
+    setLoading(true);
+    try {
+      const response = await axiosClient.post(`verify_reset_password`, {
+        code,
+        email,
+      });
+      const { token } = response.data;
+      dispatch(setResetPasswordInfo({ token, isCodeSent: true, message: "" }));
+    } catch (error) {
+      let { message } = error.response?.data || {};
+      if (message === "jwt expired") {
+        // Automatically resend code when current one expires
+        try {
+          await axiosClient.post(`send_verification_code`, {
             type: "reset_password",
             email,
           });
-          message = "Code has expired. we sent another code to your email";
+          message = "Code has expired. A new code has been sent to your email";
+          // Clear the code input when a new code is sent
+          setCode("");
+        } catch (resendError) {
+          message = "Code has expired. Please request a new code.";
         }
-        dispatch(setResetPasswordInfo({ message }));
-      });
+      }
+      dispatch(setResetPasswordInfo({ message }));
+    } finally {
+      setLoading(false);
+    }
   };
+
   const sendBtn = useRef(null);
 
   const resendCode = async () => {
     setResending(true);
     setResent(false);
+    setCode(""); // Clear the current code input
+
     try {
       await axiosClient.post(`send_verification_code`, {
         type: "reset_password",
         email: email,
       });
+      dispatch(
+        setResetPasswordInfo({
+          email: email,
+          isCodeSent: true,
+          message: "",
+        })
+      );
       setResent(true);
-    } catch (e) {}
-    setResending(false);
+    } catch (error) {
+      const { message } = error.response?.data || {};
+      dispatch(setResetPasswordInfo({ message }));
+    } finally {
+      setResending(false);
+    }
   };
 
   return (
@@ -66,7 +91,7 @@ const VerifyCode = () => {
           value={code}
           placeholder="------"
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && code.length === 6 && !loading) {
               sendBtn.current.click();
             }
           }}
@@ -84,7 +109,7 @@ const VerifyCode = () => {
       <SubmitBtn
         disabled={code?.length < 6 || loading}
         ref={sendBtn}
-        onClick={async () => await verifyCode()}
+        onClick={verifyCode}
       >
         {loading ? "Verifying..." : "Verify"}
       </SubmitBtn>
@@ -102,7 +127,7 @@ const VerifyCode = () => {
           </span>
         )}
         <span className="text-gray-400 text-xs mt-2">
-          Code expires in 10 minutes.
+          Code expires in 1 minute.
         </span>
       </div>
     </div>

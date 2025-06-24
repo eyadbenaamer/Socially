@@ -1,57 +1,138 @@
 import { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { clearSessionStorage, setAuthStatus, setProfile } from "state/index.js";
 
 import axiosClient from "utils/AxiosClient.js";
 
-import { ReactComponent as NotFoundPicture } from "assets/not-found-2.svg";
+import { ReactComponent as TickIcon } from "assets/icons/tick.svg";
+import { ReactComponent as InfoIcon } from "assets/icons/info.svg";
+import { ReactComponent as RedCrossIcon } from "assets/icons/red-cross.svg";
 
 const VerifyAccountByLink = () => {
   const { isVerified } = useSelector((state) => state.authStatus);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [isAlreadyVerified, setIsAlreadyVerified] = useState(false);
   const dispatch = useDispatch();
   dispatch(clearSessionStorage());
   const { token } = useParams();
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (token) {
+      setIsLoading(true);
       axiosClient(`/verify_account?token=${token}`)
         .then((response) => {
-          const { token, profile, isVerified } = response.data;
+          const { token, profile, email } = response.data;
           localStorage.setItem("token", token);
           dispatch(setProfile(profile));
           dispatch(
             setAuthStatus({
               message: "",
               isLoggedin: true,
-              isVerified,
+              token,
+              isVerified: true,
+              email: email,
             })
           );
+          setIsLoading(false);
         })
-        .catch(() =>
-          setMessage("Not valid or expired link. Please try again.")
-        );
+        .catch((error) => {
+          const { alreadyVerified } = error.response?.data || {};
+          if (alreadyVerified) {
+            setMessage("Your account is already verified.");
+            setIsAlreadyVerified(true);
+            setTimeout(() => {
+              navigate("/login");
+            }, 3000);
+          } else {
+            setMessage(
+              "Invalid or expired verification link. Please try again."
+            );
+            setIsError(true);
+          }
+          setIsLoading(false);
+        });
     }
   }, []);
 
-  return (
-    <>
-      {/* once the account is verified, the router will redirect to the set profile page*/}
-      {isVerified && <Navigate to={"/welcome"} />}
-      {message && (
-        <div
-          className="container flex flex-col items-center p-3 text-2xl text-center justify-center"
-          style={{ height: "calc(100vh - 78px)" }}
-        >
-          <div className="w-full min-[425px]:w-[400px] sm:w-[500px] text-[transparent]">
-            <NotFoundPicture />
-          </div>
-          <div className="py-14">{message}</div>
+  if (isVerified) {
+    return <Navigate to={"/welcome"} />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Verifying your account...</p>
         </div>
-      )}
-    </>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-100 px-4">
+      <div className="max-w-md w-full">
+        <div className="bg-300 rounded-2xl shadow-xl p-8 text-center">
+          {/* Icon */}
+          <div className="mb-6">
+            {isAlreadyVerified ? (
+              <div className="mx-auto w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center">
+                <InfoIcon className="w-10 h-10 text-yellow-600" />
+              </div>
+            ) : isError ? (
+              <div className="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                <RedCrossIcon className="w-10 h-10" />
+              </div>
+            ) : (
+              <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                <TickIcon className="w-10 h-10" />
+              </div>
+            )}
+          </div>
+
+          {/* Title */}
+          <h1 className="text-2xl font-bold  mb-4">
+            {isAlreadyVerified
+              ? "Account Already Verified"
+              : isError
+              ? "Verification Failed"
+              : "Account Verified Successfully"}
+          </h1>
+
+          {/* Message */}
+          <p className=" mb-6 leading-relaxed">{message}</p>
+
+          {/* Additional info for already verified */}
+          {isAlreadyVerified && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-yellow-800">
+                You will be redirected to the login page in a few seconds.
+              </p>
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div className="space-y-3">
+            {isError && (
+              <button
+                onClick={() => (window.location.href = "/login")}
+                className="w-full bg-primary text-white py-3 px-6 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              >
+                Go to Login
+              </button>
+            )}
+
+            {isAlreadyVerified && (
+              <div className="text-sm ">Redirecting to login...</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -264,7 +264,10 @@ export const verifyAccountByCode = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
     if (user.verificationStatus.isVerified) {
-      return res.status(400).send("already verified");
+      return res.status(400).json({
+        message: "Account is already verified.",
+        alreadyVerified: true,
+      });
     }
     /*
       verify the verification code by the token that was created and associated with the code 
@@ -308,7 +311,10 @@ export const verifyAccountByToken = async (req, res) => {
       return res.status(400).send("Bad Request");
     }
     if (user.verificationStatus.isVerified) {
-      return res.status(400).send("already verified");
+      return res.status(400).json({
+        message: "Account is already verified.",
+        alreadyVerified: true,
+      });
     }
     if (userInfo.id === user.id) {
       user.verificationStatus.isVerified = true;
@@ -318,7 +324,9 @@ export const verifyAccountByToken = async (req, res) => {
         expiresIn: process.env.TOKEN_EXPIRATION,
       });
       await user.save();
-      return res.status(200).json({ profile, token, isVerified: true });
+      return res
+        .status(200)
+        .json({ profile, token, isVerified: true, email: user.email });
     } else {
       return res.status(400).send("Bad Request");
     }
@@ -405,7 +413,10 @@ export const sendVerificationCode = async (req, res) => {
     } else if (type === "verify_account") {
       await sendAccountVerificationCode(email, verificationCode, token);
       if (user.verificationStatus.isVerified) {
-        return res.status(400).send("already verified");
+        return res.status(400).json({
+          message: "Account is already verified.",
+          alreadyVerified: true,
+        });
       }
       user.verificationStatus.verificationToken = token;
       user.save();
@@ -455,7 +466,23 @@ export const verifyResetPasswordToken = async (req, res) => {
       if (!user) {
         return res.status(400).send("Bad Request");
       }
-      return res.status(200).json({ token: user.resetPasswordToken });
+
+      // Check if the user has a valid reset password token
+      if (!user.resetPasswordToken) {
+        return res.status(401).json({
+          message:
+            "No active password reset request found. Please request a new reset.",
+        });
+      }
+
+      // Verify that the stored token matches the one from the URL
+      if (user.resetPasswordToken !== verificationToken) {
+        return res.status(401).json({
+          message: "Invalid or expired reset link. Please request a new one.",
+        });
+      }
+
+      return res.status(200).json({ token: verificationToken });
     } catch {
       return res
         .status(401)

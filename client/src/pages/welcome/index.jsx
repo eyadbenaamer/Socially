@@ -133,7 +133,7 @@ const Welcome = () => {
                 .patch(`profile/set`, formData)
                 .then((resposnse) => {
                   // if the request was successful, the response will return the updated profile
-                  dispatch(setAuthStatus({ email: "" }));
+                  dispatch(setAuthStatus({ email: "", token: "" }));
                   dispatch(setProfile(resposnse.data));
                   connectToSocketServer();
                 })

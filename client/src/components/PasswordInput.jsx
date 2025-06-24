@@ -217,7 +217,7 @@ const PasswordInput = (props) => {
         </div>
       </div>
 
-      <div className="text-[red] h-3 text-sm">
+      <div className="text-[red] h-6 text-xs">
         {!focused ? check.message : ""}
       </div>
     </>

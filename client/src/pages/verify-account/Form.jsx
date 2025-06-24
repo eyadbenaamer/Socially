@@ -2,7 +2,7 @@ import SubmitBtn from "components/SubmitBtn";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setAuthStatus, setProfile } from "state";
+import { setAuthStatus, setProfile, logout } from "state";
 
 import axiosClient from "utils/AxiosClient";
 
@@ -28,7 +28,7 @@ const Form = (props) => {
         dispatch(setProfile(profile));
       })
       .catch(async (error) => {
-        let { message } = error.response.data;
+        let { message, alreadyVerified } = error.response.data;
         if (message === "jwt expired") {
           axiosClient.post(`send_verification_code`, {
             type: "verify_account",
@@ -36,9 +36,22 @@ const Form = (props) => {
           });
           message = "Code has expired. We sent another code to your email.";
         }
-        setMessage(message);
-        setIsAlertOpen(true);
-        dispatch(setAuthStatus({ isVerified: false }));
+
+        if (alreadyVerified) {
+          // If account is already verified, show message and log out
+          setMessage(
+            "Your account is already verified. You will be logged out."
+          );
+          setIsAlertOpen(true);
+          // Log out after a short delay to show the message
+          setTimeout(() => {
+            dispatch(logout());
+          }, 2000);
+        } else {
+          setMessage(message);
+          setIsAlertOpen(true);
+          dispatch(setAuthStatus({ isVerified: false }));
+        }
       });
     setLoading(false);
   };
@@ -53,7 +66,15 @@ const Form = (props) => {
       });
       setResent(true);
     } catch (e) {
-      setMessage("Failed to resend code. Try again later.");
+      const { message, alreadyVerified } = e.response?.data || {};
+      if (alreadyVerified) {
+        setMessage("Your account is already verified. You will be logged out.");
+        setTimeout(() => {
+          dispatch(logout());
+        }, 2000);
+      } else {
+        setMessage(message || "Failed to resend code. Try again later.");
+      }
       setIsAlertOpen(true);
     }
     setResending(false);
