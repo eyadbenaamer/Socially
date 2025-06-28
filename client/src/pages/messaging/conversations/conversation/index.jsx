@@ -58,7 +58,7 @@ const Conversation = ({ conversation }) => {
                 {participantProfile.firstName} {participantProfile.lastName}
               </div>
               {unreadMessagesCount > 0 && (
-                <div className="flex-shrink-0 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium">
+                <div className="flex-shrink-0 w-5 h-5 bg-primary text-white text-xs circle flex items-center justify-center font-medium">
                   {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
                 </div>
               )}

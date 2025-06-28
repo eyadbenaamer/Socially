@@ -26,7 +26,7 @@ const SharedPost = (props) => {
 
   return (
     <div
-      className={`shared-post flex flex-col gap-4 bg-200 w-full py-3 ${
+      className={`shared-post flex flex-col bg-200 w-full  ${
         theme === "light" ? "border" : ""
       }`}
     >
@@ -41,12 +41,12 @@ const SharedPost = (props) => {
             />
           </div>
           <div className="px-1 sm:px-4 flex flex-col gap-3">
-            <div className="p-1 mt-5">{post.text}</div>
+            <div className="p-1 my-2">{post.text}</div>
           </div>
           {post.files?.length > 0 && <Slider files={post.files} />}
         </div>
       )}
-      {post?.status == "not found" && (
+      {post?.status === "not found" && (
         <div className="bg-100 p-4 rounded-md m-1">
           This content is not available.
         </div>

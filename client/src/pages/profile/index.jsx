@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import Bar from "layout/bar";
 import Content from "./Content";
@@ -8,7 +8,6 @@ import CoverPicture from "./CoverPicture";
 import MessagingBtn from "./MessagingBtn";
 import AboutUser from "./AboutUser";
 import FollowToggleBtn from "components/FollowingBtn";
-import NotFound from "pages/NotFound";
 
 import { useWindowWidth } from "hooks/useWindowWidth";
 
@@ -18,8 +17,10 @@ export const ProfileContext = createContext();
 
 const Profile = () => {
   const windowWidth = useWindowWidth();
+  const navigate = useNavigate();
   const { username } = useParams();
   const myProfile = useSelector((state) => state.profile);
+
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
@@ -30,31 +31,41 @@ const Profile = () => {
         })
         .catch(() => setProfile("not found"));
     };
+    setProfile(null);
     getProfile();
   }, [username]);
 
+  if (profile === "not found") {
+    navigate("/not-found");
+    return;
+  }
+
   return (
     <ProfileContext.Provider value={{ ...profile, setProfile }}>
-      {profile === "not found" && <NotFound />}
-      {profile?._id && (
-        <>
-          <div className="container relative center px-2">
-            <div className="mb-20">
-              <CoverPicture />
-              <div dir="rtl" className="absolute w-[95%] my-5">
-                {myProfile && myProfile.username !== username && (
-                  <div className="flex gap-2 items-center">
-                    <FollowToggleBtn id={profile._id} />
-                    <MessagingBtn id={profile._id} />
-                  </div>
-                )}
-              </div>
+      <div className="container relative center px-2">
+        <div className="mb-20">
+          <CoverPicture />
+          {profile && (
+            <div dir="rtl" className="absolute w-[95%] my-5">
+              {myProfile && myProfile.username !== username && (
+                <div className="flex gap-2 items-center">
+                  <FollowToggleBtn id={profile._id} />
+                  <MessagingBtn id={profile._id} />
+                </div>
+              )}
             </div>
-            <AboutUser />
-            {profile && <Content profile={profile} />}
+          )}
+        </div>
+        {!profile && (
+          <div className="flex flex-col gap-2 py-2 px-4">
+            <div className="rounded-xl h-5 w-40 loading"></div>
+            <div className="user-name loading w-32 h-4 rounded-xl my-1"></div>
+            <div className="loading rounded-xl w-36 h-3"></div>
           </div>
-        </>
-      )}
+        )}
+        {profile && <AboutUser />}
+        {profile && <Content profile={profile} />}
+      </div>
       {windowWidth < 768 && myProfile && <Bar />}
     </ProfileContext.Provider>
   );

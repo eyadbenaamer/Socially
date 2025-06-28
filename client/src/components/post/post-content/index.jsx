@@ -7,6 +7,7 @@ import Text from "components/Text";
 import Slider from "components/slider";
 
 import { PostContext } from "..";
+import Views from "../reactions-bar/Views";
 
 const PostContent = () => {
   const {
@@ -21,7 +22,7 @@ const PostContent = () => {
 
   return (
     <>
-      <div className="flex justify-between px-4">
+      <div className="flex justify-between px-2 sm:px-4">
         <CreatorInfo
           creatorId={creatorId}
           createdAt={createdAt}
@@ -32,8 +33,8 @@ const PostContent = () => {
           <OptionsBtn setIsModifying={setIsModifying} />
         </div>
       </div>
-      <div className="flex flex-col gap-3 px-1 sm:px-4">
-        <div className="p-1">
+      <div className="flex flex-col w-full px-1 sm:px-4">
+        <div className="py-3 px-1">
           <Text
             postCreatorId={creatorId}
             text={text}
@@ -42,6 +43,9 @@ const PostContent = () => {
             isModifying={isModifying}
             setIsModifying={setIsModifying}
           />
+        </div>
+        <div className="self-end px-4 py-2">
+          <Views />
         </div>
         {files?.length > 0 && <Slider files={files} />}
       </div>

@@ -21,7 +21,7 @@ const ContactChat = () => {
       <div className="flex-1 overflow-y-scroll">
         <MessagesArea unreadMessagesCount={conversation.unreadMessagesCount} />
       </div>
-      <div className=" px-4 w-full">
+      <div className="px-4 w-full">
         <SendMessage />
       </div>
     </>

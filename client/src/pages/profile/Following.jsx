@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import Dialog from "components/dialog";
 import UserPicture from "components/UserPicture";
 import FollowToggleBtn from "components/FollowingBtn";
+import HoverWrapper from "components/user-hover-card/HoverWrapper";
 
 import { ProfileContext } from ".";
 
@@ -13,14 +14,10 @@ import convertToUnit from "utils/convertToUnit";
 
 const Following = () => {
   const { following } = useContext(ProfileContext);
-  const [users, setUsers] = useState([]);
   const [showFollowing, setShowFollowing] = useState(false);
   const myProfile = useSelector((state) => state.profile);
 
-  // close this widget whenever the profile param is changed
-  useEffect(() => {
-    setShowFollowing(false);
-  }, [useParams()]);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -48,8 +45,8 @@ const Following = () => {
         </div>
       )}
       <Dialog isOpened={showFollowing} setIsOpened={setShowFollowing}>
-        <div className="px-4 flex flex-col gap-2 w-[90vw] sm:w-[500px]">
-          <div className="text-xl">Following</div>
+        <div className="px-4 flex flex-col gap-2 min-h-[50vh] w-[90vw] sm:w-[500px]">
+          <div className="text-xl p-3">Following</div>
           <ul className="flex flex-col gap-3">
             {users?.map((user) => {
               const { _id: id, username, firstName, lastName } = user;
@@ -59,9 +56,11 @@ const Following = () => {
                     <span className="w-12">
                       <UserPicture profile={user} />
                     </span>
-                    <Link to={`/profile/${username}`} className="link">
-                      {firstName} {lastName}
-                    </Link>
+                    <HoverWrapper profile={user}>
+                      <Link to={`/profile/${username}`} className="link">
+                        {firstName} {lastName}
+                      </Link>
+                    </HoverWrapper>
                   </div>
                   {myProfile?._id !== id && <FollowToggleBtn id={id} />}
                 </li>

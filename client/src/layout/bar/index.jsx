@@ -32,7 +32,7 @@ const Bar = () => {
 
         <BarItem to={`/profile/${profile.username}`}>
           <span className="w-[36px]">
-            <UserPicture profile={profile} noLink={true} />
+            <UserPicture profile={profile} noLink />
           </span>
         </BarItem>
 

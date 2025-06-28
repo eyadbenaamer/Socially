@@ -6,7 +6,7 @@ const SearchResults = ({ results, isLoading }) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin circle h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -34,10 +34,10 @@ const SearchResults = ({ results, isLoading }) => {
                     <img
                       src={result.avatar}
                       alt={result.name}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-12 h-12 circle object-cover"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                    <div className="w-12 h-12 circle bg-gray-200 flex items-center justify-center">
                       <User className="w-6 h-6 text-gray-500" />
                     </div>
                   )}

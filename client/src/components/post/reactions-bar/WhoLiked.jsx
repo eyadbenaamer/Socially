@@ -5,9 +5,10 @@ import UserPicture from "components/UserPicture";
 
 import axiosClient from "utils/AxiosClient";
 import FollowToggleBtn from "components/FollowingBtn";
+import HoverWrapper from "components/user-hover-card/HoverWrapper";
 
 const WhoLiked = (props) => {
-  const { setIsOpened, likes } = props;
+  const { likes } = props;
   const [profiles, setProfiles] = useState([]);
 
   useEffect(() => {
@@ -24,8 +25,8 @@ const WhoLiked = (props) => {
   }, []);
 
   return (
-    <div className="w-[250px] sm:w-[500px] p-2">
-      <h1 className="py-2 text-lg">People Who Liked</h1>
+    <div className="w-[250px] sm:w-[500px] p-2 min-h-[50vh]">
+      <h1 className="pb-4 text-lg">People Who Liked</h1>
       <ul className="flex flex-col gap-3">
         {profiles?.map((profile) => (
           <li key={profile._id} className="flex items-center justify-between">
@@ -33,12 +34,14 @@ const WhoLiked = (props) => {
               <span className="w-12">
                 <UserPicture profile={profile} />
               </span>
-              <Link
-                to={`/profile/${profile.username}`}
-                className="hover:underline"
-              >
-                {profile.firstName} {profile.lastName}
-              </Link>
+              <HoverWrapper profile={profile}>
+                <Link
+                  to={`/profile/${profile.username}`}
+                  className="hover:underline h-fit"
+                >
+                  {profile.firstName} {profile.lastName}
+                </Link>
+              </HoverWrapper>
             </div>
             <FollowToggleBtn id={profile._id} />
           </li>

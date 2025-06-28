@@ -64,7 +64,7 @@ const SearchInput = ({ query, setQuery, suggestions, loading }) => {
 
       {loading && (
         <div className="absolute right-4 top-1/2 -translate-y-1/2">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+          <div className="animate-spin circle h-5 w-5 border-b-2 border-primary"></div>
         </div>
       )}
     </div>

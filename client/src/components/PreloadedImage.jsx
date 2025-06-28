@@ -28,13 +28,13 @@ const PreloadedImage = ({
       alt={alt}
       width={width}
       height={height}
-      className={`object-cover rounded-full transition-opacity duration-200 ease-in ${className}`}
+      className={`object-cover circle transition-opacity duration-200 ease-in ${className}`}
       style={{ opacity: 1 }}
     />
   ) : (
     <div
       style={{ width, height }}
-      className={`rounded-full bg-gray-300 animate-pulse ${className}`}
+      className={`circle bg-gray-300 animate-pulse ${className}`}
     />
   );
 };

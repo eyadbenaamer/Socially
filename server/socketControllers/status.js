@@ -30,14 +30,13 @@ export const connectHandler = async (socket, io) => {
     });
 
     //set all undelivered messages to delivered when the user connects
-    user.undeliveredConversations.map(async (undeliveredConversation) => {
+    for (const undeliveredConversation of user.undeliveredConversations.slice()) {
       const conversation = await Conversation.findById(
         undeliveredConversation.id
       );
       if (!conversation) {
-        undeliveredConversation.deleteOne();
-        await user.save();
-        return;
+        user.undeliveredConversations.pull(undeliveredConversation._id);
+        continue;
       }
       const messagesInfo = [];
       undeliveredConversation.messages.map((item) => {
@@ -49,8 +48,7 @@ export const connectHandler = async (socket, io) => {
       await conversation.save();
 
       // delete this undelivered conversation from undeliveredConversations array
-      undeliveredConversation.deleteOne();
-      await user.save();
+      user.undeliveredConversations.pull(undeliveredConversation._id);
 
       // after setting deliverdTo to all messages, send them to the participants
       conversation.participants.map((participant) => {
@@ -62,7 +60,8 @@ export const connectHandler = async (socket, io) => {
           });
         });
       });
-    });
+    }
+    await user.save();
   }
 };
 

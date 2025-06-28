@@ -37,7 +37,7 @@ const CoverPicture = () => {
         )}
         <img
           alt={username || "profile"}
-          className={`h-full max-w-fit min-w-full object-cover rounded-full transition-opacity duration-300 ${
+          className={`h-full max-w-fit min-w-full object-cover circle transition-opacity duration-300 ${
             profileLoaded ? "opacity-100" : "opacity-0"
           }`}
           src={profilePicPath}

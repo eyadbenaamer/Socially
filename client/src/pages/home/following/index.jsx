@@ -27,7 +27,7 @@ const Following = () => {
   return (
     <section className="fixed flex flex-col gap-5 px-2 h-[80vh]">
       <h1 className="text-lg">People you follow</h1>
-      <ul className="flex flex-col gap-3 overflow-y-scroll w-[250px] center py-2">
+      <ul className="flex flex-col gap-3 overflow-y-scroll w-[250px] center py-2 h-full overflow-x-hidden z-40">
         {/* show only 20 following if following more than 20, otherwise show them all  */}
         {users &&
           users.slice(0, users.length < 20 ? users.length : 20).map((user) => {

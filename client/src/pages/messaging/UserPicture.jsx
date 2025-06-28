@@ -30,7 +30,7 @@ const UserPicture = ({ profile, isOnline }) => {
             alt={`${firstName} ${lastName}`}
             width={48}
             height={48}
-            className="h-full w-full object-cover rounded-full transition-opacity duration-200 ease-in"
+            className="h-full w-full object-cover circle transition-opacity duration-200 ease-in"
           />
         ) : (
           <div

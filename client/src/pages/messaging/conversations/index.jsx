@@ -12,7 +12,7 @@ import { ReactComponent as LoadingIcon } from "assets/icons/loading-circle.svg";
 
 const Conversations = () => {
   const conversations = useSelector((state) => state.conversations);
-  const [page, setPage] = useState(2);
+  const pageRef = useRef(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isFinished, setIsFinished] = useState(false);
@@ -25,6 +25,7 @@ const Conversations = () => {
   // Fetch initial conversations
   useEffect(() => {
     setIsInitialLoading(true);
+    pageRef.current = 1;
     axiosClient("conversation/all?page=1")
       .then((response) => {
         const data = response.data;
@@ -32,6 +33,7 @@ const Conversations = () => {
           setIsFinished(true);
         }
         dispatch(setConversations(data));
+        pageRef.current = 2; // Next page will be 2
       })
       .catch((err) => {
         console.error("Failed to fetch initial conversations:", err);
@@ -41,16 +43,21 @@ const Conversations = () => {
 
   // Fetch next page of conversations
   const fetchNextPage = useCallback(async () => {
-    if (isLoading || isFinished) return;
+    if (isLoading || isFinished || isInitialLoading) return;
 
     setIsLoading(true);
     try {
-      const response = await axiosClient(`conversation/all?page=${page}`);
+      const response = await axiosClient(
+        `conversation/all?page=${pageRef.current}`
+      );
       const data = response.data;
 
       if (data?.length > 0) {
-        dispatch(setConversations([...conversations, ...data]));
-        setPage((prev) => prev + 1);
+        // Deduplicate by _id
+        const existingIds = new Set(conversations.map((c) => c._id));
+        const newConvs = data.filter((c) => !existingIds.has(c._id));
+        dispatch(setConversations([...conversations, ...newConvs]));
+        pageRef.current += 1;
 
         if (data.length < 10) {
           setIsFinished(true);
@@ -63,7 +70,7 @@ const Conversations = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, isLoading, isFinished, conversations, dispatch]);
+  }, [isLoading, isFinished, isInitialLoading, conversations, dispatch]);
 
   // Use infinite scroll hook
   const { loadingRef } = useInfiniteScroll(

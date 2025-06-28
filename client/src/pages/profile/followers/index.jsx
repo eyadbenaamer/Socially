@@ -1,10 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import Dialog from "components/dialog";
 import UserPicture from "components/UserPicture";
 import FollowToggleBtn from "components/FollowingBtn";
 import RemoveFollowerBtn from "./RemoveFollowerBtn";
+import HoverWrapper from "components/user-hover-card/HoverWrapper";
 
 import { ProfileContext } from "..";
 
@@ -15,11 +16,6 @@ const Followers = () => {
   const { followers } = useContext(ProfileContext);
   const [users, setUsers] = useState([]);
   const [showFollowers, setShowFollowers] = useState(false);
-
-  // close this widget whenever the profile param is changed
-  useEffect(() => {
-    setShowFollowers(false);
-  }, [useParams()]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -46,9 +42,9 @@ const Followers = () => {
         </div>
       )}
       <Dialog isOpened={showFollowers} setIsOpened={setShowFollowers}>
-        <div className="px-4 flex flex-col gap-2 w-[90vw] sm:w-[500px]">
+        <div className="px-4 flex flex-col gap-2 min-h-[50vh] w-[90vw] sm:w-[500px]">
           <div className="text-xl">Followers</div>
-          <ul className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-5">
             {users?.map((user) => {
               const { _id: id, username, firstName, lastName } = user;
               return (
@@ -57,9 +53,11 @@ const Followers = () => {
                     <span className="w-12">
                       <UserPicture profile={user} />
                     </span>
-                    <Link to={`/profile/${username}`} className="link">
-                      {firstName} {lastName}
-                    </Link>
+                    <HoverWrapper profile={user}>
+                      <Link to={`/profile/${username}`} className="link">
+                        {firstName} {lastName}
+                      </Link>
+                    </HoverWrapper>
                   </div>
                   <div className="flex gap-2 items-center">
                     <FollowToggleBtn id={id} />

@@ -1,67 +1,78 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect } from "react";
 
 import ToggleButtons from "./ToggleButtons";
-
-import { useWindowWidth } from "hooks/useWindowWidth";
 
 import "./index.css";
 
 const Slider = (props) => {
   const { files } = props;
-  const slider = useRef();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const windowWidth = useWindowWidth();
-  const [slideWidth, setSlideWidth] = useState(slider.current?.clientWidth);
+  const [loadingStates, setLoadingStates] = useState({});
 
-  useEffect(() => {
-    setSlideWidth(slider.current?.clientWidth);
-  }, [windowWidth]);
+  const file = files[currentSlide];
 
+  // Set up loading state for all images on files change
   useEffect(() => {
-    if (slider.current) {
-      slider.current.addEventListener("scrollend", () => {
-        const scroll = Math.round(slider.current.scrollLeft);
-        if (scroll / slideWidth == Math.round(scroll / slideWidth)) {
-          setCurrentSlide(Math.round(scroll / slideWidth));
-        }
-      });
-      slider.current.scrollTo({
-        left: currentSlide * slideWidth,
-        behavior: "smooth",
-      });
-    }
-  }, [slider.current?.clientWidth, currentSlide]);
+    if (!files || files.length === 0) return;
+    const initialLoadingStates = {};
+    files.forEach((file, index) => {
+      if (file.fileType === "photo") {
+        initialLoadingStates[index] = true;
+      }
+    });
+    setLoadingStates(initialLoadingStates);
+  }, [files]);
+
+  // Load current, previous, and next images when currentSlide changes
+  useEffect(() => {
+    if (!files || files.length === 0) return;
+    const indicesToLoad = [currentSlide];
+    if (currentSlide > 0) indicesToLoad.push(currentSlide - 1);
+    if (currentSlide < files.length - 1) indicesToLoad.push(currentSlide + 1);
+
+    indicesToLoad.forEach((index) => {
+      const file = files[index];
+      if (file && file.fileType === "photo") {
+        setLoadingStates((prev) => ({ ...prev, [index]: true }));
+        const img = new Image();
+        img.onload = () => {
+          setLoadingStates((prev) => ({ ...prev, [index]: false }));
+        };
+        img.onerror = () => {
+          setLoadingStates((prev) => ({ ...prev, [index]: false }));
+        };
+        img.src = file.path;
+      }
+    });
+  }, [currentSlide, files]);
 
   return (
     <>
-      <div className="flex flex-col w-full">
-        <div className="relative w-full mx-auto">
-          {windowWidth > 768 && (
-            <ToggleButtons
-              slidesCount={files?.length}
-              currentSlide={currentSlide}
-              setCurrentSlide={setCurrentSlide}
-            />
-          )}
-          <div ref={slider} className="slider w-full rounded-lg">
-            <div className="w-max h-[40svh] sm:h-[500px]">
-              {files?.map((file, i) => (
-                <div
-                  style={{ width: slideWidth }}
-                  className="inline-block h-full"
-                >
-                  <div className="slide">
-                    {file.fileType === "photo" ? (
-                      <img src={file.path} alt={`media ${i + 1}`} />
-                    ) : (
-                      <video controls alt={`media ${i + 1}`} />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className="relative w-full rounded-2xl overflow-hidden h-[30svh] sm:h-[420px] flex justify-center items-center mb-3">
+        <ToggleButtons
+          slidesCount={files?.length}
+          currentSlide={currentSlide}
+          setCurrentSlide={setCurrentSlide}
+        />
+
+        {/* Loading effect for current slide */}
+        {loadingStates[currentSlide] && (
+          <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-800">
+            <div className="loading-shimmer w-full h-full"></div>
           </div>
-        </div>
+        )}
+
+        {!loadingStates[currentSlide] && file.fileType === "photo" && (
+          <img
+            className="w-full rounded-2xl"
+            loading="lazy"
+            src={file.path}
+            alt={`media ${currentSlide + 1}`}
+          />
+        )}
+        {!loadingStates[currentSlide] && file.fileType === "video" && (
+          <video controls alt={`media ${currentSlide + 1}`} />
+        )}
       </div>
 
       {files?.length > 1 && (
@@ -72,7 +83,7 @@ const Slider = (props) => {
                 key={i}
                 className={`bg-inverse w-[6px] aspect-square ${
                   i !== currentSlide ? " opacity-20" : ""
-                }`}
+                } ${loadingStates[i] ? "animate-pulse" : ""}`}
                 style={{ borderRadius: "50%" }}
               ></div>
             );

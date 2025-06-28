@@ -32,7 +32,7 @@ const Sidebar = () => {
           name={`${profile.firstName} ${profile.lastName}`}
         >
           <span className="">
-            <UserPicture profile={profile} noLink={true} />
+            <UserPicture profile={profile} noLink />
           </span>
         </SidebarItem>
 

@@ -66,7 +66,7 @@ const VerifyAccountByLink = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="animate-spin circle h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-lg text-gray-600">Verifying your account...</p>
         </div>
       </div>
@@ -80,15 +80,15 @@ const VerifyAccountByLink = () => {
           {/* Icon */}
           <div className="mb-6">
             {isAlreadyVerified ? (
-              <div className="mx-auto w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center">
+              <div className="mx-auto w-20 h-20 bg-yellow-100 circle flex items-center justify-center">
                 <InfoIcon className="w-10 h-10 text-yellow-600" />
               </div>
             ) : isError ? (
-              <div className="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+              <div className="mx-auto w-20 h-20 bg-red-100 circle flex items-center justify-center">
                 <RedCrossIcon className="w-10 h-10" />
               </div>
             ) : (
-              <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+              <div className="mx-auto w-20 h-20 bg-green-100 circle flex items-center justify-center">
                 <TickIcon className="w-10 h-10" />
               </div>
             )}

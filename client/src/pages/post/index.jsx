@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { Post as PostComponent } from "components/post";
-import NotFound from "pages/NotFound";
 
 import axiosClient from "utils/AxiosClient";
 
 const Post = () => {
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [searchParams] = useSearchParams();
 
@@ -26,7 +26,8 @@ const Post = () => {
   }, [postId]);
 
   if (post === "not found") {
-    return <NotFound />;
+    navigate("/not-found", { replace: true });
+    return null;
   }
 
   return (

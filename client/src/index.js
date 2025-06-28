@@ -43,13 +43,13 @@ at least once, therefore the loading effect won't be applied.
 const isLoaded = sessionStorage.getItem("isLoaded");
 
 root.render(
-  <StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistStore(store)}>
-        <Suspense fallback={!isLoaded ? <Loading /> : null}>
-          <App />
-        </Suspense>
-      </PersistGate>
-    </Provider>
-  </StrictMode>
+  // <StrictMode>
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistStore(store)}>
+      <Suspense fallback={!isLoaded ? <Loading /> : null}>
+        <App />
+      </Suspense>
+    </PersistGate>
+  </Provider>
+  // </StrictMode>
 );

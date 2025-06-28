@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import Comments from "./commnets";
@@ -37,7 +37,7 @@ export const Post = (props) => {
               commentInput,
             }}
           >
-            <div className="flex flex-col gap-4 bg-200 rounded-xl w-full py-3">
+            <div className="flex flex-col bg-200 rounded-xl w-full pt-6 pb-4">
               <PostContent />
               {post.sharedPost && <SharedPost post={post.sharedPost} />}
               <ReactionsBar />

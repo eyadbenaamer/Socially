@@ -219,6 +219,11 @@ export const deleteConversation = async (req, res) => {
 
     await conversation.deleteOne();
 
+    await User.updateMany(
+      { "undeliveredConversations._id": conversation._id },
+      { $pull: { undeliveredConversations: { _id: conversation._id } } }
+    );
+
     return res.status(200).send("success");
   } catch (err) {
     return handleError(err, res);
