@@ -3,11 +3,9 @@ import { Client } from "@elastic/elasticsearch";
 
 import Profile from "../models/profile.js";
 
-const ENV = process.env.ENV;
 const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL;
 const ELASTICSEARCH_USER = process.env.ELASTICSEARCH_USER;
 const ELASTICSEARCH_PASSWORD = process.env.ELASTICSEARCH_PASSWORD;
-const ELASTICSEARCH_API_KEY = process.env.ELASTICSEARCH_API_KEY;
 
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -31,25 +29,16 @@ const INDEX_CONFIG = {
 
 let clientData;
 
-if (ENV === "production") {
-  clientData = {
-    node: ELASTICSEARCH_URL,
-    auth: {
-      apiKey: ELASTICSEARCH_API_KEY,
-    },
-    serverMode: "serverless",
-  };
-} else {
-  clientData = {
-    node: ELASTICSEARCH_URL,
-    auth: {
-      username: ELASTICSEARCH_USER,
-      password: ELASTICSEARCH_PASSWORD,
-    },
-  };
-}
+clientData = {
+  node: ELASTICSEARCH_URL,
+  auth: {
+    username: ELASTICSEARCH_USER,
+    password: ELASTICSEARCH_PASSWORD,
+  },
+};
 
 const client = new Client(clientData);
+
 const indexProfiles = async () => {
   const profiles = await Profile.find({});
   console.log(`Found ${profiles.length} profiles.`);
@@ -102,7 +91,6 @@ export const initializeElasticsearch = async () => {
     console.log("Elasticsearch initialization complete.");
   } catch (error) {
     console.error("Failed to initialize Elasticsearch:", error);
-    throw error;
   }
 };
 
