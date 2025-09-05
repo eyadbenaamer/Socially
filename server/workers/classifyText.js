@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
 import Post from "../models/post.js";
 import classifyText from "../services/classifyText.js";
-import { config } from "dotenv";
-
-config();
 
 const workerConnect = async () => {
   try {

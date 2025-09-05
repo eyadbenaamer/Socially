@@ -19,7 +19,7 @@ const VerifyAccount = () => {
       {/* once the account is verified, the router will redirect to the set profile page*/}
       {isVerified && <Navigate to={"/welcome"} />}
       <div className="container flex flex-col p-3">
-        <div className="">
+        <div>
           {isAlertOpen && (
             <Alert
               isOpened={isAlertOpen}

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import UserPicture from "components/UserPicture";
 import { PostContext } from ".";
@@ -9,18 +9,24 @@ import axiosClient from "utils/AxiosClient";
 import { ReactComponent as PhotoIcon } from "assets/icons/photo.svg";
 import { ReactComponent as AddCommentIcon } from "assets/icons/create-comment.svg";
 import { ReactComponent as CloseIcon } from "assets/icons/cross.svg";
+import { setShowMessage } from "state";
 
 const AddComment = (props) => {
-  const { type, commentId } = props;
+  const { type, commentId, setReplies, setRepliesCount } = props;
   const {
-    setPost,
     _id: postId,
     creatorId,
+    setPost,
+    setComments,
     commentInput,
+    setIsCommentsDisabled,
   } = useContext(PostContext);
   const profile = useSelector((state) => state.profile);
+
   const [text, setText] = useState("");
   const [media, setMedia] = useState(null);
+
+  const dispatch = useDispatch();
   const mediaBtn = useRef(null);
 
   const addComment = () => {
@@ -33,8 +39,37 @@ const AddComment = (props) => {
         : `reply/add?userId=${creatorId}&postId=${postId}&commentId=${commentId}`;
     axiosClient
       .post(requestUrl, formData)
-      .then((response) => setPost(response.data))
-      .catch((err) => {});
+      .then((response) => {
+        if (type === "comment") {
+          setPost((prev) => ({
+            ...prev,
+            commentsCount: prev.commentsCount + 1,
+          }));
+          setComments((prev) => [...prev, response.data]);
+        }
+        if (type === "reply") {
+          setReplies((prev) => [...prev, response.data]);
+          setRepliesCount((prev) => prev + 1);
+        }
+      })
+      .catch((err) => {
+        if (err.response) {
+          dispatch(
+            setShowMessage({
+              message: err.response.data?.message,
+              type: "error",
+            })
+          );
+          setIsCommentsDisabled(true);
+        } else {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Please try again later.",
+              type: "error",
+            })
+          );
+        }
+      });
   };
   useEffect(() => {
     if (commentInput.current) {

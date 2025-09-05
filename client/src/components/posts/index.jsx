@@ -35,7 +35,6 @@ const Posts = () => {
         if (response.data?.length === 0) {
           setIsPostsFinished(true);
         }
-
         setPosts((prev) =>
           prev ? [...prev, ...response.data] : [...response.data]
         );
@@ -68,7 +67,7 @@ const Posts = () => {
       .catch((error) => {
         // Don't set error message if request was aborted
         if (error.name !== "CanceledError") {
-          setMessage("An error occurred. please try again later.");
+          setMessage("An error occurred. Please try again later.");
         }
       })
       .finally(() => {
@@ -101,7 +100,7 @@ const Posts = () => {
 
   return (
     <PostsContext.Provider value={{ posts, setPosts }}>
-      <div className="flex flex-col gap-y-4 items-center pb-20">
+      <div className="flex flex-col gap-y-4 items-center">
         <CreatePost />
 
         {posts?.map((post) => (

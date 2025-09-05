@@ -71,16 +71,17 @@ const indexProfiles = async () => {
 };
 
 // Initialize Elasticsearch
-export const initializeElasticsearch = async () => {
+export const initializeElasticsearch = async (reindex = false) => {
   try {
     const indexExists = await client.indices.exists({ index: "profiles" });
 
-    if (indexExists) {
+    if (indexExists && !reindex) {
       console.log("Elasticsearch index already exists.");
       return;
     }
 
     console.log("Creating Elasticsearch index...");
+    await client.indices.delete({ index: "profiles" }).catch(() => {});
     await client.indices.create({
       index: "profiles",
       body: INDEX_CONFIG,
@@ -99,7 +100,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   (async () => {
     try {
       await mongoose.connect(MONGO_URI);
-      await initializeElasticsearch();
+      await initializeElasticsearch(true);
       console.log("Done reindexing.");
       process.exit(0);
     } catch (error) {

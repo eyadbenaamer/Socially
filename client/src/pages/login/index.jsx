@@ -15,7 +15,7 @@ const Login = () => {
   dispatch(setResetPasswordInfo(null));
 
   return (
-    <div className="min-h-[calc(100dvh-145px)] flex">
+    <div className="min-h-[calc(100vh-45px)] flex">
       <div className="flex-1 flex items-center justify-center px-8">
         <div className="w-full max-w-xl">
           <div className="text-center mb-8">
@@ -34,7 +34,7 @@ const Login = () => {
                 theme === "dark" ? "border-gray-700" : "border-gray-300"
               }`}
             >
-              <p className="">
+              <p>
                 Don't have an account?{" "}
                 <Link
                   to="/signup"

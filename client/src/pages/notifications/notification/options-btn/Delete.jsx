@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 
 import axiosClient from "utils/AxiosClient";
-import { removeNotification } from "state";
+import { removeNotification, setShowMessage } from "state";
 
 import { ReactComponent as TrashIcon } from "assets/icons/trash-basket.svg";
 
@@ -13,7 +13,33 @@ const Delete = (props) => {
   const deleteMessage = async () => {
     await axiosClient
       .delete(`notifications/delete/${id}`)
-      .then(() => dispatch(removeNotification(id)));
+      .then(() => {
+        dispatch(removeNotification(id));
+        dispatch(
+          setShowMessage({
+            message: "Notification deleted.",
+            type: "info",
+          })
+        );
+      })
+      .catch((err) => {
+        if (err.response) {
+          dispatch(removeNotification(id));
+          dispatch(
+            setShowMessage({
+              message: err.response.data.message,
+              type: "error",
+            })
+          );
+        } else {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Please try again later.",
+              type: "error",
+            })
+          );
+        }
+      });
   };
 
   return (

@@ -21,7 +21,7 @@ const Sidebar = () => {
 
   return (
     <aside className="fixed">
-      <ul className="flex flex-col gap-3 items-start px-2 w-full">
+      <ul className="flex flex-col gap-3 px-2 w-full">
         <SidebarItem to={"/"} name={"Home"}>
           <HomeIcon
             className={`${location.pathname === "/" ? "text-primary" : ""}`}
@@ -31,9 +31,9 @@ const Sidebar = () => {
           to={`/profile/${profile.username}`}
           name={`${profile.firstName} ${profile.lastName}`}
         >
-          <span className="">
+          <div className="w-9">
             <UserPicture profile={profile} noLink />
-          </span>
+          </div>
         </SidebarItem>
 
         <SidebarItem to={"/search"} name={"Search"}>

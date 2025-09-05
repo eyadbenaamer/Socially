@@ -16,7 +16,7 @@ const CopyLink = (props) => {
             navigator.clipboard.writeText(
               `${window.location.host}/post?_id=${id}`
             );
-            dispatch(setShowMessage("Link copied."));
+            dispatch(setShowMessage({ message: "Link copied.", type: "info" }));
           }}
         >
           <span className="w-6">

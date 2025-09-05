@@ -1,24 +1,23 @@
-import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { ProfileContext } from "pages/profile";
-
-import { setProfile as setMyProfile } from "state";
-
 import axiosClient from "utils/AxiosClient";
+import { setShowMessage } from "state";
 
-const FollowToggleBtn = (props) => {
-  const { id: accountToFollowId } = props;
-  const myProfile = useSelector((state) => state.profile);
-  const following = myProfile?.following;
-  const myProfileId = myProfile?._id;
-  const context = useContext(ProfileContext);
-  const profileId = context?._id;
-  const setProfile = context?.setProfile;
-
-  const isFollowing = following?.find((acc) => acc._id === accountToFollowId);
+const FollowToggleBtn = ({
+  id: accountToFollowId,
+  isFollowing: isFollowingProp,
+  setCount,
+}) => {
+  const _id = useContext(ProfileContext)?._id;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const myProfile = useSelector((state) => state.profile);
+  const myProfileId = myProfile?._id;
 
+  const [isFollowing, setIsFollowing] = useState(isFollowingProp);
   const followToggle = () => {
     axiosClient
       .patch(
@@ -26,12 +25,25 @@ const FollowToggleBtn = (props) => {
           isFollowing ? "unfollow" : "follow"
         }?userId=${accountToFollowId}`
       )
-      .then((response) => {
-        // update following list only if this is the loggedin user's profile
-        if (myProfileId === profileId) {
-          setProfile(response.data);
+      .then(() => {
+        if (_id === myProfileId && setCount) {
+          setCount((prev) => prev + (isFollowing ? -1 : 1));
         }
-        dispatch(setMyProfile(response.data));
+        setIsFollowing(!isFollowing);
+      })
+      .catch((err) => {
+        if (err.response) {
+          dispatch(
+            setShowMessage({
+              message: err.response.data?.message,
+              type: "error",
+            })
+          );
+          navigate(-1);
+        }
+      })
+      .finally(() => {
+        setIsFollowing(!isFollowing);
       });
   };
 

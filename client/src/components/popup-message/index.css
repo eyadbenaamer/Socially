@@ -1,3 +1,10 @@
+  /* Error Type Colors */
+
+.info-message.type-error.theme-light,
+.info-message.type-error.theme-dark {
+  --info-accent: #ef4444;
+  --info-focus-ring: #ef4444;
+}
 /* Info Message Container */
 .info-message-container {
   position: fixed;

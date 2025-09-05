@@ -20,14 +20,9 @@ const Delete = ({ conversationId }) => {
       .then(() => {
         document.body.style = null;
         closeDialog();
-
-        dispatch(setShowMessage("Conversation deleted."));
-
-        // if (location.pathname.startsWith("/post")) {
-        //   window.history.back();
-        // } else {
-        //   setPosts((prev) => prev?.filter((post) => post._id !== postId));
-        // }
+        dispatch(
+          setShowMessage({ message: "Conversation deleted.", type: "info" })
+        );
       });
   };
 

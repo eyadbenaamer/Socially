@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import Layout from "layout";
 import Notification from "./notification";
-import LoadingNotification from "./LoadingNotification";
+import LoadingProfiles from "../../components/LoadingProfiles";
 
 import {
   clearNotifications,
@@ -103,12 +103,12 @@ it changes in /notifications route
 
   const setAllRead = () => {
     dispatch(setNotificationsAllRead());
-    axiosClient.patch("notifications/set_read");
+    axiosClient.patch("notifications/set_read").catch(() => {});
   };
 
   const clear = () => {
     dispatch(clearNotifications());
-    axiosClient.delete("notifications/clear");
+    axiosClient.delete("notifications/clear").catch(() => {});
   };
 
   return (
@@ -135,16 +135,16 @@ it changes in /notifications route
         </div>
       </div>
       {notifications?.length === 0 && !isFetching && <>No notifications</>}
-      {isFetching && notifications?.length === 0 && <LoadingNotification />}
+      {isFetching && notifications?.length === 0 && <LoadingProfiles />}
       <ul ref={container} className="flex flex-col gap-2 pt-4">
         {notifications.map((notification) => (
-          <li>
+          <li key={notification._id}>
             <Notification {...notification} />
           </li>
         ))}
         {notifications?.length >= 10 && (
           <div ref={loading}>
-            <LoadingNotification />
+            <LoadingProfiles />
           </div>
         )}
       </ul>

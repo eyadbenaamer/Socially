@@ -141,7 +141,7 @@ export const search = async (req, res) => {
     const { query } = req.query;
 
     if (!query?.trim()) {
-      return res.status(400).json({ error: "Search query is required" });
+      return res.status(400).json({ message: "Search query is required" });
     }
 
     const searchResults = await client.search({

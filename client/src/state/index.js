@@ -22,7 +22,7 @@ const initialState = {
     isCodeSent: false,
     isPasswordReset: false,
   },
-  infoMessage: "",
+  popupMessage: "",
 };
 
 export const slice = createSlice({
@@ -51,8 +51,12 @@ export const slice = createSlice({
     },
     toggleTheme: (state) => {
       if (state.settings.theme === "dark") {
+        localStorage.setItem("theme", "light");
+        document.body.style.background = "white";
         state.settings.theme = "light";
       } else {
+        localStorage.setItem("theme", "dark");
+        document.body.style.background = "#171923";
         state.settings.theme = "dark";
       }
     },
@@ -72,7 +76,7 @@ export const slice = createSlice({
       });
     },
     setShowMessage: (state, action) => {
-      state.infoMessage = action.payload;
+      state.popupMessage = action.payload;
     },
     setConversations: (state, action) => {
       state.conversations = action.payload;
@@ -272,6 +276,7 @@ export const slice = createSlice({
       const notificationToBeRemoved = state.notifications.find(
         (notification) => notification._id === action.payload
       );
+      if (!notificationToBeRemoved) return;
       state.notifications = state.notifications.filter(
         (notification) => notification._id !== notificationToBeRemoved._id
       );
@@ -322,7 +327,7 @@ export const slice = createSlice({
       state.authStatus.isLoggedin = false;
       state.authStatus.isVerified = false;
       state.settings.theme = "dark";
-      state.infoMessage = "";
+      state.popupMessage = "";
     },
   },
 });

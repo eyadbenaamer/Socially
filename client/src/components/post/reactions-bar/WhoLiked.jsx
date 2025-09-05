@@ -6,29 +6,39 @@ import UserPicture from "components/UserPicture";
 import axiosClient from "utils/AxiosClient";
 import FollowToggleBtn from "components/FollowingBtn";
 import HoverWrapper from "components/user-hover-card/HoverWrapper";
+import LoadingProfiles from "components/LoadingProfiles";
 
 const WhoLiked = (props) => {
-  const { likes } = props;
-  const [profiles, setProfiles] = useState([]);
+  const { id, type } = props;
+  const [likes, setLikes] = useState([]);
+  const [cursor, setCursor] = useState(0);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const profiles = [];
-      for (let i = 0; i < likes.length; i++) {
-        await axiosClient(`profile?id=${likes[i]._id}`).then((response) =>
-          profiles.push(response.data)
-        );
-      }
-      setProfiles(profiles);
+      const url = `${type}/likes?id=${id}&cursor=${cursor}`;
+      await axiosClient(url)
+        .then((response) => {
+          setLikes((prev) => [...prev, ...response.data]);
+          setCursor(
+            response.data.length > 0
+              ? response.data[response.data.length - 1].createdAt
+              : cursor
+          );
+        })
+        .catch(() => setMessage("Failed to load likes."));
     };
     fetchUsers();
   }, []);
 
   return (
-    <div className="w-[250px] sm:w-[500px] p-2 min-h-[50vh]">
-      <h1 className="pb-4 text-lg">People Who Liked</h1>
+    <div className="w-[90vw] md:w-[600px] p-2 min-h-[50vh]">
+      <h1 className="pb-4 text-lg">Likes</h1>
       <ul className="flex flex-col gap-3">
-        {profiles?.map((profile) => (
+        {<LoadingProfiles />}
+        {/* {likes.length === 0 && !message && <LoadingProfiles />} */}
+
+        {likes?.map((profile) => (
           <li key={profile._id} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-12">
@@ -43,9 +53,15 @@ const WhoLiked = (props) => {
                 </Link>
               </HoverWrapper>
             </div>
-            <FollowToggleBtn id={profile._id} />
+            <FollowToggleBtn
+              id={profile._id}
+              isFollowing={profile.isFollowing}
+            />
           </li>
         ))}
+        {likes?.length === 0 && message && (
+          <p className="text-sm text-slate-400">{message}</p>
+        )}
       </ul>
     </div>
   );

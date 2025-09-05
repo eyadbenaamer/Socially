@@ -14,6 +14,7 @@ const PostContent = () => {
     _id: id,
     creatorId,
     createdAt,
+    profile,
     location,
     files,
     text,
@@ -24,7 +25,7 @@ const PostContent = () => {
     <>
       <div className="flex justify-between px-2 sm:px-4">
         <CreatorInfo
-          creatorId={creatorId}
+          profile={profile}
           createdAt={createdAt}
           location={location}
           postId={id}
@@ -33,7 +34,7 @@ const PostContent = () => {
           <OptionsBtn setIsModifying={setIsModifying} />
         </div>
       </div>
-      <div className="flex flex-col w-full px-1 sm:px-4">
+      <div className="flex flex-col w-full px-1 py-4 sm:px-4">
         <div className="py-3 px-1">
           <Text
             postCreatorId={creatorId}
@@ -44,7 +45,7 @@ const PostContent = () => {
             setIsModifying={setIsModifying}
           />
         </div>
-        <div className="self-end px-4 py-2">
+        <div className="self-end px-4 mb-2">
           <Views />
         </div>
         {files?.length > 0 && <Slider files={files} />}

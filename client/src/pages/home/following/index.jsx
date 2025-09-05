@@ -7,44 +7,44 @@ import UserPicture from "components/UserPicture";
 import axiosClient from "utils/AxiosClient";
 
 const Following = () => {
-  const following = useSelector((state) => state.profile.following);
-  const [users, setUsers] = useState([]);
+  const myProfile = useSelector((state) => state.profile);
+
+  const [following, setFollowing] = useState(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const result = [];
-      for (let i = 0; i < following?.length; i++) {
-        const user = await axiosClient(`profile?id=${following[i]._id}`).then(
-          (response) => response.data
-        );
-        result.push(user);
-      }
-      setUsers(result);
-    };
-    fetchUsers();
-  }, [following]);
+    axiosClient(`profile/following?id=${myProfile._id}`)
+      .then((response) => {
+        setFollowing(response.data.following);
+        setError(false);
+      })
+      .catch(() => {
+        setError(true);
+      });
+  }, []);
+
+  if (!following && !error) return null;
 
   return (
     <section className="fixed flex flex-col gap-5 px-2 h-[80vh]">
       <h1 className="text-lg">People you follow</h1>
       <ul className="flex flex-col gap-3 overflow-y-scroll w-[250px] center py-2 h-full overflow-x-hidden z-40">
-        {/* show only 20 following if following more than 20, otherwise show them all  */}
-        {users &&
-          users.slice(0, users.length < 20 ? users.length : 20).map((user) => {
-            const { username, firstName, lastName } = user;
-            return (
-              <li className="flex items-center">
-                <div className="account flex gap-2 items-center">
-                  <span className="w-12">
-                    <UserPicture profile={user} />
-                  </span>
-                  <Link to={`/profile/${username}`} className="link">
-                    {firstName} {lastName}
-                  </Link>
-                </div>
-              </li>
-            );
-          })}
+        {following?.map((profile) => {
+          const { username, firstName, lastName } = profile;
+          return (
+            <li key={profile._id} className="flex items-center">
+              <div className="account flex gap-2 items-center">
+                <span className="w-12">
+                  <UserPicture noCard profile={profile} />
+                </span>
+                <Link to={`/profile/${username}`} className="link">
+                  {firstName} {lastName}
+                </Link>
+              </div>
+            </li>
+          );
+        })}
+        {error && <li className="text-slate-500">Failed to load.</li>}
       </ul>
     </section>
   );

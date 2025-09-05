@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   useCallback,
+  Fragment,
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -158,7 +159,7 @@ const MessagesArea = (props) => {
           thisMessageDate.getFullYear() === nextMessageDate.getFullYear();
 
         return (
-          <>
+          <Fragment key={message._id}>
             <Message message={message} />
             {!isToday && (
               <div className="self-center bg-200 px-3 p-1 rounded-xl w-fit">
@@ -170,7 +171,7 @@ const MessagesArea = (props) => {
                 Unread Messages
               </div>
             )}
-          </>
+          </Fragment>
         );
       })}
 

@@ -35,9 +35,7 @@ const Conversations = () => {
         dispatch(setConversations(data));
         pageRef.current = 2; // Next page will be 2
       })
-      .catch((err) => {
-        console.error("Failed to fetch initial conversations:", err);
-      })
+      .catch((err) => {})
       .finally(() => setIsInitialLoading(false));
   }, [dispatch]);
 

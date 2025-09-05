@@ -3,13 +3,13 @@ import { useSelector } from "react-redux";
 
 import { useHoverCard } from "./HoverCardContext";
 import UserHoverCard from ".";
+import { useWindowWidth } from "hooks/useWindowWidth";
 
 const HoverWrapper = (props) => {
-  const { profile, children } = props;
+  const { profile, children, noCard } = props;
   const { _id: id } = profile;
-
   const myProfile = useSelector((state) => state.profile);
-
+  const windowWidth = useWindowWidth();
   const [hovered, setHovered] = useState(false);
   const closeTimer = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -24,16 +24,18 @@ const HoverWrapper = (props) => {
     }
     setTimeout(() => {
       setHovered(true);
-      setActiveCardId(cardId);
+      if (activeCardId === null) {
+        setActiveCardId(cardId);
+      }
       setMousePos({ x: e.clientX, y: e.clientY });
-    }, 300);
+    }, 500);
   };
 
   const handleMouseLeave = () => {
     closeTimer.current = setTimeout(() => {
       setHovered(false);
       setActiveCardId(null);
-    }, 300);
+    }, 500);
   };
 
   const showCard = activeCardId === cardId;
@@ -57,7 +59,7 @@ const HoverWrapper = (props) => {
     };
   }, []);
 
-  if (myProfile?._id === id) {
+  if (myProfile?._id === id || noCard || windowWidth < 768) {
     return children;
   }
 

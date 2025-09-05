@@ -23,12 +23,12 @@ const SavedPosts = () => {
 
   return (
     <Layout>
-      <h1 className="text-2xl py-4 sticky top-[45px] bg-100 z-30">
+      <h1 className="text-2xl p-4 sticky top-[45px] bg-100 z-30 lg:w-4/5 center">
         Saved Posts
       </h1>
       {posts?.length === 0 && !isFetching && <>No posts.</>}
       {isFetching && <LoadingPost />}
-      <div className="flex flex-col gap-3 justify-center">
+      <div className="flex flex-col px-2 gap-3 justify-center lg:w-4/5 center">
         {posts?.map((post) => (
           <Post key={post._id} post={post} />
         ))}

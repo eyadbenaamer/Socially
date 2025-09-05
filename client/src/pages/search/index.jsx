@@ -55,7 +55,6 @@ const Search = () => {
         setSearchResults(data);
         setHasSearched(true);
       } catch (error) {
-        console.error("Error fetching search results:", error);
         setSearchResults([]);
         setHasSearched(true);
       } finally {
@@ -132,7 +131,6 @@ const Search = () => {
       setSuggestions(suggestions);
       setShowSuggestions(true);
     } catch (error) {
-      console.error("Error fetching suggestions:", error);
       setSuggestions(value ? [value] : []); // Show user's input if it exists
       setShowSuggestions(true);
     }

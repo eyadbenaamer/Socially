@@ -29,16 +29,11 @@ const Profile = () => {
         .then((response) => {
           setProfile(response.data);
         })
-        .catch(() => setProfile("not found"));
+        .catch(() => navigate("/not-found", { replace: true }));
     };
     setProfile(null);
     getProfile();
   }, [username]);
-
-  if (profile === "not found") {
-    navigate("/not-found");
-    return;
-  }
 
   return (
     <ProfileContext.Provider value={{ ...profile, setProfile }}>
@@ -49,7 +44,10 @@ const Profile = () => {
             <div dir="rtl" className="absolute w-[95%] my-5">
               {myProfile && myProfile.username !== username && (
                 <div className="flex gap-2 items-center">
-                  <FollowToggleBtn id={profile._id} />
+                  <FollowToggleBtn
+                    id={profile._id}
+                    isFollowing={profile.isFollowing}
+                  />
                   <MessagingBtn id={profile._id} />
                 </div>
               )}

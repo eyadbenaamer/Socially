@@ -1,72 +1,276 @@
+import { Types } from "mongoose";
+
 import Profile from "../models/profile.js";
 import User from "../models/user.js";
+import Comment from "../models/comment.js";
+import Reply from "../models/reply.js";
+import CommentLike from "../models/commentLike.js";
+import ReplyLike from "../models/replyLike.js";
 
 import { handleError } from "../utils/errorHandler.js";
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
-//TODO: find a way to send comments on patches
+import Notification from "../models/notification.js";
+import { get as getNotification } from "./notification.js";
 
-/*READ*/
+const { ObjectId } = Types;
 
-export const get = async (req, res) => {
+export const getOne = async (req, res) => {
   try {
-    return res.status(200).json(req.comment);
+    const { comment } = req;
+    const profile = await Profile.findById(comment.creatorId);
+    const isLiked = await CommentLike.findOne({ commentId: comment.id });
+    const likesCount = await CommentLike.countDocuments({
+      commentId: comment.id,
+    });
+    const repliesCount = await Reply.countDocuments({ commentId: comment.id });
+    const responseComment = {
+      ...comment.toObject(),
+      profile,
+      likesCount,
+      repliesCount,
+      isLiked: Boolean(isLiked),
+    };
+    return res.status(200).json(responseComment);
   } catch (err) {
     return handleError(err, res);
   }
 };
 
-/*CREAT*/
+export const getPage = async (req, res) => {
+  try {
+    const { user, post } = req;
+    const { cursor } = req.query;
+    const cursorDate = cursor ? parseInt(cursor) : Date.now();
+
+    const comments = await Comment.aggregate([
+      {
+        $match: {
+          postId: post._id,
+          createdAt: { $gt: cursorDate },
+        },
+      },
+      { $sort: { createdAt: 1 } },
+      { $limit: 20 },
+      {
+        $lookup: {
+          from: "profiles",
+          let: { creatorId: "$creatorId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$creatorId"] },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                username: 1,
+                profilePicPath: 1,
+                profileCoverPath: 1,
+                bio: 1,
+                followersCount: 1,
+                followingCount: 1,
+              },
+            },
+          ],
+          as: "profileArr",
+        },
+      },
+      {
+        $lookup: {
+          from: "commentlikes",
+          let: { commentId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$commentId", "$$commentId"] },
+              },
+            },
+          ],
+          as: "likesArr",
+        },
+      },
+      {
+        $lookup: {
+          from: "replies",
+          localField: "_id",
+          foreignField: "commentId",
+          as: "repliesArr",
+        },
+      },
+      {
+        $addFields: {
+          profile: { $arrayElemAt: ["$profileArr", 0] },
+          isLiked: {
+            $in: [
+              user?._id?.toString(),
+              {
+                $map: {
+                  input: "$likesArr",
+                  as: "like",
+                  in: { $toString: "$$like.userId" },
+                },
+              },
+            ],
+          },
+          likesCount: { $size: "$likesArr" },
+          repliesCount: { $size: "$repliesArr" },
+        },
+      },
+      {
+        $project: {
+          profileArr: 0,
+          likesArr: 0,
+          repliesArr: 0,
+        },
+      },
+    ]);
+
+    return res.status(200).json(comments);
+  } catch (err) {
+    return handleError(err, res);
+  }
+};
+
+export const getLikes = async (req, res) => {
+  try {
+    const { id, cursor } = req.query;
+    const cursorDate = cursor ? parseInt(cursor) : 0;
+    const userId = req.user?._id || req.user?.id; // may be undefined for unauthenticated
+
+    const likes = await CommentLike.aggregate([
+      {
+        $match: { commentId: new ObjectId(id), createdAt: { $gt: cursorDate } },
+      },
+      { $sort: { createdAt: 1 } },
+      { $limit: 30 },
+      {
+        $lookup: {
+          from: "profiles",
+          localField: "userId",
+          foreignField: "_id",
+          as: "profile",
+          pipeline: [
+            {
+              $project: {
+                firstName: 1,
+                lastName: 1,
+                username: 1,
+                profilePicPath: 1,
+                profileCoverPath: 1,
+                bio: 1,
+                followersCount: 1,
+                followingCount: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          profile: { $arrayElemAt: ["$profile", 0] },
+        },
+      },
+      // Attach isFollowing only if we have an authenticated user
+      ...(userId
+        ? [
+            {
+              $lookup: {
+                from: "follows",
+                let: { targetUserId: "$profile._id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $and: [
+                          { $eq: ["$followedId", "$$targetUserId"] },
+                          { $eq: ["$followerId", new ObjectId(userId)] },
+                        ],
+                      },
+                    },
+                  },
+                  { $limit: 1 },
+                ],
+                as: "followArr",
+              },
+            },
+            {
+              $addFields: {
+                isFollowing: { $gt: [{ $size: "$followArr" }, 0] },
+              },
+            },
+            { $project: { followArr: 0 } },
+          ]
+        : []),
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: [
+              { createdAt: "$createdAt" },
+              "$profile",
+              userId ? { isFollowing: "$isFollowing" } : {},
+            ],
+          },
+        },
+      },
+    ]);
+    return res.status(200).json(likes);
+  } catch (err) {
+    return handleError(err, res);
+  }
+};
+
 export const add = async (req, res) => {
   try {
     const { user, post } = req;
     const { text } = req.body;
     const { fileInfo } = req;
-    const profile = await Profile.findById(user.id);
+    const profile = await Profile.findById(user.id).select(
+      "_id firstName lastName username profilePicPath bio location gender lastSeenAt"
+    );
     // if the comment disabled then only the post author can comment
-    if (post.isCommentsDisabled && user.id !== post.creatorId) {
-      return res.status(409).json({ error: "comments are disabled" });
+    if (post.isCommentsDisabled && user.id !== post.creatorId.toString()) {
+      return res.status(409).json({ message: "Comments are disabled." });
     }
     if (!(text || fileInfo)) {
-      return res.status(400).json({ error: "comment cannot be empty" });
+      return res.status(400).json({ message: "Comment cannot be empty." });
     }
     /*
     if who commented is NOT the same as the post creator 
     then a notification will be created.
     */
-    if (user.id !== post.creatorId) {
-      const newNotification = {
-        content: `${profile.firstName} commented on your post.`,
+    if (user.id !== post.creatorId.toString()) {
+      let notification = await Notification.create({
         type: "comment",
-        userId: profile._id,
+        userId: post.creatorId,
+        engagedUserId: user._id,
         createdAt: Date.now(),
         isRead: false,
-      };
+      });
       const postCreator = await User.findById(post.creatorId);
       if (!postCreator) {
-        return res
-          .status(500)
-          .json({ message: "An error occurred. Plaese try again later." });
+        return handleError(err, res);
       }
-      postCreator.notifications.unshift(newNotification);
       postCreator.unreadNotificationsCount += 1;
       await postCreator.save();
 
-      const notification = postCreator.notifications[0];
-
-      post.comments.addToSet({
+      const comment = await Comment.create({
+        postId: post.id,
         creatorId: user.id,
         text: text.trim(),
         notificationId: notification?.id,
         file: fileInfo ? fileInfo : null,
         createdAt: Date.now(),
       });
-      await post.save();
-      const comment = post.comments[post.comments?.length - 1];
       notification.path = `/post?_id=${post.id}&commentId=${comment.id}`;
+      await notification.save();
+      notification = await getNotification(notification.id);
       await postCreator.save();
       // sending the notification by web socket
-      const socketIdsList = getOnlineUsers().get(post.creatorId);
+      const socketIdsList = getOnlineUsers().get(post.creatorId.toString());
       if (socketIdsList) {
         socketIdsList.map((socketId) => {
           getServerSocketInstance()
@@ -77,25 +281,37 @@ export const add = async (req, res) => {
 
       // adding the post's category to the user's favorite topics
       const updateObj = {};
-      post.keywords.forEach((keyword) => {
+      post.keywords?.forEach((keyword) => {
         updateObj[`favoriteTopics.${keyword}.count`] = 1;
       });
       await user.updateOne({ $inc: updateObj }, { new: true });
-      return res.status(200).json(post);
+
+      return res.status(200).json({
+        ...comment.toObject(),
+        repliesCount: 0,
+        likesCount: 0,
+        isLiked: false,
+        profile,
+      });
     }
     /*
     if who commented is the same as the post creator 
     then no notification will be created.
     */
-    post.comments.addToSet({
+    const comment = await Comment.create({
       creatorId: user.id,
+      postId: post.id,
       text: text.trim(),
       file: fileInfo ? fileInfo : null,
       createdAt: Date.now(),
     });
-    await post.save();
-
-    return res.status(200).json(post);
+    return res.status(200).json({
+      ...comment.toObject(),
+      likesCount: 0,
+      repliesCount: 0,
+      isLiked: false,
+      profile,
+    });
   } catch (err) {
     return handleError(err, res);
   }
@@ -106,17 +322,17 @@ export const add = async (req, res) => {
 export const edit = async (req, res) => {
   try {
     const { text } = req.body;
-    const { user, post, comment } = req;
+    const { user, comment } = req;
     if (text) {
-      if (comment.creatorId === user.id) {
+      if (comment.creatorId?.toString() === user.id) {
         comment.text = text;
-        await post.save();
+        await comment.save();
         return res.status(200).json(comment);
       } else {
         return res.status(401).send("Unauthorized");
       }
     } else {
-      return res.status(409).json({ error: "comment cannot be empty" });
+      return res.status(409).json({ message: "comment cannot be empty" });
     }
   } catch (err) {
     return handleError(err, res);
@@ -126,7 +342,6 @@ export const edit = async (req, res) => {
 export const likeToggle = async (req, res) => {
   try {
     const { post, user, comment } = req;
-    const profile = await Profile.findById(user.id);
     const { creatorId } = comment;
     const commentCreator = await User.findById(comment.creatorId);
 
@@ -135,19 +350,20 @@ export const likeToggle = async (req, res) => {
     it means that the user liked the comment, therefore 
     the user id will be removed from the comment's likes  
     */
-    const like = comment.likes.id(user.id);
+    const like = await CommentLike.findOne({
+      userId: user.id,
+      postId: post.id,
+    });
     if (like) {
       /*
     if who unliked the comment is the same as the comment creator 
     then no notification will be removed.
     */
-      if (user.id !== comment.creatorId) {
+      if (user.id !== comment.creatorId.toString()) {
         // romving the like's notification
-        const notification = commentCreator.notifications.id(
-          like.notificationId
-        );
+        const notification = await Notification.findById(like.notificationId);
         if (notification) {
-          const socketIdsList = getOnlineUsers().get(creatorId);
+          const socketIdsList = getOnlineUsers().get(creatorId.toString());
           if (socketIdsList) {
             socketIdsList.map((socketId) => {
               getServerSocketInstance()
@@ -159,42 +375,41 @@ export const likeToggle = async (req, res) => {
           if (!notification.isRead) {
             commentCreator.unreadNotificationsCount--;
           }
-          notification.deleteOne();
+          await notification.deleteOne();
           await commentCreator.save();
         }
       }
-      like.deleteOne();
-      await post.save();
-
-      return res.status(200).json({ likes: comment.likes });
+      await like.deleteOne();
+      return res.status(200).json({ isLiked: false });
     }
 
     /*
     if who liked the comment is the same as the comment creator 
     then no notification will be created.
     */
-    if (user.id !== comment.creatorId) {
-      const newNotification = {
-        content: `${profile.firstName} liked your comment.`,
-        userId: profile.id,
-        type: "like",
-        path: `/post?_id=${post.id}&commentId${comment.id}`,
+    if (user.id !== comment.creatorId.toString()) {
+      let notification = await Notification.create({
+        userId: comment.creatorId,
+        engagedUserId: user._id,
+        type: "commentLike",
+        path: `/post?_id=${post.id}&commentId=${comment.id}`,
         createdAt: Date.now(),
         isRead: false,
-      };
+      });
       if (commentCreator) {
-        commentCreator.notifications.unshift(newNotification);
         commentCreator.unreadNotificationsCount += 1;
         await commentCreator.save();
 
-        const notification = commentCreator.notifications[0];
-        comment.likes.addToSet({
-          _id: user.id,
+        const commentLike = await CommentLike.create({
+          userId: user.id,
+          commentId: comment.id,
+          postId: post.id,
           notificationId: notification.id,
+          createdAt: Date.now(),
         });
-        await post.save();
-
-        const socketIdsList = getOnlineUsers().get(creatorId);
+        await commentLike.save();
+        notification = await getNotification(notification.id);
+        const socketIdsList = getOnlineUsers().get(creatorId.toString());
         if (socketIdsList) {
           socketIdsList.map((socketId) => {
             getServerSocketInstance()
@@ -203,12 +418,17 @@ export const likeToggle = async (req, res) => {
           });
         }
       }
-      return res.status(200).json({ likes: comment.likes });
+      return res.status(200).json({ isLiked: true });
     }
-    comment.likes.addToSet({ _id: user.id });
-    await post.save();
+    const commentLike = await CommentLike.create({
+      userId: user.id,
+      commentId: comment.id,
+      postId: post.id,
+      createdAt: Date.now(),
+    });
+    await commentLike.save();
 
-    return res.status(200).json({ likes: comment.likes });
+    return res.status(200).json({ isLiked: true });
   } catch (err) {
     return handleError(err, res);
   }
@@ -223,14 +443,19 @@ export const deleteComment = async (req, res) => {
     the comment can be deleted ether by the comment
     creator or the post creator
     */
-    if (!(user.id === comment.creatorId || user.id === post.creatorId)) {
+    if (
+      !(
+        user.id === comment.creatorId?.toString() ||
+        user.id === post.creatorId?.toString()
+      )
+    ) {
       return res.status(401).send("Unauthorized");
     }
 
     const postCreator = await User.findById(post.creatorId);
-    const notification = postCreator.notifications.id(comment.notificationId);
+    const notification = await Notification.findById(comment.notificationId);
     if (notification) {
-      const socketIdsList = getOnlineUsers().get(post.creatorId);
+      const socketIdsList = getOnlineUsers().get(post.creatorId.toString());
       if (socketIdsList) {
         socketIdsList.map((socketId) => {
           getServerSocketInstance()
@@ -242,12 +467,17 @@ export const deleteComment = async (req, res) => {
       if (!notification.isRead) {
         postCreator.unreadNotificationsCount--;
       }
-      notification.deleteOne();
+
+      await notification.deleteOne();
       await postCreator.save();
     }
-    comment.deleteOne();
-    await post.save();
-    return res.status(200).json(post);
+    // delete all related docs to the post
+    await Reply.deleteMany({ postId: post.id });
+    await ReplyLike.deleteMany({ postId: post.id });
+    await CommentLike.deleteMany({ postId: post.id });
+    // finally delete the comment
+    await comment.deleteOne();
+    return res.status(200).json({ message: "Comment deleted." });
   } catch (err) {
     return handleError(err, res);
   }

@@ -1,20 +1,20 @@
+import { useContext } from "react";
 import { useDispatch } from "react-redux";
 
 import RedBtn from "components/RedBtn";
 import PrimaryBtn from "components/PrimaryBtn";
+import CheckBox from "components/CheckBox";
 
 import axiosClient from "utils/AxiosClient";
 import { setShowMessage } from "state";
 import { useDialog } from "components/dialog/DialogContext";
+import { ConversationContext } from "..";
 
 import { ReactComponent as BrushIcon } from "assets/icons/brush.svg";
-import CheckBox from "components/CheckBox";
-import { useContext, useState } from "react";
-import { ConversationContext } from "..";
 
 const Clear = ({ conversationId }) => {
   const { openDialog, closeDialog } = useDialog();
-  const { participantProfile } = useContext(ConversationContext);
+  const { participant } = useContext(ConversationContext);
   let forEveryone = false;
 
   const dispatch = useDispatch();
@@ -28,7 +28,9 @@ const Clear = ({ conversationId }) => {
         document.body.style = null;
         closeDialog();
 
-        dispatch(setShowMessage("Conversation cleared."));
+        dispatch(
+          setShowMessage({ message: "Conversation cleared.", type: "info" })
+        );
       });
   };
 
@@ -43,7 +45,7 @@ const Clear = ({ conversationId }) => {
                 forEveryone = checked;
               }}
             />
-            <span>Also clear for {participantProfile.firstName}</span>
+            <span>Also clear for {participant.firstName}</span>
           </div>
         </div>
         <div className="flex justify-between mt-2">

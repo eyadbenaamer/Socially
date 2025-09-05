@@ -8,16 +8,16 @@ import {
   getFollowing,
   checkUsernameAvailability,
 } from "../controllers/profile.js";
-import { verifyToken } from "../middleware/auth.js";
+import { getUserInfo, verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
 import { newConversationByFollow } from "../middleware/conversation.js";
 
 const router = Router();
 
 /*READ*/
-router.get("/", verifyId, getProfile);
-router.get("/following", verifyId, getFollowing);
-router.get("/followers", verifyId, getFollowers);
+router.get("/", verifyId, getUserInfo, getProfile);
+router.get("/following", verifyId, getUserInfo, getFollowing);
+router.get("/followers", verifyId, getUserInfo, getFollowers);
 router.post(
   "/check_username_availability",
   verifyId,

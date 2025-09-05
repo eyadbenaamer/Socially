@@ -24,13 +24,8 @@ const useUpdate = () => {
     axiosClient(`/login`)
       .then((response) => {
         if (response.status === 200) {
-          const {
-            profile,
-            contacts,
-            unreadMessagesCount,
-            unreadNotificationsCount,
-          } = response.data;
-          dispatch(setProfile(profile));
+          const { contacts, unreadMessagesCount, unreadNotificationsCount } =
+            response.data;
           dispatch(setUnreadMessagesCount(unreadMessagesCount));
           dispatch(setUnreadNotificationsCount(unreadNotificationsCount));
           dispatch(setContacts(contacts));

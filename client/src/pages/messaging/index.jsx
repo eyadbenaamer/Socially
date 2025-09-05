@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,7 +10,6 @@ import Contact from "./contact";
 import Conversations from "./conversations";
 
 import { useWindowWidth } from "hooks/useWindowWidth";
-import useFetchProfile from "hooks/useFetchProfile";
 
 export const SelectedChatContext = createContext();
 
@@ -39,8 +38,6 @@ const Messaging = () => {
   )._id;
 
   // to fetch the other participant's info in the conversation
-  let [participantProfile, setParicipantProfile] =
-    useFetchProfile(participantId);
   let participant = contacts.find((contact) => contact._id === participantId);
 
   // for all conversations
@@ -53,16 +50,11 @@ const Messaging = () => {
     }
   }, [conversation]);
 
-  useEffect(() => {
-    setParicipantProfile(null);
-  }, [conversationId]);
-
   return (
     <>
       <SelectedChatContext.Provider
         value={{
           conversation,
-          participantProfile,
           participant,
         }}
       >
@@ -78,9 +70,9 @@ const Messaging = () => {
           </div>
         )}
         <>
-          <div className="grid grid-cols-10">
+          <div className="grid grid-cols-12">
             {windowWidth >= 1024 && (
-              <div className="sidebar pt-5 flex justify-center col-span-2">
+              <div className="sidebar pt-5 flex justify-center col-span-3">
                 <Sidebar />
               </div>
             )}
@@ -91,7 +83,7 @@ const Messaging = () => {
                     ? "calc(100vh - 45px)"
                     : "calc(100vh - 95px)",
               }}
-              className="content messaging bg-200 col-span-10 lg:col-span-8 md:mx-0 grid grid-cols-3 h-[calc(100vh - 45px)] overflow-hidden"
+              className="content messaging bg-200 col-span-12 lg:col-span-9 md:mx-0 grid grid-cols-3 h-[calc(100vh - 45px)] overflow-hidden"
             >
               <div
                 className="col-span-3 md:col-span-1 md:col-start-1 flex flex-col "
@@ -108,10 +100,10 @@ const Messaging = () => {
                     style={{ scrollbarWidth: "none" }}
                   >
                     {onlineContactsIds.map((contact) => (
-                      <Contact id={contact._id} isOnline={contact.isOnline} />
+                      <Contact key={contact._id} {...contact} />
                     ))}
                     {offlineContactsIds.map((contact) => (
-                      <Contact id={contact._id} isOnline={contact.isOnline} />
+                      <Contact key={contact._id} {...contact} />
                     ))}
                   </div>
                 </div>

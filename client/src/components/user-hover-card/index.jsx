@@ -10,8 +10,8 @@ const UserHoverCard = (props) => {
     lastName,
     profilePicPath,
     coverPicPath,
-    followers = 0,
-    following = 0,
+    followersCount = 0,
+    followingCount = 0,
     bio,
   } = profile;
   // Determine vertical position only
@@ -19,17 +19,17 @@ const UserHoverCard = (props) => {
   if (mousePos.y < window.innerHeight / 2) {
     style.top = 40;
   } else {
-    style.bottom = window.innerHeight - 40;
+    style.bottom = 40;
   }
   if (mousePos.x < window.innerWidth / 2) {
-    style.left = -10;
+    style.left = -20;
   } else {
-    style.right = -10;
+    style.right = -0;
   }
 
   return (
     <div
-      className={`absolute z-[10000] w-80 rounded-md shadow-2xl bg-100 overflow-hidden transition-opacity duration-300 ease-out ${
+      className={`absolute z-[100000] w-80 rounded-md shadow-2xl bg-100 overflow-hidden transition-opacity duration-300 ease-out ${
         visible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       style={style}
@@ -68,15 +68,15 @@ const UserHoverCard = (props) => {
             </span>
           </div>
           {/* Follow/Following Button */}
-          <FollowToggleBtn id={profile._id} />
+          <FollowToggleBtn id={profile._id} isFollowing={profile.isFollowing} />
         </div>
         {/* Followers/Following Counts */}
         <div className="flex gap-4 text-xs mb-2">
           <span>
-            <span className="font-bold">{following?.length}</span> Following
+            <span className="font-bold">{followingCount}</span> Following
           </span>
           <span>
-            <span className="font-bold">{followers?.length}</span> Followers
+            <span className="font-bold">{followersCount}</span> Followers
           </span>
         </div>
         <p className="text-sm mb-2 max-h-56 truncate">{bio}</p>

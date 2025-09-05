@@ -5,72 +5,139 @@ import Dialog from "components/dialog";
 import UserPicture from "components/UserPicture";
 import FollowToggleBtn from "components/FollowingBtn";
 import RemoveFollowerBtn from "./RemoveFollowerBtn";
+import LoadingProfiles from "components/LoadingProfiles";
 import HoverWrapper from "components/user-hover-card/HoverWrapper";
 
 import { ProfileContext } from "..";
 
 import axiosClient from "utils/AxiosClient";
 import convertToUnit from "utils/convertToUnit";
+import { useSelector } from "react-redux";
 
 const Followers = () => {
-  const { followers } = useContext(ProfileContext);
-  const [users, setUsers] = useState([]);
+  const { followersCount, _id } = useContext(ProfileContext);
+  const myProfile = useSelector((state) => state.profile);
   const [showFollowers, setShowFollowers] = useState(false);
+  const [followers, setFollowers] = useState(null);
+  const [count, setCount] = useState(followersCount);
+  const [cursor, setCursor] = useState("000000000000000000000000");
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [loaderEl, setLoaderEl] = useState(null);
+
+  const fetchProfiles = async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    const result = await axiosClient(
+      `profile/followers?id=${_id}&cursor=${cursor}`
+    )
+      .then((response) => response.data)
+      .catch(() => null);
+    const newItems = result?.followers || [];
+    setFollowers((prev) => (prev ? [...prev, ...newItems] : newItems));
+    if (
+      newItems.length === 0 ||
+      newItems.length + (followers?.length || 0) >= followersCount
+    ) {
+      setHasMore(false);
+    }
+    const newCursor = newItems.slice(-1)[0]?._id;
+    if (newCursor && newCursor !== cursor) {
+      setCursor(newCursor);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const result = [];
-      for (let i = 0; i < followers?.length; i++) {
-        const user = await axiosClient(`profile?id=${followers[i]._id}`).then(
-          (response) => response.data
-        );
-        result.push(user);
-      }
-      setUsers(result);
-    };
-    fetchUsers();
+    if (followers?.length === 0) {
+      setCount(0);
+      setShowFollowers(false);
+    }
   }, [followers]);
+
+  useEffect(() => {
+    if (!showFollowers) {
+      setFollowers(null);
+      setCursor("000000000000000000000000");
+      setHasMore(true);
+      return;
+    }
+    if (showFollowers && followers === null) {
+      fetchProfiles();
+    }
+  }, [showFollowers]);
+
+  useEffect(() => {
+    if (!showFollowers) return;
+    if (!hasMore) return;
+    if (!loaderEl) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            fetchProfiles();
+          }
+        });
+      },
+      { root: null, rootMargin: "200px", threshold: 0 }
+    );
+    observer.observe(loaderEl);
+    return () => observer.disconnect();
+  }, [loaderEl, hasMore, showFollowers, cursor, followers, loading]);
 
   return (
     <>
-      {followers?.length > 0 && (
+      {count > 0 && (
         <div
           className="hover:text-[var(--primary-color)] hover:underline underline-offset-2 cursor-pointer"
           onClick={() => setShowFollowers(true)}
         >
-          Followers {convertToUnit(followers?.length)}
+          Followers {convertToUnit(count)}
         </div>
       )}
       <Dialog isOpened={showFollowers} setIsOpened={setShowFollowers}>
         <div className="px-4 flex flex-col gap-2 min-h-[50vh] w-[90vw] sm:w-[500px]">
           <div className="text-xl">Followers</div>
           <ul className="flex flex-col gap-5">
-            {users?.map((user) => {
-              const { _id: id, username, firstName, lastName } = user;
+            {followers?.map((profile) => {
+              const { _id: id, username, firstName, lastName } = profile;
               return (
-                <li className="flex items-center justify-between">
+                <li key={id} className="flex items-center justify-between">
                   <div className="account flex gap-2 items-center">
                     <span className="w-12">
-                      <UserPicture profile={user} />
+                      <UserPicture profile={profile} />
                     </span>
-                    <HoverWrapper profile={user}>
+                    <HoverWrapper profile={profile}>
                       <Link to={`/profile/${username}`} className="link">
                         {firstName} {lastName}
                       </Link>
                     </HoverWrapper>
                   </div>
                   <div className="flex gap-2 items-center">
-                    <FollowToggleBtn id={id} />
-                    <RemoveFollowerBtn id={id} />
+                    <FollowToggleBtn
+                      id={id}
+                      isFollowing={profile.isFollowing}
+                    />
+                    {_id === myProfile?._id && (
+                      <RemoveFollowerBtn
+                        id={id}
+                        setFollowers={setFollowers}
+                        setCount={setCount}
+                      />
+                    )}
                   </div>
                 </li>
               );
             })}
+            {showFollowers && hasMore && followers?.length < followersCount && (
+              <li ref={setLoaderEl} className="py-2">
+                <LoadingProfiles />
+              </li>
+            )}
           </ul>
         </div>
       </Dialog>
-
-      {followers?.length === 0 && <>Followers 0</>}
+      {count === 0 && <>Followers 0</>}
     </>
   );
 };

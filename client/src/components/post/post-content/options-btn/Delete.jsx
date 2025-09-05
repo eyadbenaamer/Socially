@@ -22,18 +22,37 @@ const Delete = () => {
   const dispatch = useDispatch();
 
   const deletePost = async () => {
-    await axiosClient.delete(`post/delete?postId=${postId}`).then(() => {
-      document.body.style = null;
-      closeDialog();
-
-      dispatch(setShowMessage("Post deleted."));
-
-      if (location.pathname.startsWith("/post")) {
-        window.history.back();
-      } else {
-        setPosts((prev) => prev?.filter((post) => post._id !== postId));
-      }
-    });
+    await axiosClient
+      .delete(`post/delete?postId=${postId}`)
+      .then(() => {
+        dispatch(setShowMessage({ message: "Post deleted.", type: "info" }));
+        if (location.pathname.startsWith("/post")) {
+          window.history.back();
+        } else {
+          setPosts((prev) => prev?.filter((post) => post._id !== postId));
+        }
+      })
+      .catch((err) => {
+        if (err.response) {
+          dispatch(
+            setShowMessage({
+              message: err.response.data.message,
+              type: "error",
+            })
+          );
+        } else {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Please try again later.",
+              type: "error",
+            })
+          );
+        }
+      })
+      .finally(() => {
+        document.body.style = null;
+        closeDialog();
+      });
   };
 
   const handleDeleteClick = () => {

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import Lottie from "react-lottie";
 
 import axiosClient from "utils/AxiosClient";
+import { setShowMessage } from "state";
 
 import tickAnimationData from "assets/icons/tick.json";
 import crossAnimationData from "assets/icons/cross.json";
@@ -17,7 +19,7 @@ const EmailInput = (props) => {
   const [isEmailChecked, setIsEmailChecked] = useState(false);
 
   const input = useRef(null);
-
+  const dispatch = useDispatch();
   const verifyValue = () => {
     if (!fieldValue) {
       input.current.style.border = "solid 2px red";
@@ -40,18 +42,28 @@ const EmailInput = (props) => {
       // checking of email availability
       axiosClient(`check_email_availability/${type}/${fieldValue}`)
         .then((response) => {
-          const { message } = response.data;
-          input.current.style.border = "solid 2px green";
-          setCheck({
-            state: "success",
-            message,
-          });
-          setIsEmailChecked(true);
+          const { message, success } = response.data;
+          if (success) {
+            input.current.style.border = "solid 2px green";
+            setCheck({
+              state: "success",
+              message,
+            });
+          } else {
+            input.current.style.border = "solid 2px red";
+            setCheck({ state: "fail", message: response.data.message });
+          }
         })
-        .catch((error) => {
+        .catch(() => {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Plaese try again later.",
+              type: "error",
+            })
+          );
+        })
+        .finally(() => {
           setIsEmailChecked(true);
-          setCheck({ state: "fail", message: error.response.data.message });
-          input.current.style.border = "solid 2px red";
         });
       return;
     }

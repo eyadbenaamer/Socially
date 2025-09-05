@@ -30,10 +30,12 @@ const Form = (props) => {
       .catch(async (error) => {
         let { message, alreadyVerified } = error.response.data;
         if (message === "jwt expired") {
-          axiosClient.post(`send_verification_code`, {
-            type: "verify_account",
-            email,
-          });
+          axiosClient
+            .post(`send_verification_code`, {
+              type: "verify_account",
+              email,
+            })
+            .catch(() => {});
           message = "Code has expired. We sent another code to your email.";
         }
 

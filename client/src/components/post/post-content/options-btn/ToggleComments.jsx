@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { PostContext } from "components/post";
 
@@ -7,24 +7,44 @@ import axiosClient from "utils/AxiosClient";
 
 import { ReactComponent as CommentsEnabledIcon } from "assets/icons/comments.svg";
 import { ReactComponent as CommentsDisabledIcon } from "assets/icons/comments-turnedoff.svg";
+import { setShowMessage } from "state";
 
 const ToggleComments = () => {
   const {
-    setPost,
-    creatorId: id,
     _id: postId,
+    creatorId: id,
     isCommentsDisabled,
+    setIsCommentsDisabled,
   } = useContext(PostContext);
+
+  const dispatch = useDispatch();
 
   const toggleComments = () => {
     axiosClient
       .patch(`/post/toggle_comments?userId=${id}&postId=${postId}`)
-      .then(() =>
-        setPost((prev) => ({
-          ...prev,
-          isCommentsDisabled: !isCommentsDisabled,
-        }))
-      );
+      .then((response) => {
+        setIsCommentsDisabled((prev) => !prev);
+        dispatch(
+          setShowMessage({ message: response.data.message, type: "info" })
+        );
+      })
+      .catch((err) => {
+        if (err.response) {
+          dispatch(
+            setShowMessage({
+              message: err.response.data.message,
+              type: "error",
+            })
+          );
+        } else {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Please try again later.",
+              type: "error",
+            })
+          );
+        }
+      });
   };
   return (
     <li>

@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 import useCloseWidget from "hooks/useCloseWidget";
@@ -15,16 +15,19 @@ import { ReactComponent as MoreIcon } from "assets/icons/more.svg";
 
 const OptionsBtn = ({ setIsModifying }) => {
   // Destructure post info from context
-  const { _id: postId, creatorId } = useContext(PostContext);
+  const {
+    _id: postId,
+    creatorId,
+    isSaved: isSavedCon,
+  } = useContext(PostContext);
 
   // Get current user info from Redux
   const profile = useSelector((state) => state.profile);
-
   // Get current theme (light/dark) from Redux
   const theme = useSelector((state) => state.settings.theme);
 
-  // State to toggle options menu visibility
   const [isOpen, setIsOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(isSavedCon);
 
   // Ref to the options container (used for outside click detection)
   const optionsList = useRef(null);
@@ -59,7 +62,7 @@ const OptionsBtn = ({ setIsModifying }) => {
       {/* Dropdown menu */}
       {isOpen && (
         <ul
-          className={`absolute top-full right-0 rounded-xl w-max overflow-hidden z-10 ${menuBg}`}
+          className={`absolute top-full right-0 rounded-xl w-max overflow-hidden z-20 ${menuBg}`}
         >
           {/* Options only visible to post owner */}
           {isOwner && (
@@ -69,15 +72,19 @@ const OptionsBtn = ({ setIsModifying }) => {
                 setIsModifying={setIsModifying}
                 id={postId}
                 user={profile}
-              />{" "}
+              />
               {/* Edit mode */}
               <ToggleComments /> {/* Toggle comment visibility */}
             </div>
           )}
-
+          {profile && (
+            <div onClick={() => setIsOpen(false)}>
+              <SavePost id={postId} isSaved={isSaved} setIsSaved={setIsSaved} />{" "}
+              {/* Save post feature */}
+            </div>
+          )}
           {/* Public options */}
           <div onClick={() => setIsOpen(false)}>
-            <SavePost id={postId} /> {/* Save post feature */}
             <CopyLink id={postId} /> {/* Copy post link */}
           </div>
         </ul>

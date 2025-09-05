@@ -1,11 +1,13 @@
 import { Types } from "mongoose";
 
-import Conversation from "../models/conversation.js";
 import User from "../models/user.js";
+import Conversation from "../models/conversation.js";
+import Message from "../models/message.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
 import { handleError } from "../utils/errorHandler.js";
+import Profile from "../models/profile.js";
 
 const { ObjectId } = Types;
 
@@ -34,7 +36,6 @@ export const newConversationByFollow = async (req, res, next) => {
         { _id: new ObjectId(myId) },
         { _id: new ObjectId(accountToMessageId) },
       ],
-      updatedAt: new Date(),
     });
     await conversation.save();
     user.contacts.addToSet({
@@ -62,6 +63,9 @@ export const newConversationByFollow = async (req, res, next) => {
       );
 
       if (socketIdsList) {
+        const otherParticipantProfile = await Profile.findById(
+          otherParticipant.id
+        );
         /*
         if the user is online send a the new conversation 
         with the new contact by socket
@@ -70,11 +74,12 @@ export const newConversationByFollow = async (req, res, next) => {
           getServerSocketInstance()
             .to(socketId)
             .emit("add-new-conversation", {
-              conversation,
+              conversation: { ...conversation.toObject(), messages: [] },
               contact: {
                 _id: otherParticipant.id,
                 conversationId: conversation.id,
                 isOnline: otherParticipantSocketIdsList ? true : false,
+                ...otherParticipantProfile?.toObject(),
               },
             });
         });
@@ -112,7 +117,6 @@ export const newConversationByMessaging = async (req, res, next) => {
         { _id: new ObjectId(myId) },
         { _id: new ObjectId(accountToMessageId) },
       ],
-      updatedAt: new Date(),
     });
     await conversation.save();
     user.contacts.addToSet({
@@ -140,6 +144,9 @@ export const newConversationByMessaging = async (req, res, next) => {
         otherParticipant.id
       );
       if (socketIdsList) {
+        const otherParticipantProfile = await Profile.findById(
+          otherParticipant.id
+        );
         /*
         if the user is online send a the new conversation 
         with the new contact by socket
@@ -148,11 +155,12 @@ export const newConversationByMessaging = async (req, res, next) => {
           getServerSocketInstance()
             .to(socketId)
             .emit("add-new-conversation", {
-              conversation,
+              conversation: { ...conversation.toObject(), messages: [] },
               contact: {
                 _id: otherParticipant.id,
                 conversationId: conversation.id,
                 isOnline: otherParticipantSocketIdsList ? true : false,
+                ...otherParticipantProfile?.toObject(),
               },
             });
         });
@@ -179,7 +187,7 @@ export const getConversationInfo = async (req, res, next) => {
     req.conversation = conversation;
 
     if (messageId) {
-      const message = conversation.messages.id(messageId);
+      const message = await Message.findById(messageId);
       if (!message) {
         return res.status(404).json({ message: "Message not found." });
       }

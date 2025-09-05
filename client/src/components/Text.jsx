@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import PrimaryBtn from "./PrimaryBtn";
 import SubmitBtn from "./SubmitBtn";
 
 import axiosClient from "utils/AxiosClient";
+import { setShowMessage } from "state";
 
 const Text = (props) => {
-  const [text, setText] = useState("");
   const {
     type,
     postCreatorId,
@@ -17,11 +17,14 @@ const Text = (props) => {
     isModifying,
     setIsModifying,
   } = props;
+  const profile = useSelector((state) => state.profile);
 
-  const textArea = useRef(null);
+  const [text, setText] = useState("");
   const [modifiedText, setModifiedText] = useState(null);
   const [originalText, setOriginalText] = useState(props.text);
-  const profile = useSelector((state) => state.profile);
+
+  const dispatch = useDispatch();
+  const textArea = useRef(null);
 
   const editText = async () => {
     let requestUrl;
@@ -32,7 +35,7 @@ const Text = (props) => {
     } else if (type === "reply") {
       requestUrl = `reply/edit?userId=${postCreatorId}&postId=${postId}&commentId=${commentId}&replyId=${replyId}`;
     }
-    axiosClient
+    await axiosClient
       .patch(
         requestUrl,
         { text: modifiedText },
@@ -40,6 +43,27 @@ const Text = (props) => {
       )
       .then((response) => {
         setOriginalText(response.data.text);
+      })
+      .catch((err) => {
+        if (err.response) {
+          dispatch(
+            setShowMessage({
+              message:
+                err.response?.data?.message || "You cannot edit this text.",
+              type: "error",
+            })
+          );
+        } else {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Please try again later.",
+              type: "error",
+            })
+          );
+        }
+      })
+      .finally(() => {
+        setModifiedText(null);
         setIsModifying(false);
       });
   };
@@ -58,7 +82,7 @@ const Text = (props) => {
       {isModifying ? (
         <>
           <textarea
-            defaultValue={text}
+            defaultValue={originalText}
             autoFocus
             ref={textArea}
             dir="auto"
@@ -75,7 +99,7 @@ const Text = (props) => {
             <span>
               <SubmitBtn
                 disabled={!modifiedText || modifiedText === text}
-                onClick={() => editText()}
+                onClick={editText}
               >
                 Edit
               </SubmitBtn>
@@ -83,11 +107,13 @@ const Text = (props) => {
           </div>
         </>
       ) : (
-        <p dir="auto">
-          {text}{" "}
+        <div className="flex flex-col">
+          <pre dir="auto" className="font-[inherit]">
+            {text}
+          </pre>
           {text.length > 100 && originalText.length !== text.length && (
             <button
-              className="cursor-pointer hover:underline"
+              className="hover:underline w-fit"
               onClick={() => setText(originalText)}
             >
               show more
@@ -95,13 +121,13 @@ const Text = (props) => {
           )}
           {text.length > 100 && text.length === originalText.length && (
             <button
-              className="hover:underline"
+              className="hover:underline w-fit"
               onClick={() => setText(originalText.slice(0, 100).concat(" ..."))}
             >
               show less
             </button>
           )}
-        </p>
+        </div>
       )}
     </>
   );

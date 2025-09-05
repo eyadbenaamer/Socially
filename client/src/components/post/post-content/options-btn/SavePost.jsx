@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import { setShowMessage } from "state";
@@ -9,25 +8,39 @@ import { ReactComponent as SaveIcon } from "assets/icons/save.svg";
 import { ReactComponent as UnsaveIcon } from "assets/icons/unsave.svg";
 
 const SavePost = (props) => {
-  const { id } = props;
-  const [savedPosts, setSavedPosts] = useState([]);
+  const { id, isSaved, setIsSaved } = props;
+
   const dispatch = useDispatch();
 
   const savePost = () => {
-    axiosClient(`toggle_save_post?_id=${id}`).then(() => {
-      if (!savedPosts.includes(id)) {
-        dispatch(setShowMessage("Post saved."));
-      } else {
-        dispatch(setShowMessage("Post unsaved."));
-      }
-    });
+    axiosClient
+      .patch(`toggle_save_post?id=${id}`)
+      .then(() => {
+        if (!isSaved) {
+          dispatch(setShowMessage({ message: "Post saved.", type: "info" }));
+        } else {
+          dispatch(setShowMessage({ message: "Post unsaved.", type: "info" }));
+        }
+        setIsSaved((prev) => !prev);
+      })
+      .catch((err) => {
+        if (err.response) {
+          dispatch(
+            setShowMessage({
+              message: err.response.data.message,
+              type: "error",
+            })
+          );
+        } else {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Please try again later.",
+              type: "error",
+            })
+          );
+        }
+      });
   };
-
-  useEffect(() => {
-    axiosClient(`saved_posts_ids/`).then((resposne) =>
-      setSavedPosts(resposne.data)
-    );
-  }, []);
 
   return (
     <li>
@@ -35,14 +48,15 @@ const SavePost = (props) => {
         className="flex w-full gap-2 p-3 bg-hovered"
         onClick={() => savePost()}
       >
-        {!savedPosts.includes(id) ? (
+        {isSaved === false && (
           <>
             <span className="w-6">
               <SaveIcon />
             </span>
             Save the post
           </>
-        ) : (
+        )}
+        {isSaved === true && (
           <>
             <span className="w-6">
               <UnsaveIcon />

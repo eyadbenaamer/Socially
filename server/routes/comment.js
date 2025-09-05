@@ -1,27 +1,30 @@
 import express from "express";
 import {
-  get,
+  getOne,
+  getPage,
   edit,
   deleteComment,
   likeToggle,
+  getLikes,
 } from "../controllers/comment.js";
-import { verifyToken } from "../middleware/auth.js";
+import { getUserInfo, verifyToken } from "../middleware/auth.js";
 import { verifyId } from "../middleware/check.js";
 import { getPostsInfo } from "../middleware/post.js";
-const router = express.Router();
+
 //root path: /comment
 
-/*READ*/
+const router = express.Router();
 
-// get a pirticular comment
-router.get("/", verifyId, getPostsInfo, get);
+router.get("/", verifyId, getUserInfo, getPostsInfo, getOne);
 
-/*UPDATE*/
+router.get("/likes", verifyId, getUserInfo, getLikes);
+
+router.get("/page", verifyId, getUserInfo, getPostsInfo, getPage);
+
 router.patch("/like-toggle", verifyId, verifyToken, getPostsInfo, likeToggle);
 
 router.patch("/edit", verifyId, verifyToken, getPostsInfo, edit);
 
-/*DELETE*/
 router.delete("/delete", verifyId, verifyToken, getPostsInfo, deleteComment);
 
 export default router;

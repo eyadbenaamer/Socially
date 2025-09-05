@@ -17,7 +17,10 @@ const SearchResults = ({ results, hasSearched }) => {
   return (
     <div className="flex flex-col gap-10">
       {results.map((profile) => (
-        <div className="flex items-start gap-4 transition-all rounded-xl xl:w-3/4">
+        <div
+          key={profile._id}
+          className="flex items-start gap-4 transition-all rounded-xl xl:w-3/4"
+        >
           <span className="w-12">
             <UserPicture profile={profile} />
           </span>

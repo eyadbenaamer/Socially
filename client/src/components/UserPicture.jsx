@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import HoverWrapper from "./user-hover-card/HoverWrapper";
 
-const UserPicture = ({ profile, noLink = false }) => {
+const UserPicture = ({ profile, noLink = false, noCard }) => {
   const { _id: id, username, firstName, lastName, profilePicPath } = profile;
 
   const myProfile = useSelector((state) => state.profile);
@@ -46,7 +46,7 @@ const UserPicture = ({ profile, noLink = false }) => {
   );
 
   return (
-    <HoverWrapper profile={profile}>
+    <HoverWrapper noCard={noCard} profile={profile}>
       <div className="relative">
         {noLink ? (
           <div className="circle shadow-md border-2 block">{imageContent}</div>

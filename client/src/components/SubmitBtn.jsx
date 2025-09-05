@@ -11,7 +11,7 @@ const SubmitBtn = forwardRef((props, ref) => {
       <button
         ref={ref}
         tabIndex={tabIndex}
-        className="flex justify-center py-2 px-4 border-solid bg-primary rounded-xl text-white disabled:opacity-70"
+        className="flex justify-center py-1 px-4 border-solid bg-primary rounded-xl text-white disabled:opacity-70"
         disabled={disabled || isLoading}
         onClick={async () => {
           // this will trigger the loading effect

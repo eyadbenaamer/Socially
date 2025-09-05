@@ -2,17 +2,6 @@ import { Schema, model, Types } from "mongoose";
 
 const { ObjectId } = Types;
 
-const NotificationSchema = new Schema({
-  content: String,
-  type: String, // following, like, comment or reply
-  // the url reffered to when the notification is clicked
-  path: String,
-  // the ID of the engaged user in the notification
-  userId: String,
-  createdAt: Number,
-  isRead: { type: Boolean, default: false },
-});
-
 const UserSchema = new Schema(
   {
     email: { type: String, uniqe: true, max: 50 },
@@ -27,7 +16,6 @@ const UserSchema = new Schema(
       rel: "User",
       default: [],
     },
-    notifications: [NotificationSchema],
     conversations: [{ type: ObjectId, ref: "Conversation" }],
     unreadMessagesCount: { type: Number, default: 0, min: 0 },
     unreadNotificationsCount: { type: Number, default: 0, min: 0 },
@@ -67,5 +55,8 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
-const User = model("Users", UserSchema);
+
+UserSchema.index({ email: 1 });
+
+const User = model("User", UserSchema);
 export default User;

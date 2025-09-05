@@ -1,13 +1,24 @@
 import fs from "fs";
 import { fork } from "child_process";
+import { Types } from "mongoose";
 
 import User from "../models/user.js";
 import Profile from "../models/profile.js";
 import Post from "../models/post.js";
+import Comment from "../models/comment.js";
+import Reply from "../models/reply.js";
+import View from "../models/view.js";
+import PostLike from "../models/PostLike.js";
+import CommentLike from "../models/commentLike.js";
+import ReplyLike from "../models/replyLike.js";
+import Notification from "../models/notification.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
+import { get as getNotification } from "./notification.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
 import { handleError } from "../utils/errorHandler.js";
+
+const { ObjectId } = Types;
 
 export const create = async (req, res) => {
   try {
@@ -15,12 +26,19 @@ export const create = async (req, res) => {
     const { text, location } = req.body;
     const { filesInfo } = req;
 
+    const profile = await Profile.findById(id);
     const post = await Post.create({
-      creatorId: id.trim(),
+      creatorId: id,
       text: text?.trim(),
       files: filesInfo,
       createdAt: Date.now(),
       location: location?.trim(),
+    });
+
+    await View.create({
+      userId: id,
+      postId: post._id,
+      createdAt: Date.now(),
     });
 
     /*
@@ -30,11 +48,18 @@ export const create = async (req, res) => {
     const child = fork("./workers/classifyText.js");
     child.send({ postId: post._id, text });
 
-    return res.status(201).json(post);
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. Please try again later." });
+    return res.status(201).json({
+      ...post.toObject(),
+      profile,
+      commentsCount: 0,
+      likesCount: 0,
+      views: 1,
+      isLiked: false,
+      isSaved: false,
+      isViewed: true,
+    });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -42,10 +67,19 @@ export const share = async (req, res) => {
   const uploadsFolder = `${process.env.API_URL}/storage/`;
   try {
     const { user } = req;
-    const profile = await Profile.findById(user.id);
-    let { text, location } = req.body;
     let { postId } = req.query;
+    let { text, location } = req.body;
     const { media } = req.files;
+
+    const profile = await Profile.findById(user.id);
+    const sharedPost = await Post.findById(postId);
+
+    if (!sharedPost) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+
+    const sharedPostProfile = await Profile.findById(sharedPost.creatorId);
+
     let filesInfo = [];
     if (media) {
       media.map((file) => {
@@ -57,41 +91,32 @@ export const share = async (req, res) => {
         } else if (file.mimetype.startsWith("video")) {
           filesInfo.push({
             path: `${uploadsFolder}${file.filename}`,
-            fileType: "vedio",
+            fileType: "video",
           });
         }
       });
-    }
-    const sharedPost = await Post.findById(postId);
-    if (!sharedPost) {
-      return res.status(404).json({ message: "Post not found." });
     }
     /*
     if who shared the post is NOT the same as the post creator 
     then a notification will be created.
     */
-    if (user.id !== sharedPost.creatorId) {
-      const newNotification = {
-        content: `${profile.firstName} shared your post.`,
+    if (user.id !== sharedPost.creatorId.toString()) {
+      let notification = await Notification.create({
         type: "share",
-        userId: profile._id,
+        userId: sharedPost.creatorId,
+        engagedUserId: user._id,
         createdAt: Date.now(),
         isRead: false,
-      };
+      });
       const postCreator = await User.findById(sharedPost.creatorId);
       if (postCreator) {
-        postCreator.notifications.unshift(newNotification);
         postCreator.unreadNotificationsCount += 1;
         await postCreator.save();
-
-        const notification = postCreator.notifications[0];
 
         const post = await Post.create({
           creatorId: user.id,
           text: text.trim(),
           createdAt: Date.now(),
-          comments: [],
-          views: [],
           location: location.trim(),
           sharedPost: {
             _id: sharedPost._id,
@@ -101,9 +126,13 @@ export const share = async (req, res) => {
         });
         await post.save();
         notification.path = `/post?_id=${post.id}`;
+        await notification.save();
         await postCreator.save();
+        notification = await getNotification(notification.id);
         // sending the notification by web socket
-        const socketIdsList = getOnlineUsers().get(sharedPost.creatorId);
+        const socketIdsList = getOnlineUsers().get(
+          sharedPost.creatorId.toString()
+        );
         if (socketIdsList) {
           socketIdsList.map((socketId) => {
             getServerSocketInstance()
@@ -111,22 +140,38 @@ export const share = async (req, res) => {
               .emit("push-notification", notification);
           });
         }
-        return res.status(201).json(post);
+        return res.status(201).json({
+          ...post.toObject(),
+          sharedPost: {
+            ...sharedPost.toObject(),
+            profile: sharedPostProfile.toObject(),
+          },
+          profile,
+          commentsCount: 0,
+          likesCount: 0,
+          views: 1,
+          isSaved: false,
+          isLiked: false,
+          isViewed: true,
+        });
       }
     }
     const post = await Post.create({
       creatorId: user.id,
       text: text.trim(),
       createdAt: Date.now(),
-      comments: [],
-      views: [],
       location: location.trim(),
       sharedPost: {
         _id: sharedPost._id,
         creatorId: sharedPost.creatorId,
       },
     });
-    await post.save();
+
+    await View.create({
+      userId: user.id,
+      postId: post.id,
+      createdAt: Date.now(),
+    });
 
     // adding the post's category to the user's favorite topics
     const updateObj = {};
@@ -135,16 +180,437 @@ export const share = async (req, res) => {
     });
 
     await user.updateOne({ $inc: updateObj }, { new: true });
-    return res.status(201).json(post);
+
+    return res.status(201).json({
+      ...post.toObject(),
+      sharedPost: {
+        ...sharedPost.toObject(),
+        profile: sharedPostProfile.toObject(),
+      },
+      profile,
+      commentsCount: 0,
+      likesCount: 0,
+      views: 1,
+      isSaved: false,
+      isLiked: false,
+      isViewed: true,
+    });
   } catch (err) {
     return handleError(err, res);
   }
 };
 
-export const getPost = async (req, res) => {
+export const get = async (req, res) => {
   try {
-    const { post } = req;
-    return res.status(200).json(post);
+    const userId = req.user?._id;
+    const postId = req.query?.postId;
+    if (!postId) {
+      return res.status(400).json({ message: "Post ID is required" });
+    }
+    const post = await Post.aggregate([
+      {
+        $match: {
+          _id: new ObjectId(postId),
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          let: {
+            sharedPostId: "$sharedPost._id",
+            currentUserId: userId,
+          },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_id", "$$sharedPostId"] } } },
+            {
+              $lookup: {
+                from: "profiles",
+                let: { creatorId: "$creatorId" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: { $eq: ["$_id", "$$creatorId"] },
+                    },
+                  },
+                  {
+                    $project: {
+                      _id: 1,
+                      firstName: 1,
+                      lastName: 1,
+                      username: 1,
+                      profilePicPath: 1,
+                      followersCount: 1,
+                      followingCount: 1,
+                      bio: 1,
+                      location: 1,
+                      gender: 1,
+                      lastSeenAt: 1,
+                    },
+                  },
+                ],
+                as: "profileArr",
+              },
+            },
+            {
+              $addFields: {
+                profile: { $arrayElemAt: ["$profileArr", 0] },
+              },
+            },
+            // follow state for shared post creator
+            {
+              $lookup: {
+                from: "follows",
+                let: {
+                  targetId: "$creatorId",
+                  currentUserId: userId,
+                },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $and: [
+                          { $eq: ["$followedId", "$$targetId"] },
+                          { $eq: ["$followerId", "$$currentUserId"] },
+                        ],
+                      },
+                    },
+                  },
+                  { $limit: 1 },
+                ],
+                as: "sharedFollowArr",
+              },
+            },
+            {
+              $addFields: {
+                profile: {
+                  $mergeObjects: [
+                    { $ifNull: ["$profile", {}] },
+                    {
+                      isFollowing: { $gt: [{ $size: "$sharedFollowArr" }, 0] },
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              $project: {
+                profileArr: 0,
+                sharedFollowArr: 0,
+              },
+            },
+          ],
+          as: "sharedPostArr",
+        },
+      },
+      {
+        $lookup: {
+          from: "views",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$postId", "$$postId"] },
+              },
+            },
+            { $count: "count" },
+          ],
+          as: "viewsCountArr",
+        },
+      },
+      {
+        $addFields: {
+          isSharedNull: { $eq: ["$sharedPost", null] },
+        },
+      },
+      {
+        $lookup: {
+          from: "postlikes",
+          let: { postId: "$_id", userId: userId },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$postId", "$$postId"] },
+                    { $eq: ["$userId", "$$userId"] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "userLikeArr",
+        },
+      },
+      {
+        $lookup: {
+          from: "postlikes",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$postId", "$$postId"] },
+              },
+            },
+            { $count: "count" },
+          ],
+          as: "likesCountArr",
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$postId", "$$postId"] },
+              },
+            },
+            { $count: "count" },
+          ],
+          as: "commentsCountArr",
+        },
+      },
+      {
+        $lookup: {
+          from: "views",
+          let: { postId: "$_id", userId: userId },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$postId", "$$postId"] },
+                    { $eq: ["$userId", "$$userId"] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "userViewsArr",
+        },
+      },
+      // saved state for current user
+      {
+        $lookup: {
+          from: "savedposts",
+          let: { postId: "$_id", userId: userId },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$postId", "$$postId"] },
+                    { $eq: ["$userId", "$$userId"] },
+                  ],
+                },
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: "userSavedArr",
+        },
+      },
+      {
+        $lookup: {
+          from: "profiles",
+          let: { creatorId: "$creatorId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$creatorId"] },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                username: 1,
+                profilePicPath: 1,
+                followersCount: 1,
+                followingCount: 1,
+                bio: 1,
+                location: 1,
+                gender: 1,
+                lastSeenAt: 1,
+              },
+            },
+          ],
+          as: "profileArr",
+        },
+      },
+      // follow state for main post creator
+      {
+        $lookup: {
+          from: "follows",
+          let: {
+            creatorId: "$creatorId",
+            currentUserId: userId,
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$followedId", "$$creatorId"] },
+                    { $eq: ["$followerId", "$$currentUserId"] },
+                  ],
+                },
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: "followArr",
+        },
+      },
+      {
+        $addFields: {
+          isLiked: { $gt: [{ $size: "$userLikeArr" }, 0] },
+          // if user not authenticated (userId null) treat as viewed
+          isViewed: userId ? { $gt: [{ $size: "$userViewsArr" }, 0] } : true,
+          likesCount: {
+            $cond: [
+              { $gt: [{ $size: "$likesCountArr" }, 0] },
+              { $arrayElemAt: ["$likesCountArr.count", 0] },
+              0,
+            ],
+          },
+          commentsCount: {
+            $cond: [
+              { $gt: [{ $size: "$commentsCountArr" }, 0] },
+              { $arrayElemAt: ["$commentsCountArr.count", 0] },
+              0,
+            ],
+          },
+          views: {
+            $cond: [
+              { $gt: [{ $size: "$viewsCountArr" }, 0] },
+              { $arrayElemAt: ["$viewsCountArr.count", 0] },
+              0,
+            ],
+          },
+          isSaved: { $gt: [{ $size: "$userSavedArr" }, 0] },
+          sharedPost: {
+            $cond: [
+              { $gt: [{ $size: "$sharedPostArr" }, 0] },
+              { $arrayElemAt: ["$sharedPostArr", 0] },
+              null,
+            ],
+          },
+          // embed isFollowing into profile
+          profile: {
+            $mergeObjects: [
+              { $ifNull: ["$profile", {}] },
+              { isFollowing: { $gt: [{ $size: "$followArr" }, 0] } },
+              { $arrayElemAt: ["$profileArr", 0] },
+            ],
+          },
+        },
+      },
+      {
+        $project: {
+          commentsCountArr: 0,
+          likesCountArr: 0,
+          userLikeArr: 0,
+          userViewsArr: 0,
+          viewsCountArr: 0,
+          sharedPostArr: 0,
+          keywords: 0,
+          profileArr: 0,
+          followArr: 0,
+          isFollowing: 0,
+          userSavedArr: 0,
+        },
+      },
+    ]);
+    return res.status(200).json(post[0]);
+  } catch (error) {
+    return handleError(err, res);
+  }
+};
+
+export const getLikes = async (req, res) => {
+  try {
+    const { id, cursor } = req.query;
+    const cursorDate = cursor ? parseInt(cursor) : 0;
+    const userId = req.user?._id || req.user?.id; // may be undefined for unauthenticated
+
+    const likes = await PostLike.aggregate([
+      { $match: { postId: new ObjectId(id), createdAt: { $gt: cursorDate } } },
+      { $sort: { createdAt: 1 } },
+      { $limit: 30 },
+      {
+        $lookup: {
+          from: "profiles",
+          localField: "userId",
+          foreignField: "_id",
+          as: "profile",
+          pipeline: [
+            {
+              $project: {
+                firstName: 1,
+                lastName: 1,
+                username: 1,
+                profilePicPath: 1,
+                profileCoverPath: 1,
+                bio: 1,
+                followersCount: 1,
+                followingCount: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          profile: { $arrayElemAt: ["$profile", 0] },
+        },
+      },
+      // Attach isFollowing only if we have an authenticated user
+      ...(userId
+        ? [
+            {
+              $lookup: {
+                from: "follows",
+                let: { targetUserId: "$profile._id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $and: [
+                          { $eq: ["$followedId", "$$targetUserId"] },
+                          { $eq: ["$followerId", new ObjectId(userId)] },
+                        ],
+                      },
+                    },
+                  },
+                  { $limit: 1 },
+                ],
+                as: "followArr",
+              },
+            },
+            {
+              $addFields: {
+                isFollowing: { $gt: [{ $size: "$followArr" }, 0] },
+              },
+            },
+            { $project: { followArr: 0 } },
+          ]
+        : []),
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: [
+              { createdAt: "$createdAt" },
+              "$profile",
+              userId ? { isFollowing: "$isFollowing" } : {},
+            ],
+          },
+        },
+      },
+    ]);
+    return res.status(200).json(likes);
   } catch (err) {
     return handleError(err, res);
   }
@@ -154,7 +620,7 @@ export const edit = async (req, res) => {
   try {
     const { user, post } = req;
     const { text, location } = req.body;
-    if (post.creatorId !== user.id) {
+    if (post.creatorId.toString() !== user.id) {
       return res.status(401).send("Unauthorized");
     }
 
@@ -167,14 +633,32 @@ export const edit = async (req, res) => {
   }
 };
 
+export const setViewed = async (req, res) => {
+  try {
+    const { user, post } = req;
+    const isViewed = await View.findOne({ postId: post._id, userId: user._id });
+    if (isViewed) {
+      return res.status(409).send("already viewed");
+    }
+    await View.create({
+      userId: user.id,
+      postId: post.id,
+      createdAt: Date.now(),
+    });
+    return res.send("success");
+  } catch (err) {
+    return handleError(err, res);
+  }
+};
+
 export const toggleComments = async (req, res) => {
   try {
     const { post } = req;
     post.isCommentsDisabled = !post.isCommentsDisabled;
     await post.save();
     const message = post.isCommentsDisabled
-      ? "comments disabled"
-      : "comments enabled";
+      ? "Disabled Comments."
+      : "Enabled Comments.";
     return res.status(200).json({ message });
   } catch (err) {
     return handleError(err, res);
@@ -183,23 +667,22 @@ export const toggleComments = async (req, res) => {
 export const likeToggle = async (req, res) => {
   try {
     const { user, post } = req;
-    const profile = await Profile.findById(user.id);
     const postCreator = await User.findById(post.creatorId);
-    const like = post.likes.id(user.id);
+    const like = await PostLike.findOne({ userId: user.id, postId: post.id });
     /*
-    if the user liked the post then
-    add thier id to the post's likes
+    if the user liked the post then create 
+    a like doc for the user and the post
     */
     if (like) {
       /*
       if who unliked the post is the same as the post creator 
       then no notification will be removed.
       */
-      if (user.id !== post.creatorId) {
+      if (user.id !== post.creatorId.toString()) {
         // romving the like's notification
-        const notification = postCreator.notifications.id(like.notificationId);
+        const notification = await Notification.findById(like.notificationId);
         if (notification) {
-          const socketIdsList = getOnlineUsers().get(post.creatorId);
+          const socketIdsList = getOnlineUsers().get(post.creatorId.toString());
           if (socketIdsList) {
             socketIdsList.map((socketId) => {
               getServerSocketInstance()
@@ -211,41 +694,39 @@ export const likeToggle = async (req, res) => {
           if (!notification.isRead) {
             postCreator.unreadNotificationsCount--;
           }
-          notification.deleteOne();
+          await notification.deleteOne();
           await postCreator.save();
         }
       }
-      like.deleteOne();
-      await post.save();
-      return res.status(200).json({ likes: post.likes });
+      await like.deleteOne();
+      return res.status(200).json({ isLiked: false });
     }
-    /*
-    if the user haven't like the post then
-    add thier id to the post's likes
-    */
-
     /*
     if who liked the post is the same as the post creator 
     then no notification will be created.
     */
-    if (user.id !== post.creatorId) {
-      const newNotification = {
-        userId: profile._id,
-        content: `${profile.firstName} liked your post.`,
-        type: "like",
+    if (user.id !== post.creatorId.toString()) {
+      let notification = await Notification.create({
+        userId: post.creatorId,
+        engagedUserId: user._id,
+        type: "postLike",
         path: `/post?_id=${post.id}`,
         createdAt: Date.now(),
         isRead: false,
-      };
+      });
       if (postCreator) {
-        postCreator.notifications.unshift(newNotification);
         postCreator.unreadNotificationsCount += 1;
         await postCreator.save();
-        const notification = postCreator.notifications[0];
-        post.likes.addToSet({ _id: user.id, notificationId: notification.id });
-        await post.save();
 
-        const socketIdsList = getOnlineUsers().get(post.creatorId);
+        await PostLike.create({
+          postId: post.id,
+          userId: user.id,
+          notificationId: notification.id,
+          createdAt: Date.now(),
+        });
+        notification = await getNotification(notification.id);
+
+        const socketIdsList = getOnlineUsers().get(post.creatorId.toString());
         if (socketIdsList) {
           socketIdsList.map((socketId) => {
             getServerSocketInstance()
@@ -257,16 +738,19 @@ export const likeToggle = async (req, res) => {
 
       // adding the post's category to the user's favorite topics
       const updateObj = {};
-      post.keywords.forEach((keyword) => {
+      post.keywords?.forEach((keyword) => {
         updateObj[`favoriteTopics.${keyword}.count`] = 1;
       });
 
       await user.updateOne({ $inc: updateObj }, { new: true });
-      return res.status(200).json({ likes: post.likes });
+      return res.status(200).json({ isLiked: true });
     }
-    post.likes.addToSet({ _id: user.id });
-    await post.save();
-    return res.status(200).json({ likes: post.likes });
+    await PostLike.create({
+      postId: post.id,
+      userId: user.id,
+      createdAt: Date.now(),
+    });
+    return res.status(200).json({ isLiked: true });
   } catch (err) {
     return handleError(err, res);
   }
@@ -276,7 +760,7 @@ export const deletePost = async (req, res) => {
   try {
     const { user, post } = req;
 
-    if (post.creatorId !== user.id) {
+    if (post.creatorId?.toString() !== user.id) {
       return res.status(401).send("Unauthorized");
     }
 
@@ -285,7 +769,9 @@ export const deletePost = async (req, res) => {
       const filename = `./public/storage/${file.path.split("/").at(-1)}`;
       try {
         fs.unlinkSync(filename);
-      } catch {}
+      } catch (e) {
+        console.log(e);
+      }
     });
 
     // if the post is a shared post then the share notification should be deleted
@@ -294,12 +780,12 @@ export const deletePost = async (req, res) => {
     if who shared the post is the same as the post creator 
     then no notification will be removed.
     */
-      if (user.id !== post.sharedPost.creatorId) {
+      if (user.id !== post.sharedPost.creatorId.toString()) {
         const sharedPostCreator = await User.findById(
           post.sharedPost.creatorId
         );
         // romving the like's notification
-        const notification = sharedPostCreator.notifications.id(
+        const notification = await Notification.findById(
           post.sharedPost.notificationId
         );
         if (notification) {
@@ -315,11 +801,19 @@ export const deletePost = async (req, res) => {
           if (!notification.isRead) {
             sharedPostCreator.unreadNotificationsCount--;
           }
-          notification.deleteOne();
+          await notification.deleteOne();
           await sharedPostCreator.save();
         }
       }
     }
+    // delete all related docs to the post
+    await PostLike.deleteMany({ postId: post.id });
+    await View.deleteMany({ postId: post.id });
+    await Reply.deleteMany({ postId: post.id });
+    await ReplyLike.deleteMany({ postId: post.id });
+    await Comment.deleteMany({ postId: post.id });
+    await CommentLike.find({ postId: post.id });
+
     await post.deleteOne();
     return res.status(200).json({ message: "post deleted successfully" });
   } catch (err) {

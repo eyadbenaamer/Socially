@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import {
   addMessage,
@@ -12,6 +12,7 @@ import {
   messageLikeToggle,
   removeNotification,
   setNotifyTyping,
+  setShowMessage,
   updateActivityStatus,
   updateConversationStatus,
 } from "state";
@@ -40,11 +41,38 @@ export const connectToSocketServer = () => {
 
 const useHandleSocket = () => {
   const dispatch = useDispatch();
+  // Track whether we previously got disconnected so we can distinguish
+  // the initial connect from a reconnection.
+  const wasDisconnectedRef = useRef(false);
 
   useEffect(() => {
     if (!socket) {
       return;
     }
+    const handleReconnect = () => {
+      if (wasDisconnectedRef.current) {
+        dispatch(
+          setShowMessage({
+            message: "Connection restored. You're back online.",
+            type: "info",
+          })
+        );
+        wasDisconnectedRef.current = false;
+      }
+    };
+    const handleDisconnect = () => {
+      wasDisconnectedRef.current = true;
+      try {
+        dispatch(
+          setShowMessage({
+            message: "Connection lost. Please check your internet connection.",
+            type: "error",
+          })
+        );
+      } catch (error) {}
+    };
+
+    // Core domain event listeners
     socket.on("contact-connected", (data) => {
       dispatch(
         updateActivityStatus({ id: data.id, isOnline: true, lastSeenAt: null })
@@ -91,6 +119,30 @@ const useHandleSocket = () => {
     socket.on("remove-notification", (data) => {
       dispatch(removeNotification(data));
     });
+
+    // Connection lifecycle listeners
+    socket.on("disconnect", handleDisconnect);
+    // The manager emits reconnect events (after a successful recovery)
+    socket.io?.on("reconnect", handleReconnect);
+
+    return () => {
+      // Remove domain listeners
+      socket.off("contact-connected");
+      socket.off("contact-disconnected");
+      socket.off("send-message");
+      socket.off("add-new-conversation");
+      socket.off("update-conversation");
+      socket.off("clear-conversation");
+      socket.off("delete-conversation");
+      socket.off("message-like-toggle");
+      socket.off("delete-message");
+      socket.off("notify-typing");
+      socket.off("push-notification");
+      socket.off("remove-notification");
+      // Connection lifecycle
+      socket.off("disconnect", handleDisconnect);
+      socket.io?.off("reconnect", handleReconnect);
+    };
   }, [socket]);
 };
 

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 
 const UserPicture = ({ profile, isOnline }) => {
-  const { _id: id, username, firstName, lastName, profilePicPath } = profile;
+  const { _id: id, firstName, lastName, profilePicPath } = profile;
 
   const myProfile = useSelector((state) => state.profile);
 

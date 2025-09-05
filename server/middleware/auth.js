@@ -26,6 +26,28 @@ export const verifyToken = async (req, res, next) => {
   }
 };
 
+export const getUserInfo = async (req, res, next) => {
+  let token = req.header("Authorization");
+  if (!token) {
+    return next();
+  }
+  if (token.startsWith("Bearer ")) {
+    token = token.trimStart().slice(7);
+  }
+  try {
+    const userInfo = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(userInfo.id);
+    if (user) {
+      req.user = user;
+      next();
+    } else {
+      return res.status(403).json("invalid token or user doesn't exist");
+    }
+  } catch (err) {
+    return handleError(err, res);
+  }
+};
+
 export const verifySocketToken = async (socket, next) => {
   let token = socket.handshake.auth?.token;
   if (!token) {
@@ -47,6 +69,6 @@ export const verifySocketToken = async (socket, next) => {
   } catch {
     // return res
     // .status(500)
-    // .json({ message: "An error occurred. Plaese try again later." });
+    // .json({ message: "An error occurred. Please try again later." });
   }
 };

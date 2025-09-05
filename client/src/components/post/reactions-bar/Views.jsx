@@ -10,7 +10,7 @@ const Views = () => {
 
   return (
     <div className="flex items-center gap-1 mx-">
-      <span className="text-xs">{convertToUnit(views.length)}</span>
+      <span className="text-xs">{convertToUnit(views)}</span>
       <div className="w-4">
         <ViewsIcon />
       </div>

@@ -3,13 +3,11 @@ import { Link } from "react-router-dom";
 import UserPicture from "components/UserPicture";
 
 import useGetTime from "hooks/useGetTime";
-import useFetchProfile from "hooks/useFetchProfile";
 import HoverWrapper from "components/user-hover-card/HoverWrapper";
 
 const CreatorInfo = (props) => {
-  const { creatorId, createdAt, location, postId } = props;
+  const { profile, createdAt, location, postId } = props;
   const time = useGetTime(createdAt);
-  const [profile] = useFetchProfile(creatorId);
 
   if (!profile) {
     return (

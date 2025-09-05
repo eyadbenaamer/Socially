@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import RedBtn from "components/RedBtn";
@@ -8,13 +9,15 @@ import CheckBox from "components/CheckBox";
 import axiosClient from "utils/AxiosClient";
 import { SelectedChatContext } from "pages/messaging";
 import { useDialog } from "components/dialog/DialogContext";
+import { setShowMessage } from "state";
 
 import { ReactComponent as TrashIcon } from "assets/icons/trash-basket.svg";
 
 const Delete = ({ id }) => {
   const { conversationId } = useParams();
-  const { participantProfile } = useContext(SelectedChatContext);
+  const { participant } = useContext(SelectedChatContext);
   const { openDialog, closeDialog } = useDialog();
+  const dispatch = useDispatch();
 
   let forEveryone = false;
 
@@ -23,7 +26,21 @@ const Delete = ({ id }) => {
       .delete(
         `message/delete?conversationId=${conversationId}&messageId=${id}&forEveryone=${forEveryone}`
       )
-      .then(() => {
+      .catch((err) => {
+        if (err.response) {
+          dispatch(
+            setShowMessage({ message: err.response?.data, type: "error" })
+          );
+        } else {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Please try again later.",
+              type: "error",
+            })
+          );
+        }
+      })
+      .finally(() => {
         document.body.style = null;
         closeDialog();
       });
@@ -40,7 +57,7 @@ const Delete = ({ id }) => {
                 forEveryone = checked;
               }}
             />
-            <span>Also delete for {participantProfile.firstName}</span>
+            <span>Also delete for {participant.firstName}</span>
           </div>
         </div>
         <div className="flex justify-between mt-2">

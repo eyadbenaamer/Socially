@@ -56,7 +56,7 @@ const Dialog = (props) => {
   return (
     <dialog
       aria-busy={true}
-      className="p-3 ps-1 text-inherit w-full fixed top-0 bg-[#00000063] h-[100dvh] flex items-center justify-center z-[1150]"
+      className=" text-inherit w-full fixed top-0 bg-[#00000063] h-[100dvh] flex items-center justify-center z-[1150]"
     >
       <section
         ref={prompt}

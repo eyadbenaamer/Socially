@@ -1,5 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 import { client } from "../services/elasticsearch.js";
+
 const { ObjectId } = Types;
 
 const ProfileSchema = new Schema({
@@ -24,22 +25,16 @@ const ProfileSchema = new Schema({
     min: 1,
     max: 20,
   },
+  bio: { type: String, default: "" },
+  followingCount: { type: Number, default: 0, min: 0 },
+  followersCount: { type: Number, default: 0, min: 0 },
   profilePicPath: {
     type: String,
     default: `/assets/blank_user.jpg`,
   },
   coverPicPath: { type: String, default: "" },
-  bio: { type: String, default: "" },
   birthDate: String,
   gender: String,
-  followers: {
-    type: [{ _id: ObjectId, notificationId: String }],
-    default: [],
-  },
-  following: {
-    type: [{ _id: ObjectId }],
-    default: [],
-  },
   location: {
     type: String,
     min: 2,
@@ -48,6 +43,8 @@ const ProfileSchema = new Schema({
   lastSeenAt: Number,
   joinedAt: { type: Number, default: Date.now() },
 });
+
+ProfileSchema.index({ username: 1 });
 
 // indexing the profile in elasticsearch
 ProfileSchema.post("save", async function (doc) {
@@ -69,6 +66,6 @@ ProfileSchema.post("save", async function (doc) {
   }
 });
 
-const Profile = model("Profiles", ProfileSchema);
+const Profile = model("Profile", ProfileSchema);
 
 export default Profile;

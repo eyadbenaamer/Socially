@@ -1,91 +1,98 @@
+import Message from "../models/message.js";
 import User from "../models/user.js";
 
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
 import { handleError } from "../utils/errorHandler.js";
 
-export const sendMessage = async (req, res) => {
+export const create = async (req, res) => {
   try {
     const { filesInfo, user, conversation } = req;
     const { replyTo } = req.query;
     const { text } = req.body;
+    const now = Date.now();
+    const onlineUsersMap = getOnlineUsers();
 
-    const newMessage = {
+    // Determine which participants are currently online (include sender)
+    const deliveredToSet = [];
+    for (const participant of conversation.participants) {
+      const socketIdsList = onlineUsersMap.get(participant.id);
+      if (socketIdsList) {
+        deliveredToSet.push({ _id: participant._id });
+      }
+    }
+
+    const message = await Message.create({
+      conversationId: conversation._id,
       senderId: user.id,
       to: conversation.participants,
       text,
       files: filesInfo,
       info: {
         readBy: [{ _id: user.id }],
+        deliveredTo: deliveredToSet,
       },
       replyTo: replyTo ? replyTo : null,
-      createdAt: Date.now(),
-    };
-    // conversation.updatedAt is only updated when a new message is sent or when messages is liked
-    conversation.messages.unshift(newMessage);
-    const message = conversation.messages[0];
-    conversation.updatedAt = message.createdAt;
-
-    // if recipient is online then add user's ID to deliveredTo array.
-    conversation.participants.map(async (participant) => {
-      const socketIdsList = getOnlineUsers().get(participant.id);
-      if (socketIdsList) {
-        message.info.deliveredTo.addToSet({ _id: participant._id });
-      }
+      createdAt: now,
     });
-    await conversation.save();
 
-    conversation.participants.map(async (participant) => {
+    // Update conversation metadata & unread counts
+    conversation.updatedAt = now;
+    const senderSubDoc = conversation.participants.id(user.id);
+    if (senderSubDoc) {
+      senderSubDoc.lastReadMessageId = message._id;
+    }
+
+    // Collect participant user docs for offline handling
+    const participantUserDocs = new Map();
+
+    for (const participant of conversation.participants) {
       if (participant.id !== user.id) {
         participant.unreadMessagesCount += 1;
-        await conversation.updateOne(conversation);
       }
-    });
-    conversation.participants.map(async (participant) => {
-      const participantDoc = await User.findById(participant._id);
+      // Fetch user doc once
+      const userDoc = await User.findById(participant._id);
+      participantUserDocs.set(participant.id, userDoc);
       if (participant.id !== user.id) {
-        participantDoc.unreadMessagesCount += 1;
+        userDoc.unreadMessagesCount += 1;
       }
-      const socketIdsList = getOnlineUsers().get(participant.id);
-      if (socketIdsList) {
-        //  if the user is online send a message by socket and
-        socketIdsList.map((socketId) => {
+    }
+
+    // Persist conversation after unread counters updated
+    await conversation.save();
+
+    // Handle undelivered logic & socket emission
+    for (const participant of conversation.participants) {
+      const participantDoc = participantUserDocs.get(participant.id);
+      const socketIdsList = onlineUsersMap.get(participant.id);
+      if (socketIdsList && socketIdsList.length > 0) {
+        // Emit to each active socket
+        for (const socketId of socketIdsList) {
           getServerSocketInstance().to(socketId).emit("send-message", {
             conversationId: conversation.id,
-            message: message,
+            message,
             unreadMessagesCount: participant.unreadMessagesCount,
             updatedAt: conversation.updatedAt,
           });
-        });
-      } else {
-        // only for receivers
-        if (participantDoc.id !== user.id) {
-          /*
-          if recipient is not online then add the the conversation 
-          id with undelivered messages to user.undeliveredConversations
-          */
-          const undeliveredConversation =
-            participantDoc.undeliveredConversations.id(conversation.id);
-          /*
-          if the conversation is already exist, add the message to it otherwise 
-          create a new conversation and then add the message to it 
-          */
-          if (undeliveredConversation) {
-            undeliveredConversation.messages.unshift({ _id: message._id });
-          } else {
-            participantDoc.undeliveredConversations.addToSet({
-              _id: conversation._id,
-              participants: conversation.participants,
-              messages: [{ _id: message._id }],
-            });
-          }
+        }
+      } else if (participant.id !== user.id) {
+        // Offline receiver: track undelivered
+        const undeliveredConversation =
+          participantDoc.undeliveredConversations.id(conversation.id);
+        if (undeliveredConversation) {
+          undeliveredConversation.messages.unshift({ _id: message._id });
+        } else {
+          participantDoc.undeliveredConversations.addToSet({
+            _id: conversation._id,
+            participants: conversation.participants,
+            messages: [{ _id: message._id }],
+          });
         }
       }
       await participantDoc.save();
-    });
-    await conversation.save();
-    //
-    return res.status(201).send("success");
+    }
+
+    return res.status(201).json({ messageId: message._id });
   } catch (err) {
     return handleError(err, res);
   }
@@ -147,7 +154,9 @@ export const deleteMessage = async (req, res) => {
     */
     if (message.info.readBy.length === 1) {
       conversation.participants.id(participantId).unreadMessagesCount -= 1;
-      participantProfile.unreadMessagesCount -= 1;
+      if (participantProfile.unreadMessagesCount > 0) {
+        participantProfile.unreadMessagesCount -= 1;
+      }
     }
     /*
     if the message is not delivered to the other participant then delete
@@ -174,12 +183,15 @@ export const deleteMessage = async (req, res) => {
     the user's ID from "to" property.
     */
     if (forEveryone === "true" || message.to.length === 1) {
-      message.deleteOne();
+      await message.deleteOne();
     } else {
-      message.to.id(user._id).deleteOne();
+      await message.updateOne({ $pull: { to: { _id: user._id } } });
     }
-    if (conversation.messages[0]) {
-      conversation.updatedAt = conversation.messages[0].createdAt;
+    const lastMessage = await Message.findOne({
+      conversation: conversation.id,
+    }).sort({ createdAt: -1 });
+    if (lastMessage) {
+      conversation.updatedAt = lastMessage.createdAt;
     } else {
       conversation.updatedAt = null;
     }

@@ -37,20 +37,20 @@ const CreatePost = () => {
               className="cursor-pointer h-[2.75rem] text-ellipsis overflow-clip rounded-xl bg-300 p-2 w-full shadow-md"
               style={{ lineHeight: 2 }}
             >
-              {data.text || "Type Anything!"}
+              Share something...
             </div>
           </div>
           <div className="flex items-center">
             <div
               onClick={() => setIsOpened(!isOpened)}
-              className="icon-hover text-hovered p-3 flex items-center gap-3 cursor-pointer w-full justify-center"
+              className="p-3 flex items-center gap-3 cursor-pointer w-full justify-center"
             >
               <PhotoIcon className="w-7" /> Photo
             </div>
             <span className={`bg-inverse h-7 w-[1px] opacity-10`}></span>
             <div
               onClick={() => setIsOpened(!isOpened)}
-              className="icon-hover text-hovered p-3 flex items-center gap-3 cursor-pointer w-full justify-center"
+              className="p-3 flex items-center gap-3 cursor-pointer w-full justify-center"
             >
               <VideoIcon className="w-7" /> Video
             </div>

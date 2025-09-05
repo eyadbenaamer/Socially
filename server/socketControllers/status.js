@@ -7,6 +7,7 @@ import {
 import User from "../models/user.js";
 import Conversation from "../models/conversation.js";
 import Profile from "../models/profile.js";
+import Message from "../models/message.js";
 
 export const connectHandler = async (socket, io) => {
   console.log(`New socket connection connected: ${socket.id}`);
@@ -14,55 +15,62 @@ export const connectHandler = async (socket, io) => {
 
   const user = await User.findById(socket.user?.id);
   const profile = await Profile.findById(socket.user?.id);
-  if (user) {
-    addConnectedUser(user.id, socket.id);
-    // once the user is connected the lastSeenAt will be null
-    profile.lastSeenAt = null;
-    await profile.save();
-    await user.save();
-    // send activity status to all user's contacts once the user is online
-    const { contacts } = user;
-    contacts.map((contact) => {
-      const socketIdsList = getOnlineUsers().get(contact.id);
-      socketIdsList?.map((socketId) => {
-        io.to(socketId).emit("contact-connected", { id: user.id });
-      });
+
+  if (!(user && profile)) return;
+
+  addConnectedUser(user.id, socket.id);
+  // once the user is connected the lastSeenAt will be null
+  profile.lastSeenAt = null;
+  await profile.save();
+
+  // send activity status to all user's contacts once the user is online
+  const { contacts } = user;
+  contacts.map((contact) => {
+    const socketIdsList = getOnlineUsers().get(contact.id);
+    socketIdsList?.map((socketId) => {
+      io.to(socketId).emit("contact-connected", { id: user.id });
     });
+  });
 
-    //set all undelivered messages to delivered when the user connects
-    for (const undeliveredConversation of user.undeliveredConversations.slice()) {
-      const conversation = await Conversation.findById(
-        undeliveredConversation.id
-      );
-      if (!conversation) {
-        user.undeliveredConversations.pull(undeliveredConversation._id);
-        continue;
-      }
-      const messagesInfo = [];
-      undeliveredConversation.messages.map((item) => {
-        const message = conversation.messages.id(item._id);
-        message?.info.deliveredTo.addToSet({ _id: user._id });
-        messagesInfo.push({ _id: message.id, info: message.info });
-      });
-
-      await conversation.save();
-
-      // delete this undelivered conversation from undeliveredConversations array
+  //set all undelivered messages to delivered when the user connects
+  for (const undeliveredConversation of user.undeliveredConversations.slice()) {
+    const conversation = await Conversation.findById(
+      undeliveredConversation.id
+    );
+    if (!conversation) {
       user.undeliveredConversations.pull(undeliveredConversation._id);
+      continue;
+    }
+    const messagesInfo = [];
+    for (const item of undeliveredConversation.messages) {
+      const message = await Message.findById(item._id);
 
-      // after setting deliverdTo to all messages, send them to the participants
-      conversation.participants.map((participant) => {
-        const socketIdsList = getOnlineUsers().get(participant.id);
-        socketIdsList?.map((socketId) => {
-          io.to(socketId).emit("update-conversation", {
-            conversationId: conversation.id,
-            messagesInfo,
-          });
+      if (!message) continue;
+
+      if (!message.info.deliveredTo.id(user._id)) {
+        message.info.deliveredTo.push({ _id: user._id });
+      }
+      await message.save();
+      messagesInfo.push({ _id: message.id, info: message.info });
+    }
+
+    await conversation.save();
+
+    // delete this undelivered conversation from undeliveredConversations array
+    user.undeliveredConversations.pull(undeliveredConversation._id);
+
+    // after setting deliverdTo to all messages, send them to the participants
+    conversation.participants.map((participant) => {
+      const socketIdsList = getOnlineUsers().get(participant.id);
+      socketIdsList?.map((socketId) => {
+        io.to(socketId).emit("update-conversation", {
+          conversationId: conversation.id,
+          messagesInfo,
         });
       });
-    }
-    await user.save();
+    });
   }
+  await user.save();
 };
 
 export const disconnectHandler = async (socket, io) => {

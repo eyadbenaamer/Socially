@@ -5,18 +5,13 @@ import User from "../models/user.js";
 import Profile from "../models/profile.js";
 
 import { generateCode } from "../utils/generateCode.js";
-
 import {
   sendAccountVerificationCode,
   sendResetPasswordCode,
 } from "../utils/sendEmail.js";
-import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { handleError } from "../utils/errorHandler.js";
 
-/*REGISTER USER*/
-
 export const signup = async (req, res) => {
-  //TODO: set validatior for this route
   try {
     let { firstName, lastName, email, password, birthDate, gender } = req.body;
     firstName = firstName.trim();
@@ -66,25 +61,25 @@ export const signup = async (req, res) => {
     newProfile.save();
 
     return res.status(201).send("user created.");
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. please try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 export const checkEmailForRegister = async (req, res) => {
   try {
     const { email } = req.params;
-    const user = await User.findOne({ email });
+    const user = await User.exists({ email });
     if (user) {
-      res.status(409).json({ message: "This email address is registered." });
+      res
+        .status(200)
+        .json({ success: false, message: "This email address is registered." });
     } else {
-      res.status(200).json({ message: "This email is available." });
+      res
+        .status(200)
+        .json({ success: true, message: "This email is available." });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. please try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -101,10 +96,8 @@ export const checkEmailForResetPassword = async (req, res) => {
         .status(409)
         .json({ message: "This email address is not registered." });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. please try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -166,27 +159,17 @@ export const login = async (req, res) => {
     const profile = await Profile.findById(user.id);
 
     // send the users's contact with activity status
-    const onlineUsers = getOnlineUsers();
-    const contacts = [];
-    for (let i = 0; i < user.contacts.length; i++) {
-      const contact = user.contacts[i];
-      if (onlineUsers.get(contact.id)) {
-        contacts.push({
-          _id: contact.id,
-          conversationId: contact.conversationId,
-          isOnline: true,
-          lastSeenAt: null,
-        });
-      } else {
-        const contactProfile = await Profile.findById(contact.id);
-        contacts.push({
-          _id: contact.id,
-          conversationId: contact.conversationId,
-          isOnline: false,
-          lastSeenAt: contactProfile.lastSeenAt,
-        });
-      }
-    }
+    const profiles = await Profile.find({
+      _id: { $in: user.contacts.map((c) => c._id) },
+    }).select(
+      "id firstName lastName username profilePicPath coverPicPath bio gender followersCount followingCount lastSeenAt"
+    );
+    const contacts = profiles.map((profile) => ({
+      ...profile.toObject(),
+      conversationId: user.contacts.find((c) => c.id === profile.id)
+        .conversationId,
+      isOnline: profile.lastSeenAt ? false : true,
+    }));
 
     return res.status(200).json({
       isVerified,
@@ -196,10 +179,8 @@ export const login = async (req, res) => {
       unreadMessagesCount: user.unreadMessagesCount,
       unreadNotificationsCount: user.unreadNotificationsCount,
     });
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 export const loginWithToken = async (req, res) => {
@@ -210,44 +191,27 @@ export const loginWithToken = async (req, res) => {
         token = token.trimStart().slice(7);
       }
       const userInfo = jwt.verify(token, process.env.JWT_SECRET);
-      const profile = await Profile.findById(userInfo.id);
-      if (!profile) {
-        return res.status(404).json({ message: "User not found." });
-      }
       // send the users's contact with activity status
-      const onlineUsers = getOnlineUsers();
-      const contacts = [];
       const user = await User.findById(userInfo.id);
-      for (let i = 0; i < user.contacts.length; i++) {
-        const contact = user.contacts[i];
-        if (onlineUsers.get(contact.id)) {
-          contacts.push({
-            _id: contact.id,
-            conversationId: contact.conversationId,
-            isOnline: true,
-            lastSeenAt: null,
-          });
-        } else {
-          const contactProfile = await Profile.findById(contact.id);
-          contacts.push({
-            _id: contact.id,
-            conversationId: contact.conversationId,
-            isOnline: false,
-            lastSeenAt: contactProfile.lastSeenAt,
-          });
-        }
-      }
+      const profiles = await Profile.find({
+        _id: { $in: user.contacts.map((c) => c._id) },
+      }).select(
+        "id firstName lastName username profilePicPath coverPicPath bio gender followersCount followingCount lastSeenAt"
+      );
+      const contacts = profiles.map((profile) => ({
+        ...profile.toObject(),
+        conversationId: user.contacts.find((c) => c.id === profile.id)
+          .conversationId,
+        isOnline: profile.lastSeenAt ? false : true,
+      }));
       return res.status(200).json({
-        profile,
         contacts,
         unreadMessagesCount: user.unreadMessagesCount,
         unreadNotificationsCount: user.unreadNotificationsCount,
       });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 export const verifyAccountByCode = async (req, res) => {
@@ -293,10 +257,8 @@ export const verifyAccountByCode = async (req, res) => {
     } catch {
       return res.status(401).json({ message: "jwt expired" });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 export const verifyAccountByToken = async (req, res) => {
@@ -330,10 +292,8 @@ export const verifyAccountByToken = async (req, res) => {
     } else {
       return res.status(400).send("Bad Request");
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -380,10 +340,8 @@ export const resetPassword = async (req, res) => {
         .status(401)
         .json({ message: "Link is expired.", isExpired: true });
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 
@@ -424,10 +382,8 @@ export const sendVerificationCode = async (req, res) => {
     } else {
       return res.status(400).send("Bad request");
     }
-  } catch {
-    return res
-      .status(500)
-      .json({ message: "An error occurred. try again later." });
+  } catch (err) {
+    return handleError(err, res);
   }
 };
 

@@ -8,7 +8,8 @@ import convertToUnit from "utils/convertToUnit";
 import { ReactComponent as CommentIcon } from "assets/icons/comments.svg";
 
 const Comments = () => {
-  const { comments, setShowComments, commentInput } = useContext(PostContext);
+  const { commentsCount, setShowComments, commentInput } =
+    useContext(PostContext);
 
   const windowWidth = useWindowWidth();
 
@@ -26,15 +27,10 @@ const Comments = () => {
             commentInput.current.focus();
           }
         }}
-        className="flex w-full gap-1 outline-none transition hover:text-[var(--primary-color)]"
+        className="flex w-full gap-2 outline-none transition hover:text-[var(--primary-color)]"
       >
         <CommentIcon className="w-6" />
-        {windowWidth > 100 && (
-          <>
-            {convertToUnit(comments.length)}{" "}
-            {comments.length === 1 ? "Comment" : "Comments"}
-          </>
-        )}
+        {windowWidth > 100 && <>{convertToUnit(commentsCount)} </>}
       </button>
     </div>
   );

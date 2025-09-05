@@ -1,39 +1,38 @@
-import { useContext } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
-import { setProfile as setMyProfile } from "state";
-import { ProfileContext } from "..";
-
+import { useDispatch } from "react-redux";
+import { setShowMessage } from "state";
 import axiosClient from "utils/AxiosClient";
 
 const RemoveFollowerBtn = (props) => {
-  const { id } = props;
-  const { _id: profileId, setProfile } = useContext(ProfileContext);
-  const myProfileId = useSelector((state) => state.profile)?._id;
+  const { id, setFollowers, setCount } = props;
+
   const dispatch = useDispatch();
+
   const followToggle = () => {
     axiosClient
       .patch(`/profile/remove_follower?userId=${id}`)
-      .then((response) => {
-        // update following list only if this is the loggedin user's profile
-        if (myProfileId === profileId) {
-          setProfile(response.data);
+      .catch((err) => {
+        if (err.response) {
+          dispatch(
+            setShowMessage({
+              message: err.response.data?.message,
+              type: "error",
+            })
+          );
         }
-        dispatch(setMyProfile(response.data));
+      })
+      .finally(() => {
+        setCount((prev) => prev - 1);
+        setFollowers((prev) => prev.filter((profile) => profile._id !== id));
       });
   };
+
   return (
-    <>
-      {/* only show "remove follower" button for loggedin user */}
-      {profileId === myProfileId && (
-        <button
-          className="py-1 px-3 rounded-xl bg-alt shadow-md"
-          onClick={followToggle}
-        >
-          Remove
-        </button>
-      )}
-    </>
+    <button
+      className="py-1 px-3 rounded-xl bg-alt shadow-md text-sm"
+      onClick={followToggle}
+    >
+      Remove
+    </button>
   );
 };
 

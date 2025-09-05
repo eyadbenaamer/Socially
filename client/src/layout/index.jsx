@@ -8,13 +8,13 @@ const Layout = ({ children }) => {
 
   return (
     <>
-      <div className="grid grid-cols-10 pt-5">
+      <div className="grid grid-cols-12 pt-5 pb-28">
         {windowWidth >= 1024 && (
-          <div className="sidebar flex justify-center col-span-2">
+          <div className="sidebar flex justify-center col-span-3">
             <Sidebar />
           </div>
         )}
-        <div className="content sm:col-span-10 md:mx-0 lg:col-span-6 col-span-10 px-3">
+        <div className="content col-span-12 md:col-span-10 md:col-start-2 lg:col-span-8 xl:col-span-6">
           {children}
         </div>
       </div>

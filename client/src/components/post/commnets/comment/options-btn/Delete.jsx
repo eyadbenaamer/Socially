@@ -16,22 +16,50 @@ const Delete = ({ commentId }) => {
   const { openDialog, closeDialog } = useDialog();
 
   const dispatch = useDispatch();
-  const { setPost } = useContext(PostContext);
+  const { setComments, setPost } = useContext(PostContext);
 
   const deleteComment = async () => {
     await axiosClient
       .delete(
         `comment/delete?userId=${creatorId}&postId=${postId}&commentId=${commentId}`
       )
-      .then((response) => {
+      .then(() => {
+        setComments((prev) =>
+          prev.filter((comment) => comment._id !== commentId)
+        );
+        setPost((prev) => ({
+          ...prev,
+          commentsCount: prev.commentsCount - 1,
+        }));
+        dispatch(setShowMessage({ message: "Comment deleted.", type: "info" }));
+      })
+      .catch((err) => {
+        if (err.response) {
+          setPost((prev) => ({
+            ...prev,
+            commentsCount: prev.commentsCount - 1,
+          }));
+          setComments((prev) =>
+            prev.filter((comment) => comment._id !== commentId)
+          );
+          dispatch(
+            setShowMessage({
+              message: err.response.data.message,
+              type: "error",
+            })
+          );
+        } else {
+          dispatch(
+            setShowMessage({
+              message: "An error occurred. Please try again later.",
+              type: "error",
+            })
+          );
+        }
+      })
+      .finally(() => {
         document.body.style = null;
         closeDialog();
-        setPost(response.data);
-        dispatch(setShowMessage("Comment deleted."));
-
-        // Optionally, update the post with new comment data
-        // You can also choose to update the local post data or refetch it
-        // setPost(response.data);
       });
   };
 

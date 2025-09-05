@@ -16,6 +16,7 @@ import { initializeElasticsearch } from "./utils/reindexProfiles.js";
 import authRoute from "./routes/auth.js";
 import profileRoute from "./routes/profile.js";
 import userRoute from "./routes/user.js";
+import savedPostRoute from "./routes/savedPost.js";
 import postsRoute from "./routes/posts.js";
 import postRoute from "./routes/post.js";
 import commentRoute from "./routes/comment.js";
@@ -33,7 +34,7 @@ import {
 } from "./controllers/post.js";
 import { add as addComment } from "./controllers/comment.js";
 import { add as addReply } from "./controllers/reply.js";
-import { sendMessage } from "./controllers/message.js";
+import { create } from "./controllers/message.js";
 
 import { verifyToken } from "./middleware/auth.js";
 import { verifyId } from "./middleware/check.js";
@@ -91,7 +92,7 @@ app.post(
   "/api/post/create",
   verifyId,
   verifyToken,
-  upload.fields([{ name: "media", maxCount: 5 }]),
+  upload.fields([{ name: "media", maxCount: 100 }]),
   compressImages,
   createPost
 );
@@ -111,7 +112,7 @@ app.post(
   compressImages,
   getConversationInfo,
   isInChat,
-  sendMessage
+  create
 );
 app.post(
   "/api/message/send_first_time",
@@ -120,7 +121,7 @@ app.post(
   upload.fields([{ name: "media", maxCount: 10 }]),
   compressImages,
   newConversationByMessaging,
-  sendMessage
+  create
 );
 app.post(
   "/api/message/reply",
@@ -130,7 +131,7 @@ app.post(
   compressImages,
   getConversationInfo,
   isInChat,
-  sendMessage
+  create
 );
 app.post(
   "/api/comment/add",
@@ -152,6 +153,7 @@ app.post(
 );
 /*ROUTES*/
 app.use("/api/", userRoute);
+app.use("/api/", savedPostRoute);
 app.use("/api/", authRoute);
 app.use("/api/home", getFeedPosts);
 app.use("/api/profile", profileRoute);

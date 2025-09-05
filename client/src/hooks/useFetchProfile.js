@@ -10,7 +10,7 @@ const useFetchProfile = (id) => {
         .then((response) => {
           setProfile(response.data);
         })
-        .catch((err) => setProfile({ notfound: true }));
+        .catch(() => setProfile({ notfound: true }));
     }
   }, [id]);
   return [profile, setProfile];

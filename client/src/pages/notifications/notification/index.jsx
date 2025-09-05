@@ -8,21 +8,39 @@ import axiosClient from "utils/AxiosClient";
 import Time from "components/time";
 
 const Notification = (props) => {
-  const { _id: id, path, content, userId, type, isRead, createdAt } = props;
+  const { _id: id, path, engagedUser, type, isRead, createdAt } = props;
   const theme = useSelector((state) => state.settings.theme);
+
+  const content = `${engagedUser?.firstName} ${
+    type === "follow"
+      ? "followed you"
+      : type === "comment"
+      ? "commented on your post"
+      : type === "reply"
+      ? "replied on your comment"
+      : type === "share"
+      ? "shared your post"
+      : type === "postLike"
+      ? "liked your post"
+      : type === "commentLike"
+      ? "liked your comment"
+      : type === "replyLike"
+      ? "liked your reply"
+      : ""
+  }`;
 
   return (
     <div className="flex gap-5 items-center bg-hovered rounded-lg transition p-2">
       <Link
         onClick={() => {
           if (!isRead) {
-            axiosClient.patch(`notifications/set_read/${id}`);
+            axiosClient.patch(`notifications/set_read/${id}`).catch(() => {});
           }
         }}
         to={path}
         className="flex gap-3 items-center flex-grow"
       >
-        <Picture userId={userId} notificationType={type} />
+        <Picture profile={engagedUser} notificationType={type} />
         <div>
           <div className={`${!isRead ? "font-bold" : ""}`}>{content}</div>
           <div

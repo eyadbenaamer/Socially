@@ -13,7 +13,8 @@ const SetRead = (props) => {
   const deleteMessage = async () => {
     await axiosClient
       .patch(`notifications/set_read/${id}`)
-      .then(() => dispatch(setNotificationIsRead(id)));
+      .catch(() => {})
+      .finally(() => dispatch(setNotificationIsRead(id)));
   };
 
   return (

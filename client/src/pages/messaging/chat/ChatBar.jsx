@@ -11,8 +11,7 @@ import { ReactComponent as ArrowLeftIcon } from "assets/icons/arrow-left.svg";
 
 const ChatBar = () => {
   const { userId } = useParams();
-  const { participant, participantProfile, conversation } =
-    useContext(SelectedChatContext);
+  const { participant, conversation } = useContext(SelectedChatContext);
   const [nonContactProfile] = useFetchProfile(userId);
 
   const lastSeenAt = useGetTime(participant?.lastSeenAt);
@@ -22,7 +21,7 @@ const ChatBar = () => {
       <Link to={"/messages"} className="block w-8 icon py-2">
         <ArrowLeftIcon fill="currentColor" />
       </Link>
-      {!participantProfile && !nonContactProfile && (
+      {!participant && !nonContactProfile && (
         <>
           <div className="circle w-12 loading"></div>
           <div className="flex flex-col justify-center gap-2">
@@ -31,17 +30,17 @@ const ChatBar = () => {
           </div>
         </>
       )}
-      {participantProfile && (
+      {participant && (
         <>
           <span className="w-12">
-            <UserPicture profile={participantProfile} />
+            <UserPicture profile={participant} />
           </span>
           <div className="flex flex-col justify-around">
             <Link
-              to={`/profile/${participantProfile.username}`}
+              to={`/profile/${participant.username}`}
               className="font-bold hover:underline"
             >
-              {participantProfile.firstName} {participantProfile.lastName}
+              {participant.firstName} {participant.lastName}
             </Link>
             {conversation?.isTyping ? (
               <span className="text-xs text-primary">Typing...</span>
@@ -61,7 +60,7 @@ const ChatBar = () => {
         </>
       )}
 
-      {!participantProfile && nonContactProfile && (
+      {!participant && nonContactProfile && (
         <>
           <span className="w-12">
             <UserPicture profile={nonContactProfile} />

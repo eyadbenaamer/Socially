@@ -18,17 +18,12 @@ const Post = () => {
         const response = await axiosClient(`post?postId=${postId}`);
         setPost(response.data);
       } catch (error) {
-        setPost("not found");
+        navigate("/not-found", { replace: true });
       }
     };
 
     fetchPost();
   }, [postId]);
-
-  if (post === "not found") {
-    navigate("/not-found", { replace: true });
-    return null;
-  }
 
   return (
     <div className="container lg:w-1/2 md:w-2/3 pt-5 px-2 pb-28">

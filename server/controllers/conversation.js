@@ -5,6 +5,7 @@ import User from "../models/user.js";
 import { getServerSocketInstance } from "../socket/socketServer.js";
 import { getOnlineUsers } from "../socket/onlineUsers.js";
 import { handleError } from "../utils/errorHandler.js";
+import Message from "../models/message.js";
 
 const { ObjectId } = Types;
 
@@ -23,6 +24,19 @@ export const getAll = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "messages",
+          localField: "_id",
+          foreignField: "conversationId",
+          as: "messages",
+          pipeline: [
+            { $match: { to: { $elemMatch: { _id: user._id } } } },
+            { $sort: { createdAt: -1 } },
+            { $limit: 1 },
+          ],
+        },
+      },
+      {
         $addFields: {
           unreadMessagesCount: {
             $arrayElemAt: [
@@ -36,6 +50,7 @@ export const getAll = async (req, res) => {
               0,
             ],
           },
+          messages: "$messages",
         },
       },
       {
@@ -45,28 +60,7 @@ export const getAll = async (req, res) => {
           unreadMessagesCount: {
             $ifNull: ["$unreadMessagesCount.unreadMessagesCount", 0],
           },
-          messages: {
-            $slice: [
-              {
-                $filter: {
-                  input: "$messages",
-                  as: "message",
-                  cond: {
-                    $anyElementTrue: {
-                      $map: {
-                        input: "$$message.to",
-                        as: "to",
-                        in: {
-                          $eq: ["$$to._id", user._id],
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              1,
-            ],
-          },
+          messages: 1,
           updatedAt: 1,
         },
       },
@@ -75,9 +69,16 @@ export const getAll = async (req, res) => {
           updatedAt: -1,
         },
       },
+      { $limit: 10 },
+      { $skip: page > 0 ? (page - 1) * 10 : 0 },
     ]);
 
-    conversations = conversations.slice((page - 1) * 10, page * 10);
+    conversations = conversations.map((conv) => {
+      if (conv.messages.length === 0) {
+        conv.updatedAt = null;
+      }
+      return conv;
+    });
     return res.status(200).json(conversations);
   } catch (err) {
     return handleError(err, res);
@@ -90,7 +91,7 @@ export const getOne = async (req, res) => {
     const { user } = req;
 
     page = parseInt(page);
-    page = page ? page : 1;
+    page = page && page > 0 ? page : 1;
 
     const conversation = await Conversation.aggregate([
       {
@@ -100,38 +101,34 @@ export const getOne = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "messages",
+          localField: "_id",
+          foreignField: "conversationId",
+          as: "messages",
+          pipeline: [
+            {
+              $match: {
+                to: { $elemMatch: { _id: user._id } },
+              },
+            },
+            { $sort: { createdAt: -1 } },
+            { $skip: (page - 1) * 10 },
+            { $limit: 10 },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          messages: "$messages",
+        },
+      },
+      {
         $project: {
           _id: 1,
           participants: 1,
           updatedAt: 1,
-          messages: {
-            $slice: [
-              {
-                $filter: {
-                  input: "$messages",
-                  as: "message",
-                  cond: {
-                    $anyElementTrue: {
-                      $map: {
-                        input: "$$message.to",
-                        as: "to",
-                        in: {
-                          $eq: ["$$to._id", user._id],
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              (page - 1) * 10,
-              10,
-            ],
-          },
-        },
-      },
-      {
-        $sort: {
-          updatedAt: -1,
+          messages: 1,
         },
       },
     ]);
@@ -148,31 +145,36 @@ export const setRead = async (req, res) => {
     if (!conversation) {
       return res.status(404).json({ message: "Conversation not found." });
     }
-
-    let index = 0;
+    const par = conversation.participants.id(user.id);
     const messagesInfo = [];
-    while (true) {
-      const message = conversation.messages[index];
-      if (!message) {
-        user.unreadMessagesCount -= index;
-        await user.save();
-        break;
-      }
-      const isRead = Boolean(message.info.readBy.id(user.id));
-      if (!isRead) {
-        message.info.readBy.addToSet(user.id);
-        conversation.participants.id(user.id).unreadMessagesCount -= 1;
-        messagesInfo.push({ _id: message.id, info: message.info });
-        index++;
-      } else {
-        user.unreadMessagesCount -= index;
-        await user.save();
-        break;
-      }
-    }
+    // if the last read message id is unset then the id will be the minimum ObjectId
+    const lastReadMessageId =
+      par.lastReadMessageId ?? new ObjectId("000000000000000000000000");
+
+    const unreadMessages = await Message.find({
+      conversationId: conversation._id,
+      _id: { $gt: lastReadMessageId },
+      to: { $elemMatch: { _id: user._id } },
+    }).sort({ _id: 1 });
+
+    unreadMessages.forEach((message) => {
+      message.info.readBy.addToSet(user.id);
+      message.info.deliveredTo.addToSet(user.id);
+      par.unreadMessagesCount -= 1;
+      messagesInfo.push({ _id: message.id, info: message.info });
+    });
+
+    par.lastReadMessageId = unreadMessages[unreadMessages.length - 1]._id;
     await conversation.save();
+
+    await Message.bulkSave(unreadMessages);
+
+    user.unreadMessagesCount -= unreadMessages?.length;
+    await user.save();
+
     conversation.participants.map((participant) => {
       const socketIdsList = getOnlineUsers().get(participant.id);
+
       if (!socketIdsList) return;
 
       socketIdsList.map((socketId) => {
@@ -247,8 +249,8 @@ export const clear = async (req, res) => {
         });
         participant.unreadMessagesCount = 0;
       });
-      // clrear all messages
-      conversation.messages = [];
+      // clear all messages
+      await Message.deleteMany({ conversationId: conversation._id });
       await conversation.save();
 
       //send the clearance of the conversations to all participants
@@ -267,19 +269,23 @@ export const clear = async (req, res) => {
     }
 
     conversation.participants.id(user.id).unreadMessagesCount = 0;
-
-    conversation.messages.map((message) => {
-      /*
-      if the message is deleted for everyone except this user, then delete the entire 
-      message instead of just deleting the user's ID from "to property
-       */
-      if (message.to.length === 1) {
-        message.deleteOne();
-      } else {
-        message.to.id(user._id).deleteOne();
-      }
-    });
     await conversation.save();
+    /*
+    if the message is deleted for everyone except this user, then delete the entire 
+    message instead of just deleting the user's ID from "to property
+     */
+    await Message.deleteMany({
+      conversationId: conversation._id,
+      to: { $size: 1 },
+    });
+
+    await Message.updateMany(
+      {
+        conversationId: conversation._id,
+        $expr: { $gt: [{ $size: "$to" }, 1] },
+      },
+      { $pull: { to: { _id: user._id } } }
+    );
 
     /*
     send the clearance of the conversations only to 

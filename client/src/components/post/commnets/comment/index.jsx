@@ -1,131 +1,136 @@
-import { useContext, useState } from "react";
-import { useSelector } from "react-redux";
+import { createContext, useContext, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-
-import useFetchProfile from "hooks/useFetchProfile";
-import useGetTime from "hooks/useGetTime";
 
 import Replies from "./replies";
 import OptionsBtn from "./options-btn";
 import Media from "./Media";
 
-import { PostContext } from "components/post";
+import Like from "./Like";
 import UserPicture from "components/UserPicture";
-import AddComment from "components/post/AddComment";
-import Like from "components/post/reactions-bar/Like";
 import Text from "components/Text";
 
+import { PostContext } from "components/post";
+import useGetTime from "hooks/useGetTime";
 import convertToUnit from "utils/convertToUnit";
 
 import { ReactComponent as CommentIcon } from "assets/icons/comments.svg";
+import HoverWrapper from "components/user-hover-card/HoverWrapper";
+
+export const CommentContext = createContext();
 
 const Comment = (props) => {
   const {
-    comment: { _id: id, createdAt, creatorId, likes, replies, file, text },
+    comment: {
+      _id: id,
+      createdAt,
+      creatorId,
+      isLiked,
+      profile,
+      file,
+      text,
+      likesCount,
+    },
   } = props;
   const [searchParams] = useSearchParams();
-  const replyId = searchParams.get("replyId");
+  const replyIdParam = searchParams.get("replyId");
+  const commentIdParam = searchParams.get("commentId");
 
   const post = useContext(PostContext);
-  const myProfile = useSelector((state) => state.profile);
-  const [postCreatorProfile] = useFetchProfile(creatorId);
-  const currentUser = useSelector((state) => state.profile);
+
+  const [repliesCount, setRepliesCount] = useState(props.comment.repliesCount);
   const [isModifying, setIsModifying] = useState(false);
-  const [showReplies, setShowReplies] = useState(Boolean(replyId));
+  const [isSearchReplyRendered, setIsSearchReplyRendered] = useState(false);
+
+  const [showReplies, setShowReplies] = useState(
+    Boolean(replyIdParam) && commentIdParam === id
+  );
   const time = useGetTime(createdAt);
+  if (!(props.comment && profile)) return null;
 
   return (
-    <>
-      {props.comment && postCreatorProfile && (
-        <div className="flex flex-col gap-2 rounded-xl items-start justify-start">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-2 items-start">
-              <span className="w-12">
-                <UserPicture profile={postCreatorProfile} />
-              </span>
-              <div className="flex flex-col gap-2">
-                <div className="flex gap-2">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex  items-center gap-2">
-                      <div
-                        className={`bg-300 rounded-xl shadow-md w-fit px-3 py-2`}
-                      >
+    <CommentContext.Provider value={{ setRepliesCount }}>
+      <div className="flex flex-col gap-2 rounded-xl items-start justify-start">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-2 items-start">
+            <span className="w-12">
+              <UserPicture profile={profile} />
+            </span>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`bg-300 rounded-xl shadow-md w-fit px-3 py-2 min-w-24 min-h-[68px]`}
+                    >
+                      <HoverWrapper profile={profile}>
                         <Link
-                          to={`/profile/${postCreatorProfile.username}`}
+                          to={`/profile/${profile.username}`}
                           className="hover:underline"
                         >
-                          {postCreatorProfile.firstName}{" "}
-                          {postCreatorProfile.lastName}
+                          {profile.firstName} {profile.lastName}
                         </Link>
-                        <Text
-                          postCreatorId={post.creatorId}
-                          text={text}
-                          type="comment"
-                          postId={post._id}
-                          commentId={id}
-                          isModifying={isModifying}
-                          setIsModifying={setIsModifying}
-                        />
-                      </div>
-                      <OptionsBtn
+                      </HoverWrapper>
+                      <Text
+                        postCreatorId={post.creatorId}
+                        text={text}
+                        type="comment"
+                        postId={post._id}
                         commentId={id}
-                        commentCreatorId={creatorId}
+                        isModifying={isModifying}
                         setIsModifying={setIsModifying}
-                        id={id}
                       />
                     </div>
-                    <Media>
-                      <div className="rounded-xl overflow-hidden w-fit">
-                        {file && file.fileType === "photo" && (
-                          <img src={file.path} alt="" />
-                        )}
-                        {file && file.fileType === "video" && (
-                          <video controls src={file.path} />
-                        )}
-                      </div>
-                    </Media>
+                    <OptionsBtn
+                      commentId={id}
+                      commentCreatorId={creatorId}
+                      setIsModifying={setIsModifying}
+                      id={id}
+                    />
                   </div>
-                </div>
-                <div className="flex gap-3 items-center justify-start">
-                  <Like
-                    likes={likes}
-                    type="comment"
-                    userId={post.creatorId}
-                    postId={post._id}
-                    commentId={id}
-                  />
-                  <button
-                    onClick={() => setShowReplies(!showReplies)}
-                    className="flex items-center gap-1 text-hovered transition text-slate-400"
-                  >
-                    <CommentIcon width={24} />
-                    {convertToUnit(replies.length)}
-                  </button>
-                  <span className="block text-xs text-slate-400">{time}</span>
-                </div>
-                {showReplies && (
-                  <div className="-ms-5">
-                    {replies && (
-                      <Replies
-                        commentCreator={postCreatorProfile}
-                        replies={replies}
-                      />
-                    )}
-                    <div className="-ms-6">
-                      {(!post.isCommentsDisabled ||
-                        myProfile?._id === post.creatorId) &&
-                        currentUser && (
-                          <AddComment type="reply" commentId={id} />
-                        )}
+                  <Media>
+                    <div className="rounded-xl overflow-hidden w-fit">
+                      {file && file.fileType === "photo" && (
+                        <img src={file.path} alt="" />
+                      )}
+                      {file && file.fileType === "video" && (
+                        <video controls src={file.path} />
+                      )}
                     </div>
-                  </div>
-                )}
+                  </Media>
+                </div>
+              </div>
+              <div className="flex gap-3 items-center justify-start">
+                <Like
+                  isLiked={isLiked}
+                  likesCount={likesCount}
+                  userId={post.creatorId}
+                  postId={post._id}
+                  commentId={id}
+                />
+                <button
+                  onClick={() => setShowReplies(!showReplies)}
+                  className="flex items-center gap-1 text-hovered transition text-slate-400"
+                >
+                  <CommentIcon width={24} />
+                  {convertToUnit(repliesCount)}
+                </button>
+                <span className="block text-xs text-slate-400">{time}</span>
+              </div>
+              <div className="-ms-5">
+                <Replies
+                  isSearchReplyRendered={isSearchReplyRendered}
+                  setIsSearchReplyRendered={setIsSearchReplyRendered}
+                  setRepliesCount={setRepliesCount}
+                  showReplies={showReplies}
+                  commentId={id}
+                  count={repliesCount}
+                />
               </div>
             </div>
           </div>
         </div>
-      )}
-    </>
+      </div>
+    </CommentContext.Provider>
   );
 };
 

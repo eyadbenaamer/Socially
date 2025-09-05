@@ -64,7 +64,7 @@ const Form = () => {
         );
       })
       .catch((error) => {
-        const { message, isVerified } = error.response.data;
+        const { message, isVerified } = error.response?.data;
         setMessage(message);
         if (isVerified === false) {
           sessionStorage.setItem("isNotVerified", true);

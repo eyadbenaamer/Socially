@@ -7,31 +7,30 @@ import UserPicture from "pages/messaging/UserPicture";
 import Status from "pages/messaging/chat/messages-area/message/Status";
 import OptionsBtn from "./options-btn";
 
-import useFetchProfile from "hooks/useFetchProfile";
-
 export const ConversationContext = createContext();
 
 const Conversation = ({ conversation }) => {
   const { conversationId } = useParams();
   const myProfile = useSelector((state) => state.profile);
+  const contacts = useSelector((state) => state.contacts);
   const theme = useSelector((state) => state.settings.theme);
 
   const participantId = conversation.participants?.find(
     (participant) => participant._id !== myProfile._id
   )._id;
-  const [participantProfile] = useFetchProfile(participantId);
+  const participant = contacts.find((contact) => contact._id === participantId);
   const { unreadMessagesCount } = conversation;
   const lastMessage = conversation.messages[0];
   const isOnline = useSelector((state) => state.contacts).find(
     (contact) => contact._id === participantId
   )?.isOnline;
 
-  if (!participantProfile) {
+  if (!participant) {
     return null;
   }
 
   return (
-    <ConversationContext.Provider value={{ participantProfile }}>
+    <ConversationContext.Provider value={{ participant }}>
       <div
         className={`group block ${
           conversationId === conversation._id ? "bg-alt" : ""
@@ -40,7 +39,7 @@ const Conversation = ({ conversation }) => {
         <div className="flex items-center gap-2 relative">
           {/* User Picture - Fixed width on all screens */}
           <Link to={`contact/${conversation._id}`} className="flex-shrink-0">
-            <UserPicture profile={participantProfile} isOnline={isOnline} />
+            <UserPicture profile={participant} isOnline={isOnline} />
           </Link>
 
           {/* Main Content - Flexible width */}
@@ -55,7 +54,7 @@ const Conversation = ({ conversation }) => {
                   unreadMessagesCount > 0 ? "font-semibold" : "font-medium"
                 } text-sm sm:text-base`}
               >
-                {participantProfile.firstName} {participantProfile.lastName}
+                {participant.firstName} {participant.lastName}
               </div>
               {unreadMessagesCount > 0 && (
                 <div className="flex-shrink-0 w-5 h-5 bg-primary text-white text-xs circle flex items-center justify-center font-medium">
