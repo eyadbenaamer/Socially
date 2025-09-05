@@ -8,7 +8,7 @@ import Post from "../models/post.js";
 import Comment from "../models/comment.js";
 import Reply from "../models/reply.js";
 import View from "../models/view.js";
-import PostLike from "../models/PostLike.js";
+import PostLike from "../models/postLike.js";
 import CommentLike from "../models/commentLike.js";
 import ReplyLike from "../models/replyLike.js";
 import Notification from "../models/notification.js";
