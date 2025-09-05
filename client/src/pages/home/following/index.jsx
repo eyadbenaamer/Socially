@@ -23,7 +23,7 @@ const Following = () => {
       });
   }, []);
 
-  if (!following && !error) return null;
+  if (following?.length === 0 && !error) return null;
 
   return (
     <section className="fixed flex flex-col gap-5 px-2 h-[80vh]">

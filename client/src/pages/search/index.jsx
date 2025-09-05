@@ -171,9 +171,9 @@ const Search = () => {
 
   return (
     <Layout>
-      <h1 className="text-2xl p-4 sticky top-[45px] bg-100 z-30">Search</h1>
+      <h1 className="text-2xl py-4 sticky top-[45px] bg-100 z-30">Search</h1>
       <div className="my-0 mx-auto">
-        <div className="flex flex-col gap-4 mx-2">
+        <div className="flex flex-col gap-4">
           <div className="relative" ref={searchBarRef}>
             <SearchBar
               value={inputValue}

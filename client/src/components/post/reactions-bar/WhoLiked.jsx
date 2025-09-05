@@ -11,11 +11,13 @@ import LoadingProfiles from "components/LoadingProfiles";
 const WhoLiked = (props) => {
   const { id, type } = props;
   const [likes, setLikes] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [cursor, setCursor] = useState(0);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       const url = `${type}/likes?id=${id}&cursor=${cursor}`;
       await axiosClient(url)
         .then((response) => {
@@ -26,7 +28,8 @@ const WhoLiked = (props) => {
               : cursor
           );
         })
-        .catch(() => setMessage("Failed to load likes."));
+        .catch(() => setMessage("Failed to load likes."))
+        .finally(() => setLoading(false));
     };
     fetchUsers();
   }, []);
@@ -35,9 +38,7 @@ const WhoLiked = (props) => {
     <div className="w-[90vw] md:w-[600px] p-2 min-h-[50vh]">
       <h1 className="pb-4 text-lg">Likes</h1>
       <ul className="flex flex-col gap-3">
-        {<LoadingProfiles />}
-        {/* {likes.length === 0 && !message && <LoadingProfiles />} */}
-
+        {loading && !message && <LoadingProfiles />}
         {likes?.map((profile) => (
           <li key={profile._id} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
